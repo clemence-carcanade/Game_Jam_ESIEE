@@ -254,6 +254,7 @@ class Niveau:
     hauteur: float = 0.0
     depart_chat: tuple = (100.0, 100.0)
     point: object = None            # convertit ancre/pixels image -> ecran
+    rampes: list = field(default_factory=list)   # pentes (x0,y0,x1,y1) en ecran
     faux_pieges: dict = field(default_factory=dict)   # lettre -> effet scripte
     message_piege: str = ""         # ce qu'on lit quand le piege s'arme
     message_mort: str = ""          # ce qu'on lit en grillant une vie
@@ -348,6 +349,10 @@ def construire_maison(definition) -> Niveau:
         largeur = (x1 - x0) * ech
         plate = _carre(largeur, 10, invisible, x_de((x0 + x1) / 2), y_de(y0) - 5, "plateforme")
         niveau.plateformes.append(plate)
+    niveau.rampes = [
+        (x_de(x0), y_de(y0), x_de(x1), y_de(y1))
+        for x0, y0, x1, y1 in getattr(maison, "RAMPES", [])
+    ]
 
     # l'objet a pousser
     if "objet" in definition:

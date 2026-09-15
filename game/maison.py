@@ -46,14 +46,12 @@ PLATEFORMES = [
     (1398, 215, 1550),           # l'arbre a chat, sommet
 ]
 
-# l'escalier peint monte de droite a gauche : base au salon (x~720, sol y=815),
-# sommet au palier de la cuisine (x~430, y=480). Chaque marche est un GRADIN
-# solide, assez bas pour se sauter : on monte marche apres marche.
-_MARCHES = 7
-for _i in range(_MARCHES):
-    _x = 720 - _i * 42                      # la marche recule vers la gauche
-    _haut = 762 - _i * 40                   # et monte de 40 px
-    SOLIDES.append((_x - 30, _haut, _x + 34, _haut + 38))
+# --- les rampes : on les monte en marchant, comme une pente -----------------
+# (x gauche, y du sol a gauche, x droite, y du sol a droite), pixels d'image.
+# L'escalier peint monte de la droite (bas, salon) vers la gauche (haut, palier).
+RAMPES = [
+    (430, 500, 720, 812),        # l'escalier salon -> palier de la cuisine
+]
 
 # --- les endroits qui ont un nom --------------------------------------------
 # un point (x, y du sol a cet endroit) en pixels de l'image

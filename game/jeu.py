@@ -63,6 +63,7 @@ class VueJeu(arcade.View):
             poussables=self.niveau.poussables,
             zones=self.niveau.zones,
             largeur_niveau=self.niveau.largeur,
+            rampes=getattr(self.niveau, "rampes", []),
         )
 
         self.gamelle = self.niveau.trouver_zone("gamelle")

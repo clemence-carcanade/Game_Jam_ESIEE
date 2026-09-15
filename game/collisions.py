@@ -85,6 +85,7 @@ class MoteurCollisions:
         gravite=C.GRAVITE,
         bas_du_niveau=None,
         largeur_niveau=None,
+        rampes=None,
     ):
         self.chat = chat
         self.murs = _en_listes(murs)
@@ -99,6 +100,7 @@ class MoteurCollisions:
         # Sans cette limite, un chat qui saute par-dessus le mur du bord se
         # retrouve à marcher à côté du niveau. Les bords sont durs, point.
         self.largeur_niveau = largeur_niveau
+        self.rampes = rampes or []
 
         # Les murs "durs" et les objets poussables sont délégués au moteur
         # d'arcade : il sépare déjà proprement horizontal et vertical.
@@ -120,7 +122,21 @@ class MoteurCollisions:
     # ------------------------------------------------------------------
     def est_au_sol(self) -> bool:
         """Le chat a-t-il quelque chose de solide sous les pattes ?"""
-        return self.moteur.can_jump(y_distance=SONDE_SOL) or self._touche_plateforme_dessous()
+        return (self.moteur.can_jump(y_distance=SONDE_SOL)
+                or self._touche_plateforme_dessous()
+                or self._hauteur_de_rampe() is not None)
+
+    def _hauteur_de_rampe(self):
+        """Altitude du dessus de la rampe sous le chat, ou None s'il n'y en a pas."""
+        for x0, y0, x1, y1 in self.rampes:
+            if x0 <= self.chat.center_x <= x1:
+                t = (self.chat.center_x - x0) / (x1 - x0)
+                y_sol = y0 + t * (y1 - y0)
+                # on s'accroche si les pattes sont proches de la pente : un peu
+                # en dessous (on monte la marche) ou juste au-dessus (on tombe)
+                if -C.TAILLE_TUILE <= self.chat.bottom - y_sol <= SONDE_SOL:
+                    return y_sol
+        return None
 
     def _touche_plateforme_dessous(self) -> bool:
         """On descend le chat de quelques pixels, on regarde, on le remet.
@@ -152,6 +168,7 @@ class MoteurCollisions:
         bas_precedent = self.chat.bottom
         self.moteur.update()                       # murs durs + gravité
         self._garder_dans_le_niveau()
+        self._poser_sur_rampe(descendre)
         plateforme = self._poser_sur_plateforme(bas_precedent, descendre)
         self._agripper_le_rebord(descendre)
 
@@ -178,6 +195,15 @@ class MoteurCollisions:
         if self.largeur_niveau is not None and self.chat.right > self.largeur_niveau:
             self.chat.right = self.largeur_niveau
             self.chat.change_x = 0
+
+    def _poser_sur_rampe(self, descendre: bool) -> None:
+        """Colle le chat a la pente : il la monte et la descend en marchant."""
+        if descendre or self.chat.change_y > 0:
+            return
+        y_sol = self._hauteur_de_rampe()
+        if y_sol is not None:
+            self.chat.bottom = y_sol
+            self.chat.change_y = 0
 
     # -- plateformes traversables ---------------------------------------
     def _poser_sur_plateforme(self, bas_precedent: float, descendre: bool):
