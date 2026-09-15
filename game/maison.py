@@ -1,81 +1,77 @@
 """La maison : le fond peint et sa geometrie de collision.
 
-Le decor n'est plus construit en tuiles : ``assets/images/fonds/maison.png``
-EST le niveau, et ce module decrit ou sont les sols, les murs et les meubles
-sur lesquels on peut marcher. Toutes les coordonnees sont en **pixels de
-l'image** (origine en haut a gauche, comme dans un editeur d'image) : pour les
-relever, on ouvre l'image et on lit la position au curseur.
+``assets/images/fonds/maison.png`` EST le decor. Ce module trace par-dessus les
+endroits ou le chat (et les autres) peuvent aller : les sols pleins, les
+plateformes traversables (planches et meubles), et les ANCRES nommees.
 
-Les sept niveaux partagent cette maison ; seuls les antagonistes, l'objet a
-pousser et le piege changent (voir les_niveaux.py). Les ANCRES nomment les
-endroits utiles pour ne pas semer des nombres partout.
+Toutes les coordonnees sont en pixels de l'image (origine en haut a gauche) :
+pour les relever, on ouvre l'image dans un editeur et on lit la position au
+curseur. Trois etages, relies par les plateformes flottantes du milieu.
 """
 
 FOND = "fonds/maison.png"
 LARGEUR_IMAGE = 1672
 HAUTEUR_IMAGE = 941
 
-# --- les sols et murs pleins : on ne les traverse jamais --------------------
-# (x gauche, y du dessus, x droite, y du dessous), en pixels de l'image
+# --- les sols pleins et murs : on ne les traverse jamais --------------------
+# (x gauche, y du dessus, x droite, y du dessous)
 SOLIDES = [
-    (28, 818, 1644, 852),        # le sol du rez-de-chaussee
-    (28, 272, 1140, 302),        # le plancher chambre + couloir de l'etage
-    (28, 545, 355, 575),         # le sol de la cuisine
-    (330, 480, 592, 508),        # le palier en haut de l'escalier
-    (700, 487, 1345, 512),       # la poutre au-dessus du salon
-    (1345, 460, 1644, 490),      # le sol de la chatterie
-    (1270, 185, 1596, 212),      # la corniche tout en haut a droite
-    (0, 40, 28, 852),            # le mur exterieur gauche
-    (1644, 40, 1672, 852),       # le mur exterieur droit
-    (0, 28, 1672, 45),           # le plafond
-    (1345, 212, 1368, 460),      # la cloison gauche de la chatterie
+    (40, 846, 1624, 878),        # le sol du rez-de-chaussee, d'un mur a l'autre
+    (40, 545, 388, 572),         # le sol de la salle de bain (etage 1, gauche)
+    (1234, 545, 1624, 572),      # le sol de la chatterie (etage 1, droite)
+    (40, 278, 1155, 305),        # le sol de la chambre et du couloir (etage 2)
+    (1205, 266, 1624, 294),      # le sol de la piece haute droite (etage 2)
+    (0, 32, 40, 878),            # le mur exterieur gauche
+    (1624, 32, 1672, 878),       # le mur exterieur droit
+    (0, 20, 1672, 40),           # le plafond
 ]
 
 # --- les plateformes traversables : on ne peut qu'atterrir dessus -----------
 # (x gauche, y du dessus, x droite)
 PLATEFORMES = [
-    (868, 400, 1032),            # plateforme flottante du couloir, gauche
-    (1190, 400, 1345),           # plateforme flottante du couloir, droite
-    (42, 380, 138),              # le dessus du frigo
-    (148, 460, 288),             # le plan de travail de la cuisine
-    (680, 700, 905),             # le canape du salon
-    (975, 752, 1135),            # le meuble tele
-    (198, 728, 318),             # la commode de l'entree
-    (1368, 712, 1502),           # la table de la piece de droite
-    (1408, 340, 1540),           # l'arbre a chat, plateforme du milieu
-    (1398, 215, 1550),           # l'arbre a chat, sommet
+    # les planches en bois eclairees, qui relient les etages
+    (338, 494, 594),             # planche de la salle de bain
+    (654, 518, 908),             # planche centrale basse
+    (886, 430, 1038),            # planche du milieu, gauche
+    (1138, 430, 1288),           # planche du milieu, droite
+    (668, 652, 828),             # planche au-dessus du canape (salon)
+    # les meubles sur lesquels on monte
+    (82, 662, 170),              # le dessus du frigo (cuisine)
+    (655, 792, 840),             # le canape du salon
+    (1006, 784, 1138),           # le meuble tele
+    (66, 248, 354),              # le lit de la chambre
+    (1300, 250, 1480),           # le coussin de la piece haute droite
+    (494, 205, 600),             # l'armoire du couloir (etage 2)
+    # l'arbre a chat, a droite
+    (1494, 448, 1602),           # plateforme du milieu
+    (1494, 368, 1602),           # le sommet
 ]
 
-# --- les rampes : on les monte en marchant, comme une pente -----------------
-# (x gauche, y du sol a gauche, x droite, y du sol a droite), pixels d'image.
-# L'escalier peint monte de la droite (bas, salon) vers la gauche (haut, palier).
-RAMPES = [
-    (430, 500, 720, 812),        # l'escalier salon -> palier de la cuisine
-]
-
-# --- les endroits qui ont un nom --------------------------------------------
-# un point (x, y du sol a cet endroit) en pixels de l'image
+# --- les endroits qui ont un nom (x, y du sol a cet endroit) -----------------
 ANCRES = {
-    "salon": (620, 818),
-    "entree": (120, 818),
-    "gamelle_droite": (1595, 818),   # la gamelle peinte, en bas a droite
-    "cuisine": (250, 545),
-    "plan_travail": (218, 460),  # plan de travail (plateforme y=460)
-    "frigo": (90, 380),          # dessus du frigo (plateforme y=380)
-    "palier": (555, 480),
-    "chambre": (170, 272),
-    "couloir": (950, 272),
-    "paniere": (1055, 272),          # la paniere peinte du couloir
-    "poutre": (1000, 487),
-    "poutre_gauche": (760, 487),
-    "plateforme_gauche": (950, 400),
-    "plateforme_droite": (1267, 400),
-    "chatterie": (1500, 460),
-    "chatterie_entree": (1385, 460),
-    "arbre_milieu": (1474, 340),
-    "arbre_haut": (1474, 215),
-    "corniche": (1430, 185),
-    "corniche_droite": (1550, 185),
-    "canape": (790, 700),        # dessus du canape (plateforme y=700)
-    "table_droite": (1435, 712), # table de droite (plateforme y=712)
+    # rez-de-chaussee
+    "salon": (740, 846),
+    "cuisine": (300, 846),
+    "salle_droite": (1440, 846),
+    "gamelle_bas": (1560, 846),
+    "canape": (748, 792),
+    "tv": (1072, 784),
+    "frigo": (126, 662),
+    # etage 1 (le milieu)
+    "sdb": (200, 545),
+    "chatterie": (1400, 545),
+    "planche_sdb": (466, 494),
+    "planche_centre": (780, 518),
+    "planche_milieu_g": (962, 430),
+    "planche_milieu_d": (1213, 430),
+    "planche_salon": (748, 652),
+    "arbre_bas": (1548, 448),
+    "arbre_haut": (1548, 368),
+    # etage 2 (le haut)
+    "chambre": (200, 278),
+    "lit": (210, 248),
+    "couloir": (760, 278),
+    "armoire": (547, 205),
+    "salle_haut": (1400, 266),
+    "paniere": (1390, 250),          # le coussin peint, en haut a droite
 }

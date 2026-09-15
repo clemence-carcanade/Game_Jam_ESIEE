@@ -360,6 +360,7 @@ def construire_maison(definition) -> Niveau:
         objet = _image(definition.get("objet_image") or "sac", x, y_bas=y)
         if objet is None:
             objet = _carre(56, 56, C.COULEUR_POUSSABLE, x, y + 28, "objet")
+        objet.center_y += 30          # un peu au-dessus : il se cale en tombant
         objet.amortit = True
         niveau.poussables.append(objet)
 
