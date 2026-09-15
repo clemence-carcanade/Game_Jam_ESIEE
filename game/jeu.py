@@ -42,6 +42,7 @@ class VueJeu(arcade.View):
         self.collisions = None
         self.pause_mort = 0.0        # temps d'affichage du chat allonge
         self.effets = Effets()
+        self.toupie = 0.0            # le chat tourne sur lui-meme (faux piege)
         self.audio = Audio()
         self.audio.demarrer_ambiance()
         self.ralenti = 0.0           # court ralenti a la mort
@@ -168,6 +169,10 @@ class VueJeu(arcade.View):
         if self.sortie is not None and arcade.check_for_collision(self.chat, self.sortie):
             self.gagner()
 
+        if self.toupie > 0:
+            self.toupie -= delta_time
+            # il tourne vite puis ralentit, et se stabilise droit
+            self.chat.angle = (self.toupie * 900) % 360 if self.toupie > 0.15 else 0
         self.chat.mettre_a_jour_animation(delta_time)
 
     def _action_possible(self) -> bool:
@@ -268,6 +273,9 @@ class VueJeu(arcade.View):
             self.minuteur_deguisement = effet.get("duree", 4.0)
         elif genre == "sac":
             chat.coincer_dans_le_sac()
+        elif genre == "toupie":
+            # manque de tomber en tournant sur lui-meme, puis se rattrape
+            self.toupie = effet.get("duree", 1.1)
 
     def _oter_le_deguisement(self, delta_time: float) -> None:
         if getattr(self, "minuteur_deguisement", 0) > 0:

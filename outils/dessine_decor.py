@@ -917,6 +917,24 @@ def verre_casse():
     return t.enregistrer("verre_casse")
 
 
+def lit_baldaquin():
+    t = Toile(34, 34)
+    # les quatre colonnes
+    for x in (3, 29):
+        t.rect(x, 4, x + 2, 32, "bois_sombre")
+        t.ligne_v(x, 4, 32, "bois_clair")
+    # le ciel de lit (baldaquin) et ses rideaux
+    t.rect(1, 1, 32, 6, "bois")
+    t.cadre(1, 1, 32, 6, "contour")
+    t.rect(5, 6, 10, 22, (200, 150, 190))          # rideau gauche
+    t.rect(24, 6, 29, 22, (200, 150, 190))         # rideau droit
+    # le matelas
+    t.rect(4, 24, 30, 31, (230, 220, 235))
+    t.cadre(4, 24, 30, 31, "contour")
+    t.rect(6, 22, 14, 26, (250, 245, 250))         # l'oreiller
+    return t.enregistrer("lit_baldaquin")
+
+
 # ---------------------------------------------------------------------------
 def tout_dessiner():
     mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
@@ -930,6 +948,7 @@ def tout_dessiner():
     somniferes(); defibrillateur(); medicaments()
     arbre_chat_objet(); jouet_bain(); ring_light(); couvercle()
     prise(); fenetre_ouverte(); four(); poison(); gaz(); cordelette(); bougie(); verre_casse()
+    lit_baldaquin()
     gamelle(False); gamelle(True)
     fichiers = sorted(p.name for p in DOSSIER.glob("*.png"))
     print(f"{len(fichiers)} images ecrites dans {DOSSIER} :")
