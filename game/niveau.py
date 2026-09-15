@@ -249,6 +249,11 @@ class Niveau:
     message_attente: str = ""       # E sur le piege pas encore arme
     docteur: bool = False           # niveau 6 : quelqu'un soigne toutes les morts
     objet_image: str = ""           # l'image de l'objet a pousser (somniferes...)
+    fond: str = ""                  # l'image peinte qui sert de decor
+    largeur: float = 0.0
+    hauteur: float = 0.0
+    depart_chat: tuple = (100.0, 100.0)
+    point: object = None            # convertit ancre/pixels image -> ecran
     faux_pieges: dict = field(default_factory=dict)   # lettre -> effet scripte
     message_piege: str = ""         # ce qu'on lit quand le piege s'arme
     message_mort: str = ""          # ce qu'on lit en grillant une vie
@@ -280,27 +285,108 @@ class Niveau:
 
 
 def charger(numero: int) -> Niveau:
-    """Construit le niveau ``numero`` depuis ``game/les_niveaux.py``.
-
-    Les niveaux ne sont plus des fichiers .txt : un niveau en Python porte,
-    en plus de sa carte, ses faux pieges scriptes et ses textes. Le module
-    est genere et verifie par ``outils/genere_niveaux.py``.
-    """
+    """Construit le niveau ``numero`` : la maison peinte + ce que le niveau y pose."""
     from game import les_niveaux
 
     if not 1 <= numero <= len(les_niveaux.NIVEAUX):
         raise ValueError(f"Pas de niveau {numero}")
+    return construire_maison(les_niveaux.NIVEAUX[numero - 1])
 
-    definition = les_niveaux.NIVEAUX[numero - 1]
-    niveau = construire(definition["carte"], definition)
+
+def construire_maison(definition) -> Niveau:
+    """La maison est le decor ; le niveau ne fait qu'y poser ses acteurs.
+
+    Toutes les positions de la definition sont en pixels de l'image de fond
+    (origine en haut a gauche) ou en ancres nommees de game/maison.py.
+    """
+    from game import maison
+
+    ech = C.LARGEUR_FENETRE / maison.LARGEUR_IMAGE
+    haut = maison.HAUTEUR_IMAGE
+
+    def x_de(px):
+        return px * ech
+
+    def y_de(py):
+        return (haut - py) * ech
+
+    def point(valeur):
+        """Une ancre nommee, ou un couple (x, y) en pixels d'image."""
+        if isinstance(valeur, str):
+            valeur = maison.ANCRES[valeur]
+        return x_de(valeur[0]), y_de(valeur[1])
+
+    invisible = (0, 0, 0, 0)
+    niveau = Niveau(
+        titre=definition.get("titre", ""),
+        maitre=definition.get("maitre", ""),
+        aide=definition.get("aide", ""),
+        reflexes_coupes=definition.get("reflexes_coupes", []),
+        survivre=definition.get("survivre", False),
+        message_piege=definition.get("message_piege", ""),
+        message_mort=definition.get("message_mort", ""),
+        message_attente=definition.get("message_attente", ""),
+        docteur=definition.get("docteur", False),
+        objet_image=definition.get("objet_image", ""),
+    )
     niveau.faux_pieges = definition.get("faux_pieges", {})
+    niveau.fond = maison.FOND
+    niveau.largeur = maison.LARGEUR_IMAGE * ech
+    niveau.hauteur = maison.HAUTEUR_IMAGE * ech
+    x_depart, y_depart = point(definition.get("depart", "salon"))
+    niveau.depart_chat = (x_depart, y_depart + 80)   # au-dessus du sol, il retombe
+    niveau.point = point                     # les autres modules s'en servent
 
-    # la cause de mort des elements mortels vient du niveau (l eau du bassin,
-    # pas "les pointes" partout)
-    cause = definition.get("cause_mortelle")
-    if cause:
-        for mortel in niveau.mortels:
-            mortel.cause_de_mort = cause
+    # la geometrie de la maison, en rectangles invisibles calques sur l'image
+    for x0, y0, x1, y1 in maison.SOLIDES:
+        largeur, hauteur_r = (x1 - x0) * ech, (y1 - y0) * ech
+        bloc = _carre(largeur, hauteur_r, invisible,
+                      x_de((x0 + x1) / 2), y_de((y0 + y1) / 2) + hauteur_r / 2 - hauteur_r / 2, "solide")
+        bloc.center_y = (y_de(y0) + y_de(y1)) / 2
+        niveau.murs.append(bloc)
+    for x0, y0, x1 in maison.PLATEFORMES:
+        largeur = (x1 - x0) * ech
+        plate = _carre(largeur, 10, invisible, x_de((x0 + x1) / 2), y_de(y0) - 5, "plateforme")
+        niveau.plateformes.append(plate)
+
+    # l'objet a pousser
+    if "objet" in definition:
+        x, y = point(definition["objet"])
+        objet = _image(definition.get("objet_image") or "sac", x, y_bas=y)
+        if objet is None:
+            objet = _carre(56, 56, C.COULEUR_POUSSABLE, x, y + 28, "objet")
+        objet.amortit = True
+        niveau.poussables.append(objet)
+
+    # le piege mortel (la "gamelle" generique)
+    if "piege" in definition:
+        x, y = point(definition["piege"])
+        largeur = definition.get("piege_largeur", 110)
+        zone = _carre(largeur, 64, invisible, x, y + 32, "piege")
+        zone.role = "gamelle"
+        zone.remplie = False
+        image = _image(definition.get("piege_image", ""), x, y_bas=y)
+        if image is not None:
+            niveau.decor.append(image)
+        niveau.zones.append(zone)
+
+    # la sortie du dernier niveau
+    if "sortie" in definition:
+        x, y = point(definition["sortie"])
+        zone = _carre(90, 110, invisible, x, y + 55, "sortie")
+        zone.role = "sortie"
+        niveau.zones.append(zone)
+
+    # les elements mortels du niveau 7, avec leur image
+    for element in definition.get("mortels", []):
+        x, y = point(element["pos"])
+        mortel = _carre(70, 40, invisible, x, y + 20, "mortel")
+        mortel.cause_de_mort = element.get("cause", "le danger")
+        niveau.mortels.append(mortel)
+        image = _image(element.get("image", ""), x, y_bas=y)
+        if image is not None:
+            niveau.decor.append(image)
+
     return niveau
 
 

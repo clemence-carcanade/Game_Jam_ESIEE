@@ -72,7 +72,15 @@ class VueJeu(arcade.View):
         self.medecin = None
         if self.niveau.docteur and self.gamelle is not None:
             from game.medecin import Medecin
-            self.medecin = Medecin(self.gamelle.center_x, sol=C.TAILLE_TUILE)
+            self.medecin = Medecin(self.gamelle.center_x, sol=self.gamelle.bottom)
+
+        # le fond peint : c'est lui, le decor
+        self.fond = None
+        if self.niveau.fond:
+            texture = arcade.load_texture(C.DOSSIER_IMAGES / self.niveau.fond)
+            self.fond = arcade.Sprite(texture, scale=self.niveau.largeur / texture.width)
+            self.fond.center_x = self.niveau.largeur / 2
+            self.fond.center_y = self.niveau.hauteur / 2
         if self.niveau.aide:
             self.afficher(self.niveau.aide)
 
@@ -159,23 +167,22 @@ class VueJeu(arcade.View):
         self.faux_pieges = arcade.SpriteList()
         self.images_pieges = arcade.SpriteList()
         for lettre, effet in self.niveau.faux_pieges.items():
-            for x, y in self.niveau.scriptes.get(lettre, []):
-                largeur = int(C.TAILLE_TUILE * effet.get("largeur", 1))
-                hauteur = int(C.TAILLE_TUILE * effet.get("hauteur", 1))
-                zone = arcade.Sprite(
-                    arcade.Texture.create_empty(f"fp_{lettre}", (largeur, hauteur)),
-                    center_x=x, center_y=y - C.TAILLE_TUILE / 2 + hauteur / 2,
-                )
-                zone.effet = dict(effet)
-                zone.effet.setdefault("declenchement", "action")
-                zone.recharge = 0.0
-                self.faux_pieges.append(zone)
+            x, y = self.niveau.point(effet["pos"])
+            largeur = int(C.TAILLE_TUILE * effet.get("largeur", 1.4))
+            hauteur = int(C.TAILLE_TUILE * effet.get("hauteur", 1.2))
+            zone = arcade.Sprite(
+                arcade.Texture.create_empty(f"fp_{lettre}", (largeur, hauteur)),
+                center_x=x, center_y=y + hauteur / 2,
+            )
+            zone.effet = dict(effet)
+            zone.effet.setdefault("declenchement", "action")
+            zone.recharge = 0.0
+            self.faux_pieges.append(zone)
 
-                # un piege invisible n'existe pas : chaque zone montre son image
-                image = module_niveau._image(effet.get("image", ""), x,
-                                             y_bas=y - C.TAILLE_TUILE / 2)
-                if image is not None:
-                    self.images_pieges.append(image)
+            # un piege invisible n'existe pas : chaque zone montre son image
+            image = module_niveau._image(effet.get("image", ""), x, y_bas=y)
+            if image is not None:
+                self.images_pieges.append(image)
 
     def _vivre_les_faux_pieges(self, delta_time: float) -> None:
         """Les pieges au contact se declenchent tout seuls, puis se rearment."""
@@ -335,6 +342,8 @@ class VueJeu(arcade.View):
     # ------------------------------------------------------------------
     def on_draw(self) -> None:
         self.clear()
+        if self.fond is not None:
+            arcade.draw_sprite(self.fond, pixelated=True)
         self.niveau.dessiner()
         self.images_pieges.draw(pixelated=True)
         if self.medecin is not None:
