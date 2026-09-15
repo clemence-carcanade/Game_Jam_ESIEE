@@ -25,7 +25,7 @@ DOSSIER_NIVEAUX = DOSSIER_RACINE / "niveaux"
 # Fenêtre
 # ---------------------------------------------------------------------------
 LARGEUR_FENETRE = 1280
-HAUTEUR_FENETRE = 720
+HAUTEUR_FENETRE = 640   # 9 rangees de 64 px + le bandeau du haut
 TITRE_FENETRE = "Sept Vies"
 IMAGES_PAR_SECONDE = 60
 
