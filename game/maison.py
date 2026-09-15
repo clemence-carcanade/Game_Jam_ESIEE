@@ -47,6 +47,19 @@ PLATEFORMES = [
     (1494, 368, 1602),           # le sommet
 ]
 
+# --- de quoi animer l'ambiance (pixels d'image) -----------------------------
+# les lampes et plafonniers : ils respirent, un halo doux pulse dessus
+LAMPES = [(505, 96), (1010, 165), (1355, 470), (1180, 700), (370, 622), (1470, 640)]
+# les ecrans qui scintillent (television)
+ECRANS = [(1072, 745)]
+# ou passent les petits PNJ d'ambiance : (x gauche, x droite, y du sol)
+PROMENADES = [
+    (1300, 1470, 250),      # un chat sur le coussin de la piece haute droite
+    (70, 340, 248),         # un chat sur le lit de la chambre
+]
+# la ou vole un papillon : (x centre, y centre, rayon)
+PAPILLONS = [(780, 500, 90), (1450, 360, 70)]
+
 # --- les endroits qui ont un nom (x, y du sol a cet endroit) -----------------
 ANCRES = {
     # rez-de-chaussee

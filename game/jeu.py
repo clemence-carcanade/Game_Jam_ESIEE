@@ -20,6 +20,7 @@ from game import niveau as module_niveau
 from game.chat import Chat
 from game.collisions import MoteurCollisions
 from game.effets import Effets
+from game.ambiance import Ambiance
 from game.audio import Audio
 
 #: distance a laquelle le chat peut attraper un objet devant lui
@@ -89,6 +90,7 @@ class VueJeu(arcade.View):
             self.fond = arcade.Sprite(texture, scale=self.niveau.largeur / texture.width)
             self.fond.center_x = self.niveau.largeur / 2
             self.fond.center_y = self.niveau.hauteur / 2
+        self.ambiance = Ambiance(self.niveau)
         if self.niveau.aide:
             self.afficher(self.niveau.aide)
 
@@ -112,6 +114,7 @@ class VueJeu(arcade.View):
             self.chat.alpha = max(0, int(255 * min(1, self.pause_mort / 1.2)))
             self.chat.mettre_a_jour_animation(delta_time)
             self.effets.mettre_a_jour(delta_time)
+            self.ambiance.mettre_a_jour(delta_time)
             if self.pause_mort <= 0:
                 if getattr(self, "rejouer", False):
                     self.charger_niveau(self.numero_niveau)
@@ -381,6 +384,7 @@ class VueJeu(arcade.View):
             arcade.draw_sprite(self.fond, pixelated=True)
             self.fond.center_x -= dx
             self.fond.center_y -= dy
+        self.ambiance.dessiner()
         self.niveau.dessiner()
         self.images_pieges.draw(pixelated=True)
         if self.medecin is not None:
