@@ -1,10 +1,10 @@
-{"titre": "Le cabinet medical", "maitre": "le docteur", "aide": "Endors le medecin d abord. Sinon il te soignera, encore.", "message_piege": "Le medecin s est endormi sur son bureau.", "message_mort": "Cette fois, personne n est venu recoudre."}
+{"titre": "Le cabinet medical", "maitre": "le docteur", "aide": "Le flacon d anesthesiant est en haut. Endors le medecin d abord, sinon il te soignera.", "message_mort": "Cette fois, personne n est venu recoudre.", "message_piege": "Le medecin s est endormi sur son bureau."}
 ####################
-#......O...........#
-#.9...===..........#
-#..cc..............#
-#...===...pp......f#
-#333......pp.444..f#
-#333.22...pp.44455f#
-#333822.C1pp6444555#
+#www......O........#
+#www..9..===.......#
+#....cc............#
+#...........===..pp#
+#.444............pp#
+#.44455........==pp#
+#.4445581...6C...pp#
 ####################

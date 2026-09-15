@@ -1,10 +1,10 @@
-{"titre": "L appart de l influenceur", "maitre": "l influenceur", "aide": "Le cable de la ring light traine. Fais-le tomber la ou il faut.", "message_piege": "Le cable est denude. Il grezille.", "message_mort": "Electrocute en direct. Trois cent mille vues."}
+{"titre": "L appart de l influenceur", "maitre": "l influenceur", "aide": "La ring light est en equilibre la-haut. Son cable traine juste en dessous.", "message_mort": "Electrocute en direct. Trois cent mille vues.", "message_piege": "Le cable est denude. Il grezille."}
 ####################
-#......O...........#
-#.9...===..........#
-#..............cc..#
-#...===...pp.......#
-#333......pp.444...#
-#333.22...pp.444555#
-#333822.C1pp6444555#
+#........O.........#
+#.9.....===........#
+#...cc.............#
+#....===...........#
+#333..........444..#
+#333....===...44455#
+#333.8C....1.644455#
 ####################

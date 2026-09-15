@@ -1,9 +1,9 @@
-{"titre": "Salon, 20h : encore les memes croquettes", "maitre": "le daron", "aide": "Le sac de croquettes est en haut. Fais-le tomber dans la gamelle.", "message_piege": "Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent.", "message_mort": "Etouffe avec les croquettes. Une vie de moins, une maison de plus."}
+{"titre": "Salon, 20h : encore les memes croquettes", "maitre": "le daron", "aide": "Le sac de croquettes est en haut de l etagere. Fais-le tomber dans la gamelle.", "message_mort": "Etouffe avec les croquettes. Une vie de moins, une maison de plus.", "message_piege": "Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent."}
 ####################
 #......O.....www...#
-#.9...===....www...#
+#.9..........www...#
 #..cc..............#
-#...===...pp......f#
+#.........pp......f#
 #333......pp444...f#
 #333.22...pp444555f#
 #3338226C1pp444555.#

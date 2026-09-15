@@ -1,10 +1,10 @@
-{"titre": "La chambre de l enfant riche", "maitre": "l enfant", "aide": "L aquarium est la. Il suffit de tomber dedans au bon moment.", "message_piege": "L aquarium deborde. L eau est froide.", "message_mort": "Noye dans l aquarium. Elle croira a un jeu."}
+{"titre": "La chambre de l enfant riche", "maitre": "l enfant", "aide": "Le jouet de bain est en haut de la bibliotheque. Fais-le tomber dans l aquarium.", "message_mort": "Noye dans l aquarium. Elle croira a un jeu.", "message_piege": "L aquarium deborde. L eau est froide."}
 ####################
-#......O.....www...#
-#.....===....www...#
-#.cc...............#
-#...===...........f#
-#333........444...f#
-#333.22.....444555f#
-#3338226C1..444555.#
+#..O.........www...#
+#.===..9.....www...#
+#........cc........#
+#.===..............#
+#.......333..444...#
+#.===...333..44455.#
+#....1.C333.8444556#
 ####################

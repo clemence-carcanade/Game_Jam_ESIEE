@@ -255,6 +255,32 @@ Deux pièges à connaître si tu ajoutes des images :
 Si un PNG manque, le meuble redevient un rectangle de couleur et le jeu tourne
 quand même.
 
+## Les sept niveaux
+
+Ils sont produits par un script, pas ecrits a la main :
+
+```bash
+python outils/genere_niveaux.py     # reecrit niveaux/niveau_1.txt a niveau_7.txt
+```
+
+Chaque niveau a **sa propre geometrie** : le chemin qui monte n'est jamais au
+meme endroit (a gauche, en puits, en zigzag, de droite a gauche) et le piege
+change de place. Un niveau se decrit en une entree du tableau `NIVEAUX` :
+son contexte, ses marches, ses meubles, ou tombe l'objet et ou est le piege.
+
+Le script **verifie** avant d'ecrire, et refuse d'ecrire un niveau casse :
+
+* chaque meuble forme un rectangle plein, sinon il est dessine plusieurs fois ;
+* chaque saut du parcours tient dans les capacites du chat (2 cases de haut,
+  3 de large) ;
+* la colonne ou tombe l'objet est degagee jusqu'au sol, et le piege est dessous.
+
+Mourir fait passer au foyer suivant : c'est l'objectif, pas l'echec. Au
+septieme, le jeu s'inverse — le chat est enfin heureux, mourir ne coute plus de
+vie mais fait recommencer, et il faut rejoindre la famille vivant (`G`). Les
+textes de chaque foyer sont dans les metadonnees du fichier, pas dans le code :
+`aide`, `message_piege`, `message_mort`, et `survivre` pour le dernier.
+
 ## Format des niveaux
 
 `niveaux/niveau_N.txt` — première ligne les métadonnées en JSON, puis la carte.
