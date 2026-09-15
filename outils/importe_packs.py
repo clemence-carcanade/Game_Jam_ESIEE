@@ -55,6 +55,7 @@ DECOUPES_PIXEL = {
     "mur_bas": ("floorswalls_LRK.png", 20, 52),
     "sol":     ("floorswalls_LRK.png", 34, 88),
     "plafond": ("floorswalls_LRK.png", 34, 22),
+    "bordure": ("floorswalls_LRK.png", 162, 88),
 }
 
 

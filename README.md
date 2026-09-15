@@ -257,11 +257,19 @@ quand même.
 
 ## Les sept niveaux
 
-Ils sont produits par un script, pas ecrits a la main :
+Ils vivent dans `game/les_niveaux.py`, produit et verifie par un script —
+plus de fichiers `.txt` :
 
 ```bash
-python outils/genere_niveaux.py     # reecrit niveaux/niveau_1.txt a niveau_7.txt
+python outils/genere_niveaux.py     # reecrit game/les_niveaux.py
 ```
+
+Un niveau y porte sa carte, ses textes **et ses faux pieges scriptes** : une
+lettre minuscule sur la carte, un effet a cote. Cinq effets existent :
+`message` (il ne se passe rien de grave, et on le dit), `projection` (lance,
+pousse — il retombe sur ses pattes), `soin` (quelqu'un le sauve, retour au
+depart), `deguisement` (humilie, colore, vivant), `sac` (la tete coincee).
+Declenchement `action` (touche E) ou `contact` (marcher dessus).
 
 Chaque niveau a **sa propre geometrie** : le chemin qui monte n'est jamais au
 meme endroit (a gauche, en puits, en zigzag, de droite a gauche) et le piege
@@ -283,7 +291,7 @@ textes de chaque foyer sont dans les metadonnees du fichier, pas dans le code :
 
 ## Format des niveaux
 
-`niveaux/niveau_N.txt` — première ligne les métadonnées en JSON, puis la carte.
+Dans `outils/genere_niveaux.py` — les cartes ASCII restent le format, mais en Python.
 La première ligne de carte est le **haut** du niveau (on dessine comme on lit).
 
 ```

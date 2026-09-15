@@ -107,10 +107,11 @@ def _image(nom, x, y_bas=None, y_haut=None):
 
 
 def _nom_du_mur(carte, ligne, colonne):
-    """Sol, plafond ou mur ? On regarde ce qu'il y a au-dessus et en dessous.
+    """Sol, plafond, bordure ou mur ? On regarde la position et les voisins.
 
-    Une case pleine dont le dessus est vide, c'est du sol : c'est là qu'on
-    marche. Une case pleine dont le dessous est vide, c'est le plafond.
+    Le pourtour de la piece est dessine en sombre ("bordure") : un mur qui a la
+    meme couleur que le papier peint est un mur invisible, et un mur invisible
+    est un bug pour celui qui joue. Seule la rangee du sol reste en parquet.
     """
     if carte is None:
         return "mur"
@@ -120,12 +121,16 @@ def _nom_du_mur(carte, ligne, colonne):
             return carte[l][c]
         return C.CAR_MUR
 
+    dernier_l = len(carte) - 1
+    if ligne == dernier_l and colonne not in (0, len(carte[ligne]) - 1):
+        return "sol"
+    if ligne in (0, dernier_l) or colonne in (0, len(carte[ligne]) - 1):
+        return "bordure"
     if case(ligne - 1, colonne) != C.CAR_MUR:
         return "sol"
     if case(ligne + 1, colonne) != C.CAR_MUR:
         return "plafond"
     return "mur"
-
 
 def _voisin(carte, ligne, colonne, dl, dc):
     """Le caractère de la case voisine, ou None hors de la carte."""
@@ -240,6 +245,7 @@ class Niveau:
     depart_maitre: tuple = (0.0, 0.0)
     reflexes_coupes: list = field(default_factory=list)
     survivre: bool = False          # niveau 7 : mourir n'est plus le but
+    faux_pieges: dict = field(default_factory=dict)   # lettre -> effet scripte
     message_piege: str = ""         # ce qu'on lit quand le piege s'arme
     message_mort: str = ""          # ce qu'on lit en grillant une vie
 
@@ -252,13 +258,14 @@ class Niveau:
     scriptes: dict = field(default_factory=dict)
 
     def dessiner(self) -> None:
-        # le décor passe derrière tout le reste : il ne bloque jamais le chat
-        self.decor.draw()
-        self.murs.draw()
-        self.plateformes.draw()
-        self.zones.draw()
-        self.mortels.draw()
-        self.poussables.draw()
+        # pixelated : sans ça, arcade lisse les textures agrandies et tout
+        # devient flou. C'est le reglage qui fait "pixel art".
+        self.decor.draw(pixelated=True)
+        self.murs.draw(pixelated=True)
+        self.plateformes.draw(pixelated=True)
+        self.zones.draw(pixelated=True)
+        self.mortels.draw(pixelated=True)
+        self.poussables.draw(pixelated=True)
 
     def trouver_zone(self, role: str):
         """Retourne la première zone ayant ce rôle (``gamelle``, ``verre``...)."""
@@ -268,23 +275,29 @@ class Niveau:
         return None
 
 
-def chemin_du_niveau(numero: int):
-    return C.DOSSIER_NIVEAUX / f"niveau_{numero}.txt"
-
-
 def charger(numero: int) -> Niveau:
-    """Lit ``niveaux/niveau_<numero>.txt`` et construit le niveau."""
-    chemin = chemin_du_niveau(numero)
-    if not chemin.is_file():
-        raise FileNotFoundError(f"Niveau introuvable : {chemin}")
+    """Construit le niveau ``numero`` depuis ``game/les_niveaux.py``.
 
-    lignes = chemin.read_text(encoding="utf-8").splitlines()
-    if not lignes:
-        raise ValueError(f"Niveau vide : {chemin}")
+    Les niveaux ne sont plus des fichiers .txt : un niveau en Python porte,
+    en plus de sa carte, ses faux pieges scriptes et ses textes. Le module
+    est genere et verifie par ``outils/genere_niveaux.py``.
+    """
+    from game import les_niveaux
 
-    metadonnees = json.loads(lignes[0])
-    carte = [ligne for ligne in lignes[1:] if ligne.strip()]
-    return construire(carte, metadonnees)
+    if not 1 <= numero <= len(les_niveaux.NIVEAUX):
+        raise ValueError(f"Pas de niveau {numero}")
+
+    definition = les_niveaux.NIVEAUX[numero - 1]
+    niveau = construire(definition["carte"], definition)
+    niveau.faux_pieges = definition.get("faux_pieges", {})
+
+    # la cause de mort des elements mortels vient du niveau (l eau du bassin,
+    # pas "les pointes" partout)
+    cause = definition.get("cause_mortelle")
+    if cause:
+        for mortel in niveau.mortels:
+            mortel.cause_de_mort = cause
+    return niveau
 
 
 def construire(carte, metadonnees=None) -> Niveau:
@@ -388,6 +401,11 @@ def _placer(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) -> None:
 
     elif caractere in MOBILIER:
         _placer_mobilier(niveau, caractere, x, y, carte, ligne, colonne)
+
+    elif caractere.islower() and caractere not in MOBILIER:
+        # un emplacement scripte du niveau : les faux pieges, les personnages.
+        # game/les_niveaux.py decrit ce que chaque lettre declenche.
+        niveau.scriptes.setdefault(caractere, []).append((x, y))
 
     elif caractere in C.CARS_SCRIPTES:
         # laissé au responsable du niveau : il fera ce qu'il veut de ces positions

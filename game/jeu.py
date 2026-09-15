@@ -67,6 +67,7 @@ class VueJeu(arcade.View):
 
         self.gamelle = self.niveau.trouver_zone("gamelle")
         self.sortie = self.niveau.trouver_zone("sortie")
+        self._construire_faux_pieges()
         if self.niveau.aide:
             self.afficher(self.niveau.aide)
 
@@ -97,6 +98,8 @@ class VueJeu(arcade.View):
         self._surfaces_glissantes(contacts)
         self._remplir_la_gamelle()
         self._sortir_du_sac()
+        self._vivre_les_faux_pieges(delta_time)
+        self._oter_le_deguisement(delta_time)
 
         if contacts.atterrissage:
             self.chat.signaler_atterrissage()
@@ -110,6 +113,67 @@ class VueJeu(arcade.View):
             self.gagner()
 
         self.chat.mettre_a_jour_animation(delta_time)
+
+    # ------------------------------------------------------------------
+    # Les faux pieges scriptes
+    # ------------------------------------------------------------------
+    def _construire_faux_pieges(self) -> None:
+        """Transforme les lettres de la carte en zones qui reagissent au chat.
+
+        Chaque niveau declare ses faux pieges dans game/les_niveaux.py :
+        une lettre sur la carte, et un effet. Regle n.1 du jeu : tout ce qui a
+        l'air mortel doit rater. C'est ici que ca rate.
+        """
+        self.faux_pieges = arcade.SpriteList()
+        for lettre, effet in self.niveau.faux_pieges.items():
+            for x, y in self.niveau.scriptes.get(lettre, []):
+                largeur = int(C.TAILLE_TUILE * effet.get("largeur", 1))
+                hauteur = int(C.TAILLE_TUILE * effet.get("hauteur", 1))
+                zone = arcade.Sprite(
+                    arcade.Texture.create_empty(f"fp_{lettre}", (largeur, hauteur)),
+                    center_x=x, center_y=y - C.TAILLE_TUILE / 2 + hauteur / 2,
+                )
+                zone.effet = dict(effet)
+                zone.effet.setdefault("declenchement", "action")
+                zone.recharge = 0.0
+                self.faux_pieges.append(zone)
+
+    def _vivre_les_faux_pieges(self, delta_time: float) -> None:
+        """Les pieges au contact se declenchent tout seuls, puis se rearment."""
+        for zone in self.faux_pieges:
+            zone.recharge = max(0.0, zone.recharge - delta_time)
+            if (zone.effet["declenchement"] == "contact" and zone.recharge <= 0
+                    and arcade.check_for_collision(self.chat, zone)):
+                self._declencher(zone)
+
+    def _declencher(self, zone) -> None:
+        """Applique l'effet d'un faux piege. Aucun ne tue : c'est le principe."""
+        effet, chat = zone.effet, self.chat
+        zone.recharge = effet.get("recharge", 2.5)
+
+        if "texte" in effet:
+            self.afficher(effet["texte"])
+
+        genre = effet.get("effet", "message")
+        if genre == "projection":
+            # lance en l'air facon poupee, pousse par un autre chat...
+            chat.change_x, chat.change_y = effet.get("vitesse", (0, 16))
+            chat.minuteur_sac = 0.0
+        elif genre == "soin":
+            # le medecin le soigne, le maitre le rattrape : retour case depart
+            chat.replacer_au_depart()
+        elif genre == "deguisement":
+            # maquille facon poupee : humiliant, pas dangereux
+            chat.color = effet.get("teinte", (255, 150, 200))
+            self.minuteur_deguisement = effet.get("duree", 4.0)
+        elif genre == "sac":
+            chat.coincer_dans_le_sac()
+
+    def _oter_le_deguisement(self, delta_time: float) -> None:
+        if getattr(self, "minuteur_deguisement", 0) > 0:
+            self.minuteur_deguisement -= delta_time
+            if self.minuteur_deguisement <= 0:
+                self.chat.color = (255, 255, 255)
 
     # ------------------------------------------------------------------
     # Le salon : verre glissant, gamelle, sac de croquettes
@@ -220,7 +284,7 @@ class VueJeu(arcade.View):
     def on_draw(self) -> None:
         self.clear()
         self.niveau.dessiner()
-        arcade.draw_sprite(self.chat)
+        arcade.draw_sprite(self.chat, pixelated=True)
 
         if self.debug:
             self.collisions.dessiner_debug()
@@ -271,6 +335,11 @@ class VueJeu(arcade.View):
         if self.gamelle is not None and self.gamelle.remplie:
             if arcade.check_for_collision(self.chat, self.gamelle):
                 self.manger()
+                return
+        for zone in self.faux_pieges:
+            if (zone.effet["declenchement"] == "action" and zone.recharge <= 0
+                    and arcade.check_for_collision(self.chat, zone)):
+                self._declencher(zone)
                 return
         if self.se_coincer_dans_le_sac():
             return
