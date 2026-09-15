@@ -56,6 +56,8 @@ NIVEAUX = [
         aide="Fais basculer l arbre a chat du haut du vaisselier, et place-toi dessous.",
         piege="L arbre a chat penche. Cent chats regardent ailleurs.",
         mort="Ecrase sous l arbre a chat. Personne n a rien vu.",
+        piege_image="coussin",
+        message_attente="L arbre a chat est encore debout. Fais-le basculer d abord.",
         marches=[(8, 16, 17), (7, 19, 20), (6, 14, 16), (4, 11, 13), (2, 8, 10)],
         meubles=[("2", 8, 9, 16, 17), ("3", 7, 9, 18, 20), ("=", 6, 6, 14, 16),
                  ("=", 4, 4, 11, 13), ("=", 2, 2, 8, 10), ("4", 7, 9, 1, 3),
@@ -63,12 +65,12 @@ NIVEAUX = [
         objet=9, pousse="g", piege_colonne=7, depart=12,
         deco=[(9, "8", 8), (9, "6", 13), (2, "9", 19), (3, "c", 17), (3, "c", 18)],
         lettres={
-            "k": dict(pos=[(6, 20)], declenchement="contact", recharge=8.0,
+            "k": dict(pos=[(6, 20)], declenchement="contact", recharge=8.0, image="chat_gris",
                       effet="projection", vitesse=(-9, 14),
                       texte="Un autre chat le pousse dans le vide. Les coussins l attendaient."),
-            "v": dict(pos=[(9, 10)], declenchement="action",
+            "v": dict(pos=[(9, 10)], declenchement="action", image="vieille",
                       texte="La charentaise s abat sur lui. Epaisse comme un matelas. Rien."),
-            "l": dict(pos=[(9, 4)], declenchement="action", effet="soin",
+            "l": dict(pos=[(9, 4)], declenchement="action", effet="soin", image="panier_linge",
                       texte="Range dans le buffet avec le linge. Il ressort par en bas, plie, vivant."),
         },
     ),
@@ -77,6 +79,8 @@ NIVEAUX = [
         aide="Le jouet de bain est au sommet du baldaquin. Fais-le tomber dans l aquarium.",
         piege="L aquarium deborde. L eau est froide.",
         mort="Noye dans l aquarium. Elle croira a un jeu.",
+        piege_image="aquarium",
+        message_attente="L aquarium est paisible. Le jouet de bain d abord, tout en haut.",
         marches=[(8, 2, 3), (6, 2, 4), (4, 2, 4), (2, 2, 4)],
         meubles=[("2", 8, 9, 2, 3), ("=", 6, 6, 2, 4), ("=", 4, 4, 2, 4),
                  ("=", 2, 2, 2, 4), ("3", 7, 9, 9, 11), ("4", 7, 9, 14, 16),
@@ -84,10 +88,10 @@ NIVEAUX = [
         objet=3, pousse="d", piege_colonne=5, depart=7,
         deco=[(9, "8", 13), (9, "6", 20), (2, "9", 7), (3, "c", 9), (3, "c", 10)],
         lettres={
-            "e": dict(pos=[(9, 8)], declenchement="contact", recharge=9.0,
+            "e": dict(pos=[(9, 8)], declenchement="contact", recharge=9.0, image="enfant",
                       effet="projection", vitesse=(4, 19),
                       texte="Attrape et lance en l air facon poupee. Il retombe sur ses pattes. Elle applaudit."),
-            "m": dict(pos=[(9, 17)], declenchement="action", effet="deguisement",
+            "m": dict(pos=[(9, 17)], declenchement="action", effet="deguisement", image="maquillage",
                       teinte=(255, 150, 200), duree=5.0,
                       texte="Maquille, coiffe, deguise. Humiliant. Mais vivant."),
         },
@@ -97,6 +101,8 @@ NIVEAUX = [
         aide="La ring light est perchee la-haut. Son cable traine juste dessous.",
         piege="Le cable est denude. Il gresille.",
         mort="Electrocute en direct. Trois cent mille vues.",
+        piege_image="cable",
+        message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         marches=[(8, 9, 10), (6, 6, 8), (4, 9, 11), (2, 6, 8)],
         meubles=[("2", 8, 9, 9, 10), ("=", 6, 6, 6, 8), ("=", 4, 4, 9, 11),
                  ("=", 2, 2, 6, 8), ("3", 7, 9, 1, 3), ("4", 7, 9, 15, 17),
@@ -104,10 +110,10 @@ NIVEAUX = [
         objet=7, pousse="g", piege_colonne=5, depart=12,
         deco=[(9, "8", 6), (9, "6", 14), (2, "9", 2), (3, "c", 3), (3, "c", 4)],
         lettres={
-            "g": dict(pos=[(9, 20)], declenchement="action", effet="projection",
+            "g": dict(pos=[(9, 20)], declenchement="action", effet="projection", image="griffures",
                       vitesse=(-3, 15),
                       texte="Il grimpe au mur pour s echapper. Glisse. Retombe. Story instantanee."),
-            "n": dict(pos=[(9, 13)], declenchement="action",
+            "n": dict(pos=[(9, 13)], declenchement="action", image="plante",
                       texte="Il mange la plante pour s empoisonner. La vomit. Vivant, et pas fier."),
         },
     ),
@@ -116,6 +122,8 @@ NIVEAUX = [
         aide="La marmite bout sans surveillance. Fais tomber le couvercle, et saute.",
         piege="La marmite est ouverte. Personne ne regarde.",
         mort="Tombe dans l eau bouillante. Le service continue.",
+        piege_image="marmite",
+        message_attente="Le couvercle est encore sur la marmite. Fais-le tomber.",
         marches=[(8, 3, 4), (6, 6, 8), (4, 10, 12), (2, 14, 16)],
         meubles=[("2", 8, 9, 3, 4), ("=", 6, 6, 6, 8), ("=", 4, 4, 10, 12),
                  ("=", 2, 2, 14, 16), ("4", 7, 9, 19, 20), ("5", 8, 9, 12, 13),
@@ -123,9 +131,9 @@ NIVEAUX = [
         objet=15, pousse="d", piege_colonne=17, depart=6,
         deco=[(9, "8", 8), (9, "6", 11), (2, "9", 19), (3, "c", 5), (3, "c", 6)],
         lettres={
-            "u": dict(pos=[(9, 14)], declenchement="action",
+            "u": dict(pos=[(9, 14)], declenchement="action", image="couteau",
                       texte="Le couteau bascule du plan de travail... et se plante a cote. Rate."),
-            "h": dict(pos=[(9, 10)], declenchement="action",
+            "h": dict(pos=[(9, 10)], declenchement="action", image="chef",
                       texte="Provoque, le chef s ecroule : crise cardiaque. Il n aura pas le temps de le tuer."),
         },
     ),
@@ -134,6 +142,8 @@ NIVEAUX = [
         aide="Le flacon d anesthesiant est en haut. Endors le medecin d abord, sinon il soigne tout.",
         piege="Le medecin s est endormi sur son bureau.",
         mort="Cette fois, personne n est venu recoudre.",
+        piege_image="medecin",
+        message_attente="Le medecin est reveille. Il te recoudrait. Le flacon d abord.",
         marches=[(8, 17, 18), (6, 14, 16), (4, 11, 13), (2, 8, 10)],
         meubles=[("2", 8, 9, 17, 18), ("=", 6, 6, 14, 16), ("=", 4, 4, 11, 13),
                  ("=", 2, 2, 8, 10), ("4", 7, 9, 2, 4), ("5", 8, 9, 5, 6),
@@ -141,11 +151,11 @@ NIVEAUX = [
         objet=9, pousse="g", piege_colonne=7, depart=15,
         deco=[(9, "8", 8), (9, "6", 13), (2, "9", 6), (3, "c", 5), (3, "c", 6)],
         lettres={
-            "s": dict(pos=[(9, 10)], declenchement="action", effet="soin",
+            "s": dict(pos=[(9, 10)], declenchement="action", effet="soin", image="scalpel",
                       texte="Le scalpel. Precis. Le medecin le recoud en huit minutes, montre en main."),
-            "q": dict(pos=[(9, 12)], declenchement="action", effet="soin",
+            "q": dict(pos=[(9, 12)], declenchement="action", effet="soin", image="seringue",
                       texte="La seringue du medecin. Reanime. Et vaccine, en prime."),
-            "d": dict(pos=[(9, 16)], declenchement="action", effet="soin",
+            "d": dict(pos=[(9, 16)], declenchement="action", effet="soin", image="patient",
                       texte="Il leche le patient contagieux. Gueri en une nuit. Ce medecin est trop fort."),
         },
     ),
@@ -164,9 +174,9 @@ DERNIER = dict(
     sortie=(1, 18), depart=7,
     deco=[(9, "6", 3), (9, "6", 20), (2, "9", 19), (3, "c", 6), (3, "c", 7)],
     lettres={
-        "y": dict(pos=[(8, 9)], declenchement="contact", recharge=10.0,
+        "y": dict(pos=[(8, 9)], declenchement="contact", recharge=10.0, image="papillon",
                   texte="Un papillon. Il le suit des yeux. Le bassin est juste la. Pas cette fois."),
-        "z": dict(pos=[(9, 14)], declenchement="action",
+        "z": dict(pos=[(9, 14)], declenchement="action", image="pelote",
                   texte="Une balle de laine. Non. Il sait exactement comment ca finit."),
     },
 )
@@ -287,6 +297,10 @@ def ecrire():
             entree["cause_mortelle"] = spec.get("cause_mortelle", "")
         else:
             entree["message_piege"] = spec["piege"]
+            if spec.get("piege_image"):
+                entree["piege_image"] = spec["piege_image"]
+            if spec.get("message_attente"):
+                entree["message_attente"] = spec["message_attente"]
         entree["carte"] = ["".join(ligne) for ligne in carte]
         entree["faux_pieges"] = {
             lettre: {cle: valeur for cle, valeur in effet.items() if cle != "pos"}

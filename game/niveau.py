@@ -245,6 +245,8 @@ class Niveau:
     depart_maitre: tuple = (0.0, 0.0)
     reflexes_coupes: list = field(default_factory=list)
     survivre: bool = False          # niveau 7 : mourir n'est plus le but
+    piege_image: str = ""           # l'image de la zone mortelle (aquarium...)
+    message_attente: str = ""       # E sur le piege pas encore arme
     faux_pieges: dict = field(default_factory=dict)   # lettre -> effet scripte
     message_piege: str = ""         # ce qu'on lit quand le piege s'arme
     message_mort: str = ""          # ce qu'on lit en grillant une vie
@@ -309,6 +311,8 @@ def construire(carte, metadonnees=None) -> Niveau:
         aide=metadonnees.get("aide", ""),
         reflexes_coupes=metadonnees.get("reflexes_coupes", []),
         survivre=metadonnees.get("survivre", False),
+        piege_image=metadonnees.get("piege_image", ""),
+        message_attente=metadonnees.get("message_attente", ""),
         message_piege=metadonnees.get("message_piege", ""),
         message_mort=metadonnees.get("message_mort", ""),
     )
@@ -431,6 +435,11 @@ def _placer_mobilier(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) ->
     tuile = C.TAILLE_TUILE
     nom, hauteur_tuiles, couleur, comportement = MOBILIER[caractere]
     invisible = (0, 0, 0, 0)
+
+    # la zone mortelle porte l'image de son niveau : l'aquarium de la chambre,
+    # la marmite du restaurant, le cable de l'influenceur...
+    if comportement == "gamelle" and niveau.piege_image:
+        nom = niveau.piege_image
 
     niveau.scriptes.setdefault(caractere, []).append((x, y))
 

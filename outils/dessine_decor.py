@@ -529,6 +529,219 @@ def maitresse():
     return t.enregistrer("maitresse")
 
 
+
+
+# ---------------------------------------------------------------------------
+# Les pieges et leurs figurants : chaque zone scriptee a son image.
+# Sans elles, les pieges sont invisibles — un piege invisible n'existe pas.
+# ---------------------------------------------------------------------------
+def _figure(t, habit, cheveux, largeur=32):
+    """Un personnage debout, de face : tete, buste, jambes. Iconique et lisible."""
+    m = largeur // 2
+    t.rect(m - 5, 26, m + 5, 36, "jean")            # jambes
+    t.cadre(m - 5, 26, m + 5, 36, "contour")
+    t.rect(m - 8, 12, m + 8, 26, habit)             # buste
+    t.cadre(m - 8, 12, m + 8, 26, "contour")
+    t.rect(m - 5, 2, m + 5, 12, "peau")             # tete
+    t.cadre(m - 5, 2, m + 5, 12, "contour")
+    t.rect(m - 5, 1, m + 5, 4, cheveux)
+    t.point(m - 2, 7, "contour"); t.point(m + 2, 7, "contour")
+    return t
+
+
+def vieille():
+    t = Toile(32, 38)
+    _figure(t, (150, 130, 160), (210, 210, 215))
+    t.rect(11, 1, 21, 3, (210, 210, 215))           # chignon gris
+    t.rect(22, 18, 24, 36, "bois_sombre")           # la canne
+    t.ligne_v(22, 18, 36, "bois_clair")
+    # les charentaises, epaisses
+    t.rect(9, 34, 15, 37, (200, 120, 130)); t.cadre(9, 34, 15, 37, "contour")
+    t.rect(17, 34, 23, 37, (200, 120, 130)); t.cadre(17, 34, 23, 37, "contour")
+    return t.enregistrer("vieille")
+
+
+def enfant():
+    t = Toile(32, 32)
+    m = 16
+    t.rect(m - 4, 22, m + 4, 30, (240, 200, 220))   # jupe
+    t.cadre(m - 4, 22, m + 4, 30, "contour")
+    t.rect(m - 6, 10, m + 6, 22, (250, 160, 190))
+    t.cadre(m - 6, 10, m + 6, 22, "contour")
+    t.rect(m - 4, 1, m + 4, 10, "peau")
+    t.cadre(m - 4, 1, m + 4, 10, "contour")
+    t.rect(m - 4, 0, m + 4, 3, (240, 220, 130))     # blonde
+    # les couettes
+    t.rect(m - 8, 2, m - 5, 9, (240, 220, 130)); t.cadre(m - 8, 2, m - 5, 9, "contour")
+    t.rect(m + 5, 2, m + 8, 9, (240, 220, 130)); t.cadre(m + 5, 2, m + 8, 9, "contour")
+    t.point(m - 2, 6, "contour"); t.point(m + 2, 6, "contour")
+    return t.enregistrer("enfant")
+
+
+def chef():
+    t = Toile(32, 40)
+    _figure(t, (245, 245, 245), "peau")
+    t.rect(10, 0, 22, 6, (250, 250, 250))           # la toque
+    t.cadre(10, 0, 22, 6, "contour")
+    t.rect(12, 20, 20, 21, (200, 60, 60))           # le tablier noue
+    return t.enregistrer("chef")
+
+
+def medecin():
+    t = Toile(32, 38)
+    _figure(t, (240, 240, 248), "cheveux")
+    t.rect(12, 14, 13, 24, (90, 160, 190))          # le stethoscope
+    t.rect(18, 14, 19, 24, (90, 160, 190))
+    t.rect(13, 23, 18, 25, (90, 160, 190))
+    return t.enregistrer("medecin")
+
+
+def chat_gris():
+    t = Toile(24, 16)
+    t.rect(2, 6, 17, 14, (150, 150, 158))           # le corps assis
+    t.cadre(2, 6, 17, 14, "contour")
+    t.rect(13, 1, 21, 9, (150, 150, 158))           # la tete
+    t.cadre(13, 1, 21, 9, "contour")
+    t.point(14, 0, (150, 150, 158)); t.point(20, 0, (150, 150, 158))  # oreilles
+    t.point(16, 4, "contour"); t.point(19, 4, "contour")
+    t.rect(0, 10, 2, 12, (150, 150, 158))           # la queue
+    return t.enregistrer("chat_gris")
+
+
+def panier_linge():
+    t = Toile(28, 18)
+    t.rect(2, 6, 25, 17, "sac")
+    for x in range(4, 25, 4):
+        t.ligne_v(x, 7, 16, "sac_sombre")
+    t.cadre(2, 6, 25, 17, "contour")
+    t.rect(5, 2, 12, 7, (230, 230, 240))            # le linge qui depasse
+    t.rect(14, 3, 21, 7, (200, 220, 240))
+    return t.enregistrer("panier_linge")
+
+
+def maquillage():
+    t = Toile(20, 14)
+    t.rect(2, 6, 6, 13, (220, 70, 100))             # rouge a levres
+    t.rect(2, 3, 6, 6, "metal_clair")
+    t.cadre(2, 3, 6, 13, "contour")
+    t.rect(10, 8, 18, 13, (240, 200, 220))          # poudrier
+    t.cadre(10, 8, 18, 13, "contour")
+    t.rect(12, 9, 16, 11, (250, 240, 245))
+    return t.enregistrer("maquillage")
+
+
+def griffures():
+    t = Toile(24, 30)
+    for x0 in (3, 9, 15):
+        for i in range(24):
+            t.point(x0 + i // 5, 3 + i, "mur_sombre")
+    return t.enregistrer("griffures")
+
+
+def couteau():
+    t = Toile(26, 12)
+    t.rect(2, 4, 15, 7, "metal_clair")              # la lame
+    t.rect(2, 7, 15, 8, "metal_sombre")
+    t.cadre(2, 4, 15, 8, "contour")
+    t.rect(16, 3, 24, 9, "bois_sombre")             # le manche
+    t.cadre(16, 3, 24, 9, "contour")
+    return t.enregistrer("couteau")
+
+
+def scalpel():
+    t = Toile(22, 8)
+    t.rect(1, 3, 9, 5, "metal_clair")
+    t.rect(10, 2, 20, 6, "metal")
+    t.cadre(1, 2, 20, 6, "contour")
+    return t.enregistrer("scalpel")
+
+
+def seringue():
+    t = Toile(22, 10)
+    t.rect(1, 4, 5, 5, "metal_sombre")              # l'aiguille
+    t.rect(6, 2, 16, 8, (200, 230, 240))
+    t.cadre(6, 2, 16, 8, "contour")
+    t.rect(17, 3, 20, 7, "metal")
+    t.rect(9, 4, 13, 6, (140, 200, 120))            # le produit
+    return t.enregistrer("seringue")
+
+
+def patient():
+    t = Toile(32, 24)
+    t.rect(1, 14, 30, 22, (230, 230, 240))          # le lit
+    t.cadre(1, 14, 30, 22, "contour")
+    t.rect(3, 8, 12, 15, (170, 210, 160))           # le patient, verdatre
+    t.cadre(3, 8, 12, 15, "contour")
+    t.point(6, 11, "contour"); t.point(9, 11, "contour")
+    t.rect(5, 13, 10, 14, (250, 250, 250))          # le masque
+    t.rect(13, 10, 29, 15, (200, 205, 220))         # la couverture
+    return t.enregistrer("patient")
+
+
+def papillon():
+    t = Toile(16, 12)
+    for dx in (0, 8):
+        t.rect(2 + dx, 2, 6 + dx, 6, (240, 180, 90))
+        t.rect(3 + dx, 6, 5 + dx, 9, (220, 140, 70))
+        t.cadre(2 + dx, 2, 6 + dx, 9, "contour")
+    t.rect(7, 3, 8, 9, "contour")                    # le corps
+    return t.enregistrer("papillon")
+
+
+def pelote():
+    t = Toile(18, 16)
+    for y in range(2, 14):
+        for x in range(2, 16):
+            if (x - 9) ** 2 + (y - 8) ** 2 <= 42:
+                t.point(x, y, (200, 90, 110))
+    for i in range(10):
+        t.point(4 + i, 5 + (i % 3), (230, 130 ,150))
+        t.point(5 + i, 9 + (i % 2), (160, 60, 80))
+    return t.enregistrer("pelote")
+
+
+def coussin():
+    t = Toile(30, 12)
+    t.rect(2, 3, 27, 10, (170, 120, 150))
+    t.ligne_h(3, 2, 27, (200, 150, 180))
+    t.cadre(2, 3, 27, 10, "contour")
+    return t.enregistrer("coussin")
+
+
+def aquarium():
+    t = Toile(32, 22)
+    t.rect(1, 2, 30, 20, (140, 200, 225, 200))
+    t.cadre(1, 2, 30, 20, "contour")
+    t.ligne_h(4, 2, 29, (200, 240, 250))            # la surface
+    t.rect(8, 10, 13, 14, (240, 140, 80))           # le poisson
+    t.point(7, 12, (240, 140, 80)); t.point(14, 11, "contour")
+    t.rect(22, 14, 24, 19, "feuille")               # une algue
+    return t.enregistrer("aquarium")
+
+
+def cable():
+    t = Toile(32, 14)
+    for i in range(22):
+        t.point(2 + i, 9 + (i % 4 == 0), "contour")
+        t.point(2 + i, 10 + (i % 4 == 0), (60, 60, 70))
+    t.rect(23, 4, 30, 12, (60, 60, 70))             # la prise
+    t.cadre(23, 4, 30, 12, "contour")
+    t.point(20, 6, (255, 230, 90))                  # ca gresille
+    t.point(18, 3, (255, 230, 90)); t.point(22, 2, (255, 200, 60))
+    return t.enregistrer("cable")
+
+
+def marmite():
+    t = Toile(30, 20)
+    t.rect(2, 6, 27, 18, "metal_sombre")
+    t.ligne_h(6, 2, 27, "metal")
+    t.cadre(2, 6, 27, 18, "contour")
+    t.rect(0, 8, 2, 10, "metal"); t.rect(27, 8, 29, 10, "metal")
+    for x, y in ((7, 3), (13, 1), (19, 3), (10, 4), (16, 2)):
+        t.point(x, y, (240, 240, 250))              # la vapeur
+    return t.enregistrer("marmite")
+
+
 # ---------------------------------------------------------------------------
 def tout_dessiner():
     mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
@@ -536,6 +749,9 @@ def tout_dessiner():
         canape(partie); table_verre(partie); tapis(partie); balcon(partie)
         etagere(partie, "haut"); etagere(partie, "bas")
     television(); plante(); sac(); rambarde(); daron(); maitresse()
+    vieille(); enfant(); chef(); medecin(); chat_gris(); panier_linge()
+    maquillage(); griffures(); couteau(); scalpel(); seringue(); patient()
+    papillon(); pelote(); coussin(); aquarium(); cable(); marmite()
     gamelle(False); gamelle(True)
     fichiers = sorted(p.name for p in DOSSIER.glob("*.png"))
     print(f"{len(fichiers)} images ecrites dans {DOSSIER} :")

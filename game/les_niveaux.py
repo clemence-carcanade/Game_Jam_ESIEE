@@ -32,6 +32,8 @@ NIVEAUX = [
         "aide": 'Fais basculer l arbre a chat du haut du vaisselier, et place-toi dessous.',
         "message_mort": 'Ecrase sous l arbre a chat. Personne n a rien vu.',
         "message_piege": 'L arbre a chat penche. Cent chats regardent ailleurs.',
+        "piege_image": 'coussin',
+        "message_attente": 'L arbre a chat est encore debout. Fais-le basculer d abord.',
         "carte": [
             "######################",
             "#........O...........#",
@@ -45,7 +47,7 @@ NIVEAUX = [
             "#444lpp18.v.C6..22333#",
             "######################",
         ],
-        "faux_pieges": {'k': {'declenchement': 'contact', 'recharge': 8.0, 'effet': 'projection', 'vitesse': (-9, 14), 'texte': 'Un autre chat le pousse dans le vide. Les coussins l attendaient.'}, 'v': {'declenchement': 'action', 'texte': 'La charentaise s abat sur lui. Epaisse comme un matelas. Rien.'}, 'l': {'declenchement': 'action', 'effet': 'soin', 'texte': 'Range dans le buffet avec le linge. Il ressort par en bas, plie, vivant.'}},
+        "faux_pieges": {'k': {'declenchement': 'contact', 'recharge': 8.0, 'image': 'chat_gris', 'effet': 'projection', 'vitesse': (-9, 14), 'texte': 'Un autre chat le pousse dans le vide. Les coussins l attendaient.'}, 'v': {'declenchement': 'action', 'image': 'vieille', 'texte': 'La charentaise s abat sur lui. Epaisse comme un matelas. Rien.'}, 'l': {'declenchement': 'action', 'effet': 'soin', 'image': 'panier_linge', 'texte': 'Range dans le buffet avec le linge. Il ressort par en bas, plie, vivant.'}},
     },
     {
         "titre": 'La chambre de l enfant riche',
@@ -53,6 +55,8 @@ NIVEAUX = [
         "aide": 'Le jouet de bain est au sommet du baldaquin. Fais-le tomber dans l aquarium.',
         "message_mort": 'Noye dans l aquarium. Elle croira a un jeu.',
         "message_piege": 'L aquarium deborde. L eau est froide.',
+        "piege_image": 'aquarium',
+        "message_attente": 'L aquarium est paisible. Le jouet de bain d abord, tout en haut.',
         "carte": [
             "######################",
             "#..O..........www....#",
@@ -66,7 +70,7 @@ NIVEAUX = [
             "#.22.1.Ce333pp444m556#",
             "######################",
         ],
-        "faux_pieges": {'e': {'declenchement': 'contact', 'recharge': 9.0, 'effet': 'projection', 'vitesse': (4, 19), 'texte': 'Attrape et lance en l air facon poupee. Il retombe sur ses pattes. Elle applaudit.'}, 'm': {'declenchement': 'action', 'effet': 'deguisement', 'teinte': (255, 150, 200), 'duree': 5.0, 'texte': 'Maquille, coiffe, deguise. Humiliant. Mais vivant.'}},
+        "faux_pieges": {'e': {'declenchement': 'contact', 'recharge': 9.0, 'image': 'enfant', 'effet': 'projection', 'vitesse': (4, 19), 'texte': 'Attrape et lance en l air facon poupee. Il retombe sur ses pattes. Elle applaudit.'}, 'm': {'declenchement': 'action', 'effet': 'deguisement', 'image': 'maquillage', 'teinte': (255, 150, 200), 'duree': 5.0, 'texte': 'Maquille, coiffe, deguise. Humiliant. Mais vivant.'}},
     },
     {
         "titre": 'L appart de l influenceur',
@@ -74,6 +78,8 @@ NIVEAUX = [
         "aide": 'La ring light est perchee la-haut. Son cable traine juste dessous.',
         "message_mort": 'Electrocute en direct. Trois cent mille vues.',
         "message_piege": 'Le cable est denude. Il gresille.',
+        "piege_image": 'cable',
+        "message_attente": 'Le cable est encore bien range. Fais tomber la ring light.',
         "carte": [
             "######################",
             "#......O.......www...#",
@@ -87,7 +93,7 @@ NIVEAUX = [
             "#333.18..22.Cn644455g#",
             "######################",
         ],
-        "faux_pieges": {'g': {'declenchement': 'action', 'effet': 'projection', 'vitesse': (-3, 15), 'texte': 'Il grimpe au mur pour s echapper. Glisse. Retombe. Story instantanee.'}, 'n': {'declenchement': 'action', 'texte': 'Il mange la plante pour s empoisonner. La vomit. Vivant, et pas fier.'}},
+        "faux_pieges": {'g': {'declenchement': 'action', 'effet': 'projection', 'image': 'griffures', 'vitesse': (-3, 15), 'texte': 'Il grimpe au mur pour s echapper. Glisse. Retombe. Story instantanee.'}, 'n': {'declenchement': 'action', 'image': 'plante', 'texte': 'Il mange la plante pour s empoisonner. La vomit. Vivant, et pas fier.'}},
     },
     {
         "titre": 'La cuisine du restaurant, en plein rush',
@@ -95,6 +101,8 @@ NIVEAUX = [
         "aide": 'La marmite bout sans surveillance. Fais tomber le couvercle, et saute.',
         "message_mort": 'Tombe dans l eau bouillante. Le service continue.',
         "message_piege": 'La marmite est ouverte. Personne ne regarde.',
+        "piege_image": 'marmite',
+        "message_attente": 'Le couvercle est encore sur la marmite. Fais-le tomber.',
         "carte": [
             "######################",
             "#..............O.....#",
@@ -108,7 +116,7 @@ NIVEAUX = [
             "#pp22.C.8.h655u..1.44#",
             "######################",
         ],
-        "faux_pieges": {'u': {'declenchement': 'action', 'texte': 'Le couteau bascule du plan de travail... et se plante a cote. Rate.'}, 'h': {'declenchement': 'action', 'texte': 'Provoque, le chef s ecroule : crise cardiaque. Il n aura pas le temps de le tuer.'}},
+        "faux_pieges": {'u': {'declenchement': 'action', 'image': 'couteau', 'texte': 'Le couteau bascule du plan de travail... et se plante a cote. Rate.'}, 'h': {'declenchement': 'action', 'image': 'chef', 'texte': 'Provoque, le chef s ecroule : crise cardiaque. Il n aura pas le temps de le tuer.'}},
     },
     {
         "titre": 'Le cabinet medical',
@@ -116,6 +124,8 @@ NIVEAUX = [
         "aide": 'Le flacon d anesthesiant est en haut. Endors le medecin d abord, sinon il soigne tout.',
         "message_mort": 'Cette fois, personne n est venu recoudre.',
         "message_piege": 'Le medecin s est endormi sur son bureau.',
+        "piege_image": 'medecin',
+        "message_attente": 'Le medecin est reveille. Il te recoudrait. Le flacon d abord.',
         "carte": [
             "######################",
             "#.www....O...........#",
@@ -129,7 +139,7 @@ NIVEAUX = [
             "#.4445518.s.q6.Cd22pp#",
             "######################",
         ],
-        "faux_pieges": {'s': {'declenchement': 'action', 'effet': 'soin', 'texte': 'Le scalpel. Precis. Le medecin le recoud en huit minutes, montre en main.'}, 'q': {'declenchement': 'action', 'effet': 'soin', 'texte': 'La seringue du medecin. Reanime. Et vaccine, en prime.'}, 'd': {'declenchement': 'action', 'effet': 'soin', 'texte': 'Il leche le patient contagieux. Gueri en une nuit. Ce medecin est trop fort.'}},
+        "faux_pieges": {'s': {'declenchement': 'action', 'effet': 'soin', 'image': 'scalpel', 'texte': 'Le scalpel. Precis. Le medecin le recoud en huit minutes, montre en main.'}, 'q': {'declenchement': 'action', 'effet': 'soin', 'image': 'seringue', 'texte': 'La seringue du medecin. Reanime. Et vaccine, en prime.'}, 'd': {'declenchement': 'action', 'effet': 'soin', 'image': 'patient', 'texte': 'Il leche le patient contagieux. Gueri en une nuit. Ce medecin est trop fort.'}},
     },
     {
         "titre": 'Le jardin : il ne veut plus mourir',
@@ -152,6 +162,6 @@ NIVEAUX = [
             "#33622.C..XXX.z.XX..6#",
             "######################",
         ],
-        "faux_pieges": {'y': {'declenchement': 'contact', 'recharge': 10.0, 'texte': 'Un papillon. Il le suit des yeux. Le bassin est juste la. Pas cette fois.'}, 'z': {'declenchement': 'action', 'texte': 'Une balle de laine. Non. Il sait exactement comment ca finit.'}},
+        "faux_pieges": {'y': {'declenchement': 'contact', 'recharge': 10.0, 'image': 'papillon', 'texte': 'Un papillon. Il le suit des yeux. Le bassin est juste la. Pas cette fois.'}, 'z': {'declenchement': 'action', 'image': 'pelote', 'texte': 'Une balle de laine. Non. Il sait exactement comment ca finit.'}},
     },
 ]

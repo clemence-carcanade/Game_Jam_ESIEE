@@ -114,6 +114,31 @@ class VueJeu(arcade.View):
 
         self.chat.mettre_a_jour_animation(delta_time)
 
+    def _action_possible(self) -> bool:
+        """Y a-t-il quelque chose a faire avec E, la, maintenant ?"""
+        if self.chat.dans_le_sac or not self.chat.vivant:
+            return False
+        for zone in self.faux_pieges:
+            if (zone.effet["declenchement"] == "action" and zone.recharge <= 0
+                    and arcade.check_for_collision(self.chat, zone)):
+                return True
+        if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
+            return True
+        depart = self.chat.center_x
+        self.chat.center_x += self.chat.regarde * PORTEE_ACTION
+        pres_du_sac = bool(arcade.check_for_collision_with_list(self.chat, self.niveau.poussables))
+        self.chat.center_x = depart
+        return pres_du_sac
+
+    def _dessiner_indicateur_action(self) -> None:
+        """Un petit E au-dessus du chat quand la touche fera quelque chose."""
+        if not self._action_possible():
+            return
+        x, y = self.chat.center_x, self.chat.top + 14
+        arcade.draw_lrbt_rectangle_filled(x - 11, x + 11, y - 3, y + 19, (20, 18, 26))
+        arcade.draw_lrbt_rectangle_outline(x - 11, x + 11, y - 3, y + 19, (240, 220, 120), 2)
+        arcade.draw_text("E", x, y, (240, 220, 120), 14, anchor_x="center", bold=True)
+
     # ------------------------------------------------------------------
     # Les faux pieges scriptes
     # ------------------------------------------------------------------
@@ -125,6 +150,7 @@ class VueJeu(arcade.View):
         l'air mortel doit rater. C'est ici que ca rate.
         """
         self.faux_pieges = arcade.SpriteList()
+        self.images_pieges = arcade.SpriteList()
         for lettre, effet in self.niveau.faux_pieges.items():
             for x, y in self.niveau.scriptes.get(lettre, []):
                 largeur = int(C.TAILLE_TUILE * effet.get("largeur", 1))
@@ -137,6 +163,12 @@ class VueJeu(arcade.View):
                 zone.effet.setdefault("declenchement", "action")
                 zone.recharge = 0.0
                 self.faux_pieges.append(zone)
+
+                # un piege invisible n'existe pas : chaque zone montre son image
+                image = module_niveau._image(effet.get("image", ""), x,
+                                             y_bas=y - C.TAILLE_TUILE / 2)
+                if image is not None:
+                    self.images_pieges.append(image)
 
     def _vivre_les_faux_pieges(self, delta_time: float) -> None:
         """Les pieges au contact se declenchent tout seuls, puis se rearment."""
@@ -218,7 +250,8 @@ class VueJeu(arcade.View):
         if self.gamelle.remplie:
             self.griller_une_vie("les croquettes avariees")
         else:
-            self.afficher("Les memes croquettes que tous les soirs. Meme pas de quoi s etouffer.")
+            self.afficher(self.niveau.message_attente
+                          or "Les memes croquettes que tous les soirs. Meme pas de quoi s etouffer.")
 
     def se_coincer_dans_le_sac(self) -> bool:
         """Faux piege : le chat met la tete dans le sac et fonce dans le decor.
@@ -284,7 +317,9 @@ class VueJeu(arcade.View):
     def on_draw(self) -> None:
         self.clear()
         self.niveau.dessiner()
+        self.images_pieges.draw(pixelated=True)
         arcade.draw_sprite(self.chat, pixelated=True)
+        self._dessiner_indicateur_action()
 
         if self.debug:
             self.collisions.dessiner_debug()
