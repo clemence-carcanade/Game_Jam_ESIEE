@@ -8,18 +8,33 @@ class MenuView(arcade.View):
     def __init__(self):
         super().__init__()
         self.manager = arcade.gui.UIManager()
+        arcade.load_font("assets/fonts/8-bit Arcade In.ttf")
+
+        # Répétition de la tuile sur tout l'écran
+        self.background_list = arcade.SpriteList()
+        texture = arcade.load_texture("assets/UI/Tile.png")
+
+        tile_size = 128  # Ajuste la taille si tu souhaites agrandir/réduire les tuiles
+        scale = tile_size / texture.width
+
+        for x in range(0, settings.SCREEN_WIDTH + tile_size, tile_size):
+            for y in range(0, settings.SCREEN_HEIGHT + tile_size, tile_size):
+                tile = arcade.Sprite(texture, scale=scale)
+                tile.center_x = x
+                tile.center_y = y
+                self.background_list.append(tile)
 
     def on_show_view(self):
         self.manager.enable()
-        arcade.set_background_color(arcade.color.WOOD_BROWN)
 
         self.v_box = arcade.gui.UIBoxLayout(space_between=15)
 
         title_label = arcade.gui.UILabel(
-            text="SEPT VIES",
-            font_size=28,
+            text="CHAT VA MAL",
+            font_name="8-bit Arcade In",
+            font_size=72,
             bold=True,
-            text_color=arcade.color.WHITE,
+            text_color=arcade.color.WHITE
         )
         self.v_box.add(title_label.with_padding(bottom=30))
 
@@ -36,7 +51,7 @@ class MenuView(arcade.View):
 
         # --- Bouton SETTINGS ---
         settings_button = arcade.gui.UIFlatButton(
-            text="SETTINGS", width=200, height=50
+            text="SETTINGS", width=200, height=50, font_name="8-bit Arcade In",
         )
         self.v_box.add(settings_button)
 
@@ -49,7 +64,7 @@ class MenuView(arcade.View):
 
         # --- Bouton CREDITS ---
         credits_button = arcade.gui.UIFlatButton(
-            text="CREDITS", width=200, height=50
+            text="CREDITS", width=200, height=50, font_name="8-bit Arcade In",
         )
         self.v_box.add(credits_button)
 
@@ -61,7 +76,7 @@ class MenuView(arcade.View):
             self.window.show_view(CreditsView())
 
         # --- Bouton EXIT ---
-        exit_button = arcade.gui.UIFlatButton(text="EXIT", width=200, height=50)
+        exit_button = arcade.gui.UIFlatButton(text="EXIT", width=200, height=50, font_name="8-bit Arcade In",)
         self.v_box.add(exit_button)
 
         @exit_button.event("on_click")
@@ -77,4 +92,5 @@ class MenuView(arcade.View):
 
     def on_draw(self):
         self.clear()
+        self.background_list.draw()
         self.manager.draw()
