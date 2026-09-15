@@ -46,11 +46,14 @@ PLATEFORMES = [
     (1398, 215, 1550),           # l'arbre a chat, sommet
 ]
 
-# l'escalier peint monte de droite a gauche : la base est au salon (x=735),
-# le haut rejoint le palier de la cuisine (x=430). Huit marches traversables.
-for _i in range(8):
-    _x = 735 - _i * 38
-    PLATEFORMES.append((_x - 26, 815 - (_i + 1) * 42, _x + 26))
+# l'escalier peint monte de droite a gauche : base au salon (x~720, sol y=815),
+# sommet au palier de la cuisine (x~430, y=480). Chaque marche est un GRADIN
+# solide, assez bas pour se sauter : on monte marche apres marche.
+_MARCHES = 7
+for _i in range(_MARCHES):
+    _x = 720 - _i * 42                      # la marche recule vers la gauche
+    _haut = 762 - _i * 40                   # et monte de 40 px
+    SOLIDES.append((_x - 30, _haut, _x + 34, _haut + 38))
 
 # --- les endroits qui ont un nom --------------------------------------------
 # un point (x, y du sol a cet endroit) en pixels de l'image

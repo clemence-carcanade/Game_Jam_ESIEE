@@ -70,7 +70,7 @@ class Chat(arcade.Sprite):
         # --- réflexes (actifs au départ : c'est tout le problème du joueur) ---
         self.reflexe_pattes = True
         self.reflexe_moustaches = True
-        self.reflexe_agrippe = True
+        self.reflexe_agrippe = False   # sinon le chat ne peut pas descendre d une plateforme
 
         # --- cicatrices héritées des vies précédentes (rempli par vies.py) ---
         self.cicatrices = []
