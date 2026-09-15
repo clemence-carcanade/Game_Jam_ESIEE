@@ -33,6 +33,7 @@ class VueJeu(arcade.View):
         self.niveau = None
         self.chat = None
         self.collisions = None
+        self.pause_mort = 0.0        # temps d'affichage du chat allonge
         self.charger_niveau(numero_niveau)
 
     # ------------------------------------------------------------------
@@ -62,17 +63,31 @@ class VueJeu(arcade.View):
 
     # ------------------------------------------------------------------
     def on_update(self, delta_time: float) -> None:
+        self.minuteur_message = max(0.0, self.minuteur_message - delta_time)
+
+        # TODO (vies.py) : cette pause et l'enchainement des niveaux
+        # appartiennent au systeme de vies. Ici, juste de quoi voir l'animation.
+        if self.pause_mort > 0:
+            self.pause_mort -= delta_time
+            self.chat.mettre_a_jour_animation(delta_time)
+            if self.pause_mort <= 0:
+                self.chat.replacer_au_depart()
+                self.chat.vivant = True
+            return
+
         au_sol = self.collisions.est_au_sol()
         self.chat.calculer_deplacement(delta_time, au_sol)
         contacts = self.collisions.mettre_a_jour(descendre=self.chat.veut_descendre)
 
+        if contacts.atterrissage:
+            self.chat.signaler_atterrissage()
         if contacts.esquive:
             self.afficher("Les moustaches ont senti le danger !")
 
         if not contacts.vivant:
             self.griller_une_vie(contacts.mort)
 
-        self.minuteur_message = max(0.0, self.minuteur_message - delta_time)
+        self.chat.mettre_a_jour_animation(delta_time)
 
     def griller_une_vie(self, cause: str) -> None:
         """Le chat change de vie : c'est l'objectif du niveau, pas un échec."""
@@ -80,7 +95,9 @@ class VueJeu(arcade.View):
         self.afficher(f"Une vie de moins, emportée par {cause}. Il en reste {self.vies}.")
 
         # TODO (vies.py) : enregistrer la cicatrice et passer au niveau suivant.
-        self.chat.replacer_au_depart()
+        self.chat.vivant = False
+        self.chat.change_x = self.chat.change_y = 0
+        self.pause_mort = 1.4
 
     def afficher(self, texte: str) -> None:
         self.message = texte

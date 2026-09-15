@@ -88,6 +88,42 @@ if not contacts.vivant:
 `zones`, `hors_niveau`, `mort`. **La mort est signalée sur l'image où elle
 arrive**, pas sur les suivantes : il faut la traiter tout de suite.
 
+## Les sprites du chat
+
+`assets/images/chat.png` est la planche du pack *Cat 50+ animations* : une
+grille de 8 colonnes sur 51 lignes, cases de 32 x 32 (259 images). Le
+découpage est dans `game/animations.py`.
+
+| Animation | Ligne de la planche | Quand |
+|---|---|---|
+| `repos` | 2 | le chat ne bouge pas |
+| `marche` | 17 | il se déplace |
+| `saut` | 46 (fin) | il monte |
+| `chute` | 47 (début) | il descend |
+| `reception` | 47 | il vient de toucher le sol |
+| `allonge` | 32 | il vient de griller une vie |
+| `reincarnation` | 37 | l'esprit s'élève, le chat se reforme |
+
+Pour ajouter une animation, une ligne suffit dans le dictionnaire
+`ANIMATIONS` : `(ligne, première image, nombre d'images, durée d'une image,
+en boucle ou non)`. Les lignes 34 à 36 de la planche contiennent des pixels
+rouges : on ne les utilise pas, le registre du jeu est cartoon.
+
+Deux points à ne pas casser :
+
+- **La boîte de collision ne dépend pas de l'image.** Le chat n'occupe qu'un
+  petit rectangle en bas de sa case de 32 x 32 ; `animations.boite_du_chat()`
+  mesure ce rectangle et `Chat.definir_boite_de_collision()` cale la boîte
+  dessus. Sans ça le chat flotterait au-dessus du sol et mourrait à cause d'un
+  pixel transparent.
+- Le chat est dessiné tourné **vers la droite** ; les images sont retournées
+  automatiquement quand il va à gauche.
+- Taille à l'écran : `ECHELLE_CHAT` dans `constantes.py` (2.5 = un chat
+  d'environ 50 x 35 px sur des tuiles de 64).
+
+Si `assets/images/chat.png` est absent, le chat redevient un carré orange et
+le jeu tourne quand même.
+
 ## Format des niveaux
 
 `niveaux/niveau_N.txt` — première ligne les métadonnées en JSON, puis la carte.
@@ -127,6 +163,8 @@ niveau 1 de démonstration. Restent à écrire, par leurs responsables :
 - `ui.py` — HUD (7 empreintes de pattes), menus, écrans de transition
 - `niveaux/niveau_2.txt` à `niveau_7.txt`
 - une caméra, si un niveau dépasse un écran (aujourd'hui : 20 x 11 tuiles)
+- les sprites des décors, des maîtres et des objets (tout est encore
+  rectangle de couleur, seul le chat est animé)
 
 `niveaux/niveau_1.txt` est une carte de démonstration : elle sert à valider le
 moteur, elle n'a pas encore été jouée par un humain.

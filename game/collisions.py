@@ -40,6 +40,10 @@ TOLERANCE_ATTERRISSAGE = 2.0
 #: distance de test sous les pattes du chat pour savoir s'il est au sol
 SONDE_SOL = 5.0
 
+#: largeur de la sonde qui verifie que le chat est vraiment pose (pas en
+#: equilibre sur un pixel de rebord). Sert au reflexe d'agrippement.
+SONDE_CENTRE = 10.0
+
 
 def _en_listes(valeur):
     """Accepte une SpriteList, une liste de SpriteList, ou rien du tout."""
@@ -105,6 +109,11 @@ class MoteurCollisions:
         self._etait_au_sol = False
         self._altitude_depart_chute = chat.center_y
         self._derniere_position_sure = (chat.center_x, chat.center_y)
+
+        # petite sonde invisible, placee sous le centre du chat
+        self._sonde = arcade.Sprite(
+            arcade.Texture.create_empty("_sonde", (int(SONDE_CENTRE), int(SONDE_CENTRE)))
+        )
 
     # ------------------------------------------------------------------
     # 1. Interrogation — AVANT que le chat calcule ses vitesses
@@ -192,6 +201,22 @@ class MoteurCollisions:
                     return plateforme
         return None
 
+    def _sol_sous_le_centre(self) -> bool:
+        """Y a-t-il du sol sous le *centre* du chat, et pas juste sous un bord ?
+
+        ``est_au_sol()`` est volontairement permissif (on peut sauter depuis
+        l'extrême bord). Ici on veut le contraire : savoir si le chat tient
+        vraiment debout, pour qu'il ne s'agrippe pas en flottant dans le vide.
+        """
+        self._sonde.center_x = self.chat.center_x
+        self._sonde.center_y = self.chat.bottom - SONDE_CENTRE / 2
+
+        for listes in (self.murs, self.plateformes, self.poussables):
+            for liste in listes:
+                if arcade.check_for_collision_with_list(self._sonde, liste):
+                    return True
+        return False
+
     # -- réflexe : s'agripper au rebord ----------------------------------
     def _agripper_le_rebord(self, descendre: bool) -> None:
         """Le chat s'accroche par réflexe : il ne tombe jamais en marchant.
@@ -199,7 +224,8 @@ class MoteurCollisions:
         Pour tomber, il faut sauter... ou désactiver le réflexe dans le niveau.
         """
         if not getattr(self.chat, "reflexe_agrippe", False):
-            self._derniere_position_sure = (self.chat.center_x, self.chat.center_y)
+            if self._sol_sous_le_centre():
+                self._derniere_position_sure = (self.chat.center_x, self.chat.center_y)
             return
 
         quitte_le_sol_en_marchant = (
@@ -210,7 +236,7 @@ class MoteurCollisions:
             self.chat.center_x, self.chat.center_y = self._derniere_position_sure
             self.chat.change_x = 0
             self.chat.change_y = 0
-        elif self.est_au_sol():
+        elif self._sol_sous_le_centre():
             self._derniere_position_sure = (self.chat.center_x, self.chat.center_y)
 
     # -- chutes -----------------------------------------------------------

@@ -39,8 +39,9 @@ VIES_DEPART = 7
 # Physique du chat (valeurs par image, comme le moteur d'arcade)
 # ---------------------------------------------------------------------------
 GRAVITE = 1.0
-LARGEUR_CHAT = 48
+LARGEUR_CHAT = 48              # taille du carré de secours, sans les sprites
 HAUTEUR_CHAT = 48
+ECHELLE_CHAT = 2.5             # la planche est en 32 px : le chat fait ~50 x 35
 VITESSE_CHAT = 6.0             # vitesse horizontale maximale
 ACCELERATION_SOL = 1.2
 ACCELERATION_AIR = 0.7         # on contrôle moins bien le chat en l'air
