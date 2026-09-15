@@ -776,6 +776,61 @@ def medicaments():
     return t.enregistrer("medicaments")
 
 
+def arbre_chat_objet():
+    """Un petit arbre a chat : c'est lui qui bascule sur le chat au niveau 2."""
+    t = Toile(28, 44)
+    t.rect(4, 40, 23, 43, "bois_sombre")            # la base
+    t.cadre(4, 40, 23, 43, "contour")
+    t.rect(11, 10, 16, 40, (214, 200, 176))         # le poteau (sisal)
+    for y in range(11, 40, 3):
+        t.ligne_h(y, 11, 16, (188, 172, 150))
+    t.cadre(11, 10, 16, 40, "contour")
+    t.rect(2, 4, 25, 11, (200, 186, 162))           # la plateforme du haut
+    t.cadre(2, 4, 25, 11, "contour")
+    t.rect(9, 0, 18, 5, (150, 150, 158))            # la boule/coussin
+    t.cadre(9, 0, 18, 5, "contour")
+    return t.enregistrer("arbre_chat_objet")
+
+
+def jouet_bain():
+    t = Toile(22, 18)
+    t.rect(4, 6, 17, 15, (240, 210, 70))            # le corps du canard
+    t.cadre(4, 6, 17, 15, "contour")
+    t.rect(13, 2, 19, 8, (240, 210, 70))            # la tete
+    t.cadre(13, 2, 19, 8, "contour")
+    t.rect(18, 5, 21, 7, (230, 140, 60))            # le bec
+    t.point(15, 4, "contour")                       # l'oeil
+    return t.enregistrer("jouet_bain")
+
+
+def ring_light():
+    t = Toile(30, 40)
+    for y in range(2, 22):                           # l'anneau lumineux
+        for x in range(2, 28):
+            d = (x - 15) ** 2 + (y - 12) ** 2
+            if 90 <= d <= 150:
+                t.point(x, y, (250, 245, 210))
+            elif 150 < d <= 175:
+                t.point(x, y, "contour")
+    t.rect(14, 22, 16, 37, "metal_sombre")          # le pied
+    t.rect(9, 37, 21, 39, "metal")
+    t.cadre(9, 37, 21, 39, "contour")
+    return t.enregistrer("ring_light")
+
+
+def couvercle():
+    t = Toile(30, 14)
+    for x in range(2, 28):                            # le dome
+        h = int(2 + (1 - abs(x - 15) / 14) * 6)
+        for y in range(12 - h, 12):
+            t.point(x, y, "metal")
+        t.point(x, 12 - h, "metal_clair")
+    t.rect(2, 11, 27, 13, "metal_sombre")            # le bord
+    t.cadre(2, 11, 27, 13, "contour")
+    t.rect(13, 1, 16, 4, "metal_sombre")             # la poignee
+    return t.enregistrer("couvercle")
+
+
 # ---------------------------------------------------------------------------
 def tout_dessiner():
     mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
@@ -787,6 +842,7 @@ def tout_dessiner():
     maquillage(); griffures(); couteau(); scalpel(); seringue(); patient()
     papillon(); pelote(); coussin(); aquarium(); cable(); marmite()
     somniferes(); defibrillateur(); medicaments()
+    arbre_chat_objet(); jouet_bain(); ring_light(); couvercle()
     gamelle(False); gamelle(True)
     fichiers = sorted(p.name for p in DOSSIER.glob("*.png"))
     print(f"{len(fichiers)} images ecrites dans {DOSSIER} :")

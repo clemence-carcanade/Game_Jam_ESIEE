@@ -386,8 +386,15 @@ class MoteurCollisions:
                 if support is not None:
                     objet.bottom = support
                     objet.change_y = 0
-                elif objet.top < self.bas_du_niveau:
-                    objet.remove_from_sprite_lists()   # sorti du niveau
+                    if getattr(objet, "bascule", False):
+                        # arrive : couche s'il a bascule, sinon toujours debout
+                        objet.angle = 90 if objet.angle >= 45 else 0
+                else:
+                    # en l'air : un objet qui bascule tourne pendant sa chute
+                    if getattr(objet, "bascule", False):
+                        objet.angle = min(90, getattr(objet, "angle", 0) + 8)
+                    if objet.top < self.bas_du_niveau:
+                        objet.remove_from_sprite_lists()
 
     def _support_sous(self, objet):
         """Retourne l'altitude du dessus du premier support touché, sinon None."""

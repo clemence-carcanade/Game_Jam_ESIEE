@@ -28,7 +28,7 @@ NIVEAUX = [
         message_mort="Ecrase sous l arbre a chat. Personne n a rien vu.",
         message_attente="L arbre a chat est encore debout. Fais-le basculer d abord.",
         depart="salon",
-        objet="arbre_haut", pousse="g",
+        objet="arbre_haut", pousse="g", objet_image="arbre_chat_objet", objet_anim="bascule",
         piege="chatterie", piege_largeur=120,
         faux_pieges={
             "k": dict(pos="arbre_bas", declenchement="contact", recharge=9.0,
@@ -47,7 +47,7 @@ NIVEAUX = [
         message_mort="Noye dans l aquarium. Elle croira a un jeu.",
         message_attente="L aquarium est paisible. Le jouet de bain d abord.",
         depart="salon",
-        objet="frigo", pousse="d",
+        objet="frigo", pousse="d", objet_image="jouet_bain",
         piege="sdb", piege_image="aquarium", piege_largeur=120,
         faux_pieges={
             "e": dict(pos="chambre", declenchement="contact", recharge=9.0,
@@ -65,7 +65,7 @@ NIVEAUX = [
         message_mort="Electrocute en direct. Trois cent mille vues.",
         message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         depart="salon",
-        objet="planche_milieu_d", pousse="d",
+        objet="planche_milieu_d", pousse="d", objet_image="ring_light",
         piege="chatterie", piege_image="cable", piege_largeur=120,
         faux_pieges={
             "g": dict(pos="cuisine", declenchement="action", effet="projection",
@@ -82,7 +82,7 @@ NIVEAUX = [
         message_mort="Tombe dans l eau bouillante. Le service continue.",
         message_attente="Le couvercle est encore sur la marmite. Fais-le tomber.",
         depart="salon",
-        objet="frigo", pousse="d",
+        objet="frigo", pousse="d", objet_image="couvercle",
         piege="cuisine", piege_image="marmite", piege_largeur=110,
         faux_pieges={
             "u": dict(pos="sdb", declenchement="action", image="couteau",
