@@ -14,6 +14,10 @@ NIVEAUX = [
         message_mort="Etouffe avec les croquettes. Une vie de moins, une maison de plus.",
         message_attente="Les memes croquettes que tous les soirs. Meme pas de quoi s etouffer.",
         depart="salon",
+        pousseurs=[
+            dict(min="canape", max="tv", vitesse=2.4),
+            dict(min="chambre", max="couloir", vitesse=1.8),
+        ],
         objet="tv", pousse="d",
         piege="gamelle_bas", piege_largeur=200,
         faux_pieges={
@@ -34,6 +38,11 @@ NIVEAUX = [
         message_mort="Ecrase sous l arbre a chat. Personne n a rien vu.",
         message_attente="L arbre a chat est encore debout. Fais-le basculer d abord.",
         depart="salon",
+        pousseurs=[
+            dict(min="arbre_bas", max="chatterie", vitesse=2.6, force=18),
+            dict(min="cuisine", max="salon", vitesse=2.0),
+            dict(min="sdb", max="planche_sdb", vitesse=1.6),
+        ],
         objet="planche_salon", pousse="d", objet_image="arbre_chat_objet", objet_anim="bascule",
         piege=(905, 846), piege_largeur=150,
         faux_pieges={
@@ -57,6 +66,10 @@ NIVEAUX = [
         message_mort="Noye dans l aquarium. Elle croira a un jeu.",
         message_attente="L aquarium est paisible. Le jouet de bain d abord.",
         depart="salon",
+        pousseurs=[
+            dict(min="couloir", max="chambre", vitesse=2.2),
+            dict(min="canape", max="salle_droite", vitesse=2.4),
+        ],
         objet="frigo", pousse="d", objet_image="jouet_bain",
         piege="sdb", piege_image="aquarium", piege_largeur=120,
         faux_pieges={
@@ -79,6 +92,9 @@ NIVEAUX = [
         message_mort="Electrocute en direct. Trois cent mille vues.",
         message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         depart="salon",
+        pousseurs=[
+            dict(min="salon", max="salle_droite", vitesse=3.0, force=18),
+        ],
         objet="planche_milieu_d", pousse="d", objet_image="ring_light",
         piege="chatterie", piege_image="cable", piege_largeur=120,
         faux_pieges={
@@ -100,6 +116,10 @@ NIVEAUX = [
         message_mort="Tombe dans l eau bouillante. Le service continue.",
         message_attente="Le couvercle est encore sur la marmite. Fais-le tomber.",
         depart="salon",
+        pousseurs=[
+            dict(min="cuisine", max="salon", vitesse=2.8, force=17),
+            dict(min="chatterie", max="salle_haut", vitesse=2.0),
+        ],
         objet="frigo", pousse="d", objet_image="couvercle",
         piege="cuisine", piege_image="marmite", piege_largeur=110,
         faux_pieges={
@@ -120,6 +140,9 @@ NIVEAUX = [
         message_mort="Cette fois, personne n est venu recoudre.",
         message_attente="Le medecin veille. Il recoud tout. Les somniferes d abord.",
         depart="salon", docteur=True,
+        pousseurs=[
+            dict(min="salon", max="tv", vitesse=2.2),
+        ],
         objet="planche_milieu_g", pousse="g", objet_image="somniferes",
         piege="planche_centre", piege_image="aucune", piege_largeur=150,
         faux_pieges={
@@ -149,6 +172,10 @@ NIVEAUX = [
         message_mort="Pas comme ca. Pas maintenant. On recommence.",
         survivre=True, reflexes_coupes=["moustaches"],
         depart="salon",
+        pousseurs=[
+            dict(min="canape", max="tv", vitesse=2.6),
+            dict(min="chambre", max="couloir", vitesse=2.2),
+        ],
         sortie="paniere",
         mortels=[
             dict(pos="planche_centre", image="cable", cause="la guirlande electrique"),

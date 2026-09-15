@@ -21,6 +21,7 @@ from game.chat import Chat
 from game.collisions import MoteurCollisions
 from game.effets import Effets
 from game.ambiance import Ambiance
+from game.entites import Pousseur
 from game.audio import Audio
 
 #: distance a laquelle le chat peut attraper un objet devant lui
@@ -91,6 +92,17 @@ class VueJeu(arcade.View):
             self.fond.center_x = self.niveau.largeur / 2
             self.fond.center_y = self.niveau.hauteur / 2
         self.ambiance = Ambiance(self.niveau)
+
+        # les pousseurs : des entites qui bousculent le chat loin du danger
+        self.pousseurs = arcade.SpriteList()
+        for spec in self.niveau.pousseurs:
+            (xg, yg) = self.niveau.point(spec["min"])
+            (xd, yd) = self.niveau.point(spec["max"])
+            self.pousseurs.append(Pousseur(
+                (xg + xd) / 2, min(xg, xd), max(xg, xd), yg,
+                image=spec.get("image", "chat_gris"),
+                vitesse=spec.get("vitesse", 2.2),
+                force=spec.get("force", 16)))
         if self.niveau.aide:
             self.afficher(self.niveau.aide)
 
@@ -137,6 +149,12 @@ class VueJeu(arcade.View):
         if self.medecin is not None:
             self.medecin.mettre_a_jour(delta_time)
         self.effets.mettre_a_jour(delta_time)
+        self.ambiance.mettre_a_jour(delta_time)      # la maison respire, en continu
+        for pousseur in self.pousseurs:
+            if pousseur.mettre_a_jour(delta_time, self.chat):
+                self.effets.pouf(self.chat.center_x, self.chat.center_y, (200, 210, 235), 8)
+                self.effets.trembler(4)
+                self.audio.jouer("piege", 0.4)
 
         if contacts.atterrissage:
             self.chat.signaler_atterrissage()
@@ -387,6 +405,7 @@ class VueJeu(arcade.View):
         self.ambiance.dessiner()
         self.niveau.dessiner()
         self.images_pieges.draw(pixelated=True)
+        self.pousseurs.draw(pixelated=True)
         if self.medecin is not None:
             arcade.draw_sprite(self.medecin, pixelated=True)
             if self.medecin.endormi:

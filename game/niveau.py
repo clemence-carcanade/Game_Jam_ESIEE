@@ -255,6 +255,7 @@ class Niveau:
     depart_chat: tuple = (100.0, 100.0)
     point: object = None            # convertit ancre/pixels image -> ecran
     rampes: list = field(default_factory=list)   # pentes (x0,y0,x1,y1) en ecran
+    pousseurs: list = field(default_factory=list)   # entites mobiles qui bousculent
     faux_pieges: dict = field(default_factory=dict)   # lettre -> effet scripte
     message_piege: str = ""         # ce qu'on lit quand le piege s'arme
     message_mort: str = ""          # ce qu'on lit en grillant une vie
@@ -331,6 +332,7 @@ def construire_maison(definition) -> Niveau:
         objet_image=definition.get("objet_image", ""),
     )
     niveau.faux_pieges = definition.get("faux_pieges", {})
+    niveau.pousseurs = definition.get("pousseurs", [])
     niveau.fond = maison.FOND
     niveau.largeur = maison.LARGEUR_IMAGE * ech
     niveau.hauteur = maison.HAUTEUR_IMAGE * ech
