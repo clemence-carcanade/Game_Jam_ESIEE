@@ -1,8 +1,10 @@
 import arcade
 import arcade.gui
+import settings
 
 
 class MenuView(arcade.View):
+
     def __init__(self):
         super().__init__()
         self.manager = arcade.gui.UIManager()
@@ -14,35 +16,65 @@ class MenuView(arcade.View):
         self.v_box = arcade.gui.UIBoxLayout(space_between=15)
 
         title_label = arcade.gui.UILabel(
-            text="MON JEU DE PLATEFORME",
+            text="SEPT VIES",
             font_size=28,
             bold=True,
+            text_color=arcade.color.WHITE,
         )
+        self.v_box.add(title_label.with_padding(bottom=30))
 
-        # Instruction
-        arcade.draw_text(
-            "Appuie sur ENTRÉE pour jouer",
-            settings.SCREEN_WIDTH / 2,
-            settings.SCREEN_HEIGHT / 2,
-            arcade.color.DARK_GRAY,
-            font_size=20,
-            anchor_x="center",
-        )
+        # --- Bouton PLAY ---
+        play_button = arcade.gui.UIFlatButton(text="PLAY", width=200, height=50)
+        self.v_box.add(play_button)
 
-        # Contrôles
-        arcade.draw_text(
-            "Contrôles : Q (gauche), D (droite), ESPACE (saut)",
-            settings.SCREEN_WIDTH / 2,
-            100,
-            arcade.color.GRAY,
-            font_size=14,
-            anchor_x="center",
-        )
-
-    def on_key_press(self, key, modifiers):
-        if key == arcade.key.ENTER:
-            # Le moteur de jeu vit dans game/ (voir README) ; l'ancien
-            # GameView de main.py a ete remplace par VueJeu.
+        @play_button.event("on_click")
+        def on_click_play(event):
             from game.jeu import VueJeu
 
+            self.manager.disable()
             self.window.show_view(VueJeu(1))
+
+        # --- Bouton SETTINGS ---
+        settings_button = arcade.gui.UIFlatButton(
+            text="SETTINGS", width=200, height=50
+        )
+        self.v_box.add(settings_button)
+
+        @settings_button.event("on_click")
+        def on_click_settings(event):
+            from views.settings import SettingsView
+
+            self.manager.disable()
+            self.window.show_view(SettingsView())
+
+        # --- Bouton CREDITS ---
+        credits_button = arcade.gui.UIFlatButton(
+            text="CREDITS", width=200, height=50
+        )
+        self.v_box.add(credits_button)
+
+        @credits_button.event("on_click")
+        def on_click_credits(event):
+            from views.credits import CreditsView
+
+            self.manager.disable()
+            self.window.show_view(CreditsView())
+
+        # --- Bouton EXIT ---
+        exit_button = arcade.gui.UIFlatButton(text="EXIT", width=200, height=50)
+        self.v_box.add(exit_button)
+
+        @exit_button.event("on_click")
+        def on_click_exit(event):
+            arcade.exit()
+
+        anchor = arcade.gui.UIAnchorLayout()
+        anchor.add(child=self.v_box, anchor_x="center_x", anchor_y="center_y")
+        self.manager.add(anchor)
+
+    def on_hide_view(self):
+        self.manager.disable()
+
+    def on_draw(self):
+        self.clear()
+        self.manager.draw()
