@@ -20,6 +20,7 @@ from game import niveau as module_niveau
 from game.chat import Chat
 from game.collisions import MoteurCollisions
 from game.effets import Effets
+from game.audio import Audio
 
 #: distance a laquelle le chat peut attraper un objet devant lui
 PORTEE_ACTION = 14.0
@@ -39,6 +40,10 @@ class VueJeu(arcade.View):
         self.collisions = None
         self.pause_mort = 0.0        # temps d'affichage du chat allonge
         self.effets = Effets()
+        self.audio = Audio()
+        self.audio.demarrer_ambiance()
+        self.ralenti = 0.0           # court ralenti a la mort
+        self.flash = 0.0             # flash blanc a la mort
         self.rejouer = False         # au niveau 7, mourir fait recommencer
         self.gamelle = None          # la zone du piege a armer
         self.sortie = None           # niveau 7 : la ou il faut arriver vivant
@@ -96,16 +101,25 @@ class VueJeu(arcade.View):
 
         # TODO (vies.py) : cette pause et l'enchainement des niveaux
         # appartiennent au systeme de vies. Ici, juste de quoi voir l'animation.
+        if self.ralenti > 0:
+            self.ralenti -= delta_time
+            delta_time *= 0.35                # tout ralentit, l'instant de la mort
+        self.flash = max(0.0, self.flash - delta_time * 2.2)
+
         if self.pause_mort > 0:
             self.pause_mort -= delta_time
+            self.chat.center_y += 2.2         # le chat-ange s'envole
+            self.chat.alpha = max(0, int(255 * min(1, self.pause_mort / 1.2)))
             self.chat.mettre_a_jour_animation(delta_time)
             self.effets.mettre_a_jour(delta_time)
             if self.pause_mort <= 0:
                 if getattr(self, "rejouer", False):
-                    self.charger_niveau(self.numero_niveau)   # niveau 7 : on recommence
+                    self.charger_niveau(self.numero_niveau)
                 else:
                     self.niveau_suivant()
                 self.chat.vivant = True
+                self.chat.ange = False
+                self.chat.alpha = 255
             return
 
         au_sol = self.collisions.est_au_sol()
@@ -123,6 +137,7 @@ class VueJeu(arcade.View):
 
         if contacts.atterrissage:
             self.chat.signaler_atterrissage()
+            self.audio.jouer("atterrissage", 0.4)
         if contacts.esquive:
             self.afficher("Les moustaches ont senti le danger !")
 
@@ -212,7 +227,11 @@ class VueJeu(arcade.View):
 
         if "texte" in effet:
             self.afficher(effet["texte"])
-        self.effets.pouf(chat.center_x, chat.top, (230, 235, 255), 8)
+        self.effets.pouf(chat.center_x, chat.top, (230, 235, 255), 10)
+        self.effets.trembler(5)
+        self.audio.jouer("piege", 0.5)
+        if effet.get("effet") not in ("projection",):
+            chat.change_y = 7                 # un petit sursaut de surprise
         if genre == "projection":
             # lance en l'air facon poupee, pousse par un autre chat...
             chat.change_x, chat.change_y = effet.get("vitesse", (0, 16))
@@ -313,11 +332,14 @@ class VueJeu(arcade.View):
             return
 
         self.chat.vivant = False
+        self.chat.ange = True                 # il s'envole en chat-ange
         self.chat.change_x = self.chat.change_y = 0
-        self.pause_mort = 1.6
-        self.effets.pouf(self.chat.center_x, self.chat.center_y, (255, 224, 120), 22)
-        self.effets.trembler(11)
-        self.audio_mort()
+        self.pause_mort = 1.8
+        self.ralenti = 0.5
+        self.flash = 1.0
+        self.effets.pouf(self.chat.center_x, self.chat.center_y, (255, 224, 120), 26)
+        self.effets.trembler(13)
+        self.audio.jouer("mort")
 
         if self.niveau.survivre:
             self.afficher(self.niveau.message_mort
@@ -335,6 +357,7 @@ class VueJeu(arcade.View):
         if self.termine:
             return
         self.termine = True
+        self.audio.jouer("win")
         self.afficher("Il est reste. Pour une fois, il est reste.")
 
     def niveau_suivant(self) -> None:
@@ -349,9 +372,6 @@ class VueJeu(arcade.View):
         self.minuteur_message = 2.5
 
     # ------------------------------------------------------------------
-    def audio_mort(self) -> None:
-        """Crochet pour le son de mort (audio_manager, plus tard)."""
-
     def on_draw(self) -> None:
         self.clear()
         dx, dy = self.effets.decalage()
@@ -370,6 +390,10 @@ class VueJeu(arcade.View):
                                  self.medecin.top + 6, (240, 220, 120), 16, bold=True)
         arcade.draw_sprite(self.chat, pixelated=True)
         self.effets.dessiner()
+        if self.flash > 0:
+            arcade.draw_lrbt_rectangle_filled(
+                0, C.LARGEUR_FENETRE, 0, C.HAUTEUR_FENETRE,
+                (255, 255, 255, int(200 * self.flash)))
         self._dessiner_indicateur_action()
 
         if self.debug:
@@ -400,6 +424,8 @@ class VueJeu(arcade.View):
             self.chat.veut_descendre = True
 
         if touche in C.TOUCHES_SAUT:
+            if self.chat.au_sol:
+                self.audio.jouer("saut", 0.5)
             self.chat.demander_saut()
         elif touche in C.TOUCHES_ACTION:
             self.interagir()

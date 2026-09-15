@@ -48,6 +48,7 @@ class Chat(arcade.Sprite):
 
         # --- animation en cours ---
         self.vivant = True
+        self.ange = False            # mort : il s'envole en chat-ange
         self._animation = "repos"
         self._image = 0
         self._minuteur_image = 0.0
@@ -189,6 +190,8 @@ class Chat(arcade.Sprite):
         self._minuteur_reception = 0.18
 
     def _animation_voulue(self) -> str:
+        if self.ange:
+            return "reincarnation"
         if not self.vivant:
             return "allonge"
         if not self.au_sol:
