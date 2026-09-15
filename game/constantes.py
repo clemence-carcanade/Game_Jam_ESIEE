@@ -34,6 +34,7 @@ IMAGES_PAR_SECONDE = 60
 # ---------------------------------------------------------------------------
 TAILLE_TUILE = 64          # une tuile = 64 x 64 pixels
 VIES_DEPART = 7
+NOMBRE_NIVEAUX = 7             # le 7e est l'inversion : il ne faut plus mourir
 
 # ---------------------------------------------------------------------------
 # Physique du chat (valeurs par image, comme le moteur d'arcade)

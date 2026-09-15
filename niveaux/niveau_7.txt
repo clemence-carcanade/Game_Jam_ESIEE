@@ -1,0 +1,10 @@
+{"titre": "Le jardin : il ne veut plus mourir", "maitre": "la famille", "aide": "Cette fois, il faut rentrer vivant. Rejoins-les, la, a droite.", "message_mort": "Pas comme ca. Pas maintenant. On recommence.", "survivre": true}
+####################
+#............www...#
+#.9..........www...#
+#........===.......#
+#...===.......G....#
+#333.........444...#
+#333.22......44455.#
+#3338226C....44455.#
+####################

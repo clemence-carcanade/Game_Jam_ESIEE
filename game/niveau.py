@@ -209,6 +209,7 @@ def _morceau(nom, carte, ligne, colonne):
 #:   "gamelle"    zone : c'est là que le chat peut manger
 MOBILIER = {
     "1": ("gamelle_vide", 0.45, C.COULEUR_GAMELLE, "gamelle"),
+    "G": ("sortie", 1.0, C.COULEUR_GOAL if hasattr(C, "COULEUR_GOAL") else (120, 200, 140), "sortie"),
     "2": ("table_basse", 1.0, C.COULEUR_VERRE, "verre"),
     "3": ("canape", 1.0, C.COULEUR_CANAPE, "plateforme"),
     "4": ("commode", 1.0, C.COULEUR_BUFFET, "mur"),
@@ -238,6 +239,9 @@ class Niveau:
     depart_chat: tuple = (0.0, 0.0)
     depart_maitre: tuple = (0.0, 0.0)
     reflexes_coupes: list = field(default_factory=list)
+    survivre: bool = False          # niveau 7 : mourir n'est plus le but
+    message_piege: str = ""         # ce qu'on lit quand le piege s'arme
+    message_mort: str = ""          # ce qu'on lit en grillant une vie
 
     murs: arcade.SpriteList = field(default_factory=lambda: arcade.SpriteList(use_spatial_hash=True))
     plateformes: arcade.SpriteList = field(default_factory=lambda: arcade.SpriteList(use_spatial_hash=True))
@@ -291,6 +295,9 @@ def construire(carte, metadonnees=None) -> Niveau:
         maitre=metadonnees.get("maitre", ""),
         aide=metadonnees.get("aide", ""),
         reflexes_coupes=metadonnees.get("reflexes_coupes", []),
+        survivre=metadonnees.get("survivre", False),
+        message_piege=metadonnees.get("message_piege", ""),
+        message_mort=metadonnees.get("message_mort", ""),
     )
 
     tuile = C.TAILLE_TUILE
@@ -459,6 +466,13 @@ def _placer_mobilier(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) ->
         glisse = _carre(tuile, tuile, invisible, x, y + tuile, nom + "_glisse")
         glisse.role = "verre"
         niveau.zones.append(glisse)
+
+    elif comportement == "sortie":
+        hauteur = max(4, int(tuile * hauteur_tuiles))
+        zone = _carre(tuile, hauteur, teinte, x, y - tuile / 2 + hauteur / 2, nom)
+        zone.nom = nom
+        zone.role = "sortie"
+        niveau.zones.append(zone)
 
     elif comportement == "gamelle":
         hauteur = max(4, int(tuile * hauteur_tuiles))

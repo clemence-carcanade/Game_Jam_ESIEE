@@ -1,0 +1,10 @@
+{"titre": "L appart de l influenceur", "maitre": "l influenceur", "aide": "Le cable de la ring light traine. Fais-le tomber la ou il faut.", "message_piege": "Le cable est denude. Il grezille.", "message_mort": "Electrocute en direct. Trois cent mille vues."}
+####################
+#......O...........#
+#.9...===..........#
+#..............cc..#
+#...===...pp.......#
+#333......pp.444...#
+#333.22...pp.444555#
+#333822.C1pp6444555#
+####################

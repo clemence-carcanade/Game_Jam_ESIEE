@@ -37,7 +37,10 @@ class VueJeu(arcade.View):
         self.chat = None
         self.collisions = None
         self.pause_mort = 0.0        # temps d'affichage du chat allonge
-        self.gamelle = None          # la zone ou le chat peut manger
+        self.rejouer = False         # au niveau 7, mourir fait recommencer
+        self.gamelle = None          # la zone du piege a armer
+        self.sortie = None           # niveau 7 : la ou il faut arriver vivant
+        self.termine = False         # le jeu est fini
         self.charger_niveau(numero_niveau)
 
     # ------------------------------------------------------------------
@@ -63,6 +66,9 @@ class VueJeu(arcade.View):
         )
 
         self.gamelle = self.niveau.trouver_zone("gamelle")
+        self.sortie = self.niveau.trouver_zone("sortie")
+        if self.niveau.aide:
+            self.afficher(self.niveau.aide)
 
     def on_show_view(self) -> None:
         self.window.background_color = C.COULEUR_FOND
@@ -77,7 +83,10 @@ class VueJeu(arcade.View):
             self.pause_mort -= delta_time
             self.chat.mettre_a_jour_animation(delta_time)
             if self.pause_mort <= 0:
-                self.chat.replacer_au_depart()
+                if getattr(self, "rejouer", False):
+                    self.charger_niveau(self.numero_niveau)   # niveau 7 : on recommence
+                else:
+                    self.niveau_suivant()
                 self.chat.vivant = True
             return
 
@@ -96,6 +105,9 @@ class VueJeu(arcade.View):
 
         if not contacts.vivant:
             self.griller_une_vie(contacts.mort)
+
+        if self.sortie is not None and arcade.check_for_collision(self.chat, self.sortie):
+            self.gagner()
 
         self.chat.mettre_a_jour_animation(delta_time)
 
@@ -123,7 +135,8 @@ class VueJeu(arcade.View):
             # il resterait plante devant et empecherait le chat de manger
             for objet in renverse:
                 objet.remove_from_sprite_lists()
-            self.afficher("Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent.")
+            self.afficher(self.niveau.message_piege
+                          or "Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent.")
 
     def _sortir_du_sac(self) -> None:
         """Le chat coince dans le sac s'arrete des qu'il percute quelque chose."""
@@ -161,14 +174,43 @@ class VueJeu(arcade.View):
         return True
 
     def griller_une_vie(self, cause: str) -> None:
-        """Le chat change de vie : c'est l'objectif du niveau, pas un échec."""
-        self.vies -= 1
-        self.afficher(f"Une vie de moins, emportée par {cause}. Il en reste {self.vies}.")
+        """Le chat change de vie.
 
-        # TODO (vies.py) : enregistrer la cicatrice et passer au niveau suivant.
+        Dans les six premiers niveaux, c'est l'objectif : la vie brulee fait
+        passer au foyer suivant. Au septieme, le jeu s'inverse — le chat est
+        enfin heureux, mourir devient l'echec et on recommence le niveau.
+        """
+        if self.termine:
+            return
+
         self.chat.vivant = False
         self.chat.change_x = self.chat.change_y = 0
-        self.pause_mort = 1.4
+        self.pause_mort = 1.6
+
+        if self.niveau.survivre:
+            self.afficher(self.niveau.message_mort
+                          or f"Pas comme ca. Pas maintenant. ({cause})")
+            self.rejouer = True
+            return
+
+        self.vies -= 1
+        self.rejouer = False
+        self.afficher(self.niveau.message_mort
+                      or f"Une vie de moins, emportee par {cause}. Il en reste {self.vies}.")
+
+    def gagner(self) -> None:
+        """Dernier niveau : le chat a tenu. C'est fini."""
+        if self.termine:
+            return
+        self.termine = True
+        self.afficher("Il est reste. Pour une fois, il est reste.")
+
+    def niveau_suivant(self) -> None:
+        if self.numero_niveau >= C.NOMBRE_NIVEAUX:
+            self.termine = True
+            self.afficher("Sept vies, sept maisons. Il ne lui en restait qu'une.")
+            return
+        self.charger_niveau(self.numero_niveau + 1)
 
     def afficher(self, texte: str) -> None:
         self.message = texte
@@ -184,7 +226,7 @@ class VueJeu(arcade.View):
             self.collisions.dessiner_debug()
 
         arcade.draw_text(
-            f"{self.niveau.titre}     Vies : {self.vies}",
+            f"{self.numero_niveau}/{C.NOMBRE_NIVEAUX}  {self.niveau.titre}     Vies : {self.vies}",
             16, C.HAUTEUR_FENETRE - 30, C.COULEUR_TEXTE, 16,
         )
         if self.niveau.aide:

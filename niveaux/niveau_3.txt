@@ -1,0 +1,10 @@
+{"titre": "La chambre de l enfant riche", "maitre": "l enfant", "aide": "L aquarium est la. Il suffit de tomber dedans au bon moment.", "message_piege": "L aquarium deborde. L eau est froide.", "message_mort": "Noye dans l aquarium. Elle croira a un jeu."}
+####################
+#......O.....www...#
+#.....===....www...#
+#.cc...............#
+#...===...........f#
+#333........444...f#
+#333.22.....444555f#
+#3338226C1..444555.#
+####################

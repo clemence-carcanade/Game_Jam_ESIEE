@@ -1,0 +1,10 @@
+{"titre": "La vieille demeure : cent chats, une gamelle", "maitre": "la vieille", "aide": "Reunis les chats sous l arbre a chat, puis fais-le basculer.", "message_piege": "L arbre a chat penche. Tous les chats regardent.", "message_mort": "Ecrase sous l arbre a chat. Cent chats n ont rien vu."}
+####################
+#......O...........#
+#.9...===..........#
+#..............cc..#
+#...===...pp......f#
+#333......pp.444..f#
+#333.22...pp.444..f#
+#333822.C1pp6444...#
+####################
