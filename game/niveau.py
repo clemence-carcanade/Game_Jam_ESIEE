@@ -35,6 +35,10 @@ import arcade
 from game import constantes as C
 
 
+#: certains décors ne se posent pas sur le bas de leur case : quelqu'un d'assis
+#: doit descendre jusqu'à l'assise du canapé, sous la case du dessus.
+DECALAGE = {"daron": -34, "maitresse": -34}
+
 #: les images du décor sont dessinées en 32 px et affichées x2, comme le chat
 ECHELLE_DECOR = C.TAILLE_TUILE / 32
 DOSSIER_DECOR = C.DOSSIER_IMAGES / "decor"
@@ -73,7 +77,7 @@ def _image(nom, x, y_bas=None, y_haut=None):
     if y_haut is not None:
         sprite.center_y = y_haut - hauteur / 2
     else:
-        sprite.center_y = y_bas + hauteur / 2
+        sprite.center_y = y_bas + hauteur / 2 + DECALAGE.get(nom, 0)
     sprite.nom = nom
     return sprite
 

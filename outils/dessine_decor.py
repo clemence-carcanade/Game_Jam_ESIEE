@@ -432,18 +432,31 @@ def sac():
 # Le balcon, sa rambarde, la baie vitrée
 # ---------------------------------------------------------------------------
 def balcon(partie):
-    """Une planche : sert de balcon dehors, d'etagere murale dedans."""
-    t = Toile(32, 14)
+    """Une etagere murale : la planche, et les equerres qui la tiennent.
+
+    Sans les equerres, la planche a l'air de flotter en l'air.
+    """
+    t = Toile(32, 22)
+    # la planche
     t.rect(0, 0, 31, 2, "bois_clair")
-    t.rect(0, 3, 31, 11, "bois")
-    t.rect(0, 12, 31, 13, "bois_sombre")
-    for x0, x1, y in ((4, 14, 6), (18, 28, 8)):
+    t.rect(0, 3, 31, 8, "bois")
+    t.rect(0, 9, 31, 10, "bois_sombre")
+    for x0, x1, y in ((4, 14, 5), (18, 28, 7)):
         t.ligne_h(y, x0, x1, "bois_sombre")
     t.ligne_h(0, 0, 31, (178, 132, 88))
+
+    # une equerre par morceau d'extremite, pour que ca tienne au mur
+    def equerre(x):
+        t.rect(x, 11, x + 2, 21, "metal_sombre")
+        t.ligne_v(x, 11, 21, "metal")
+        for i in range(9):                      # la diagonale de l'equerre
+            t.point(x + 3 + i // 2, 12 + i, "metal_sombre")
     if partie == "g":
-        t.ligne_v(0, 0, 13, "contour")
-    if partie == "d":
-        t.ligne_v(31, 0, 13, "contour")
+        equerre(4)
+        t.ligne_v(0, 0, 10, "contour")
+    elif partie == "d":
+        equerre(25)
+        t.ligne_v(31, 0, 10, "contour")
     return t.enregistrer(f"balcon_{partie}")
 
 
@@ -462,49 +475,57 @@ def rambarde():
 # Les habitants
 # ---------------------------------------------------------------------------
 def _personne(t, pull, cheveux, bras_leve):
-    """Une personne assise, vue de profil, tournée vers la télé (à gauche)."""
-    # jambes
-    t.rect(2, 26, 18, 31, "jean")
-    t.ligne_h(26, 2, 18, (76, 86, 120))
-    t.cadre(2, 26, 18, 31, "contour")
+    """Quelqu'un d'assis, vu de profil, tourne vers la tele (a gauche).
+
+    Le bassin est en bas de l'image : le sprite se pose sur l'assise du canape,
+    les jambes pendent devant. Debout, ca ne collerait jamais avec le canape.
+    """
+    # cuisses, a l'horizontale vers la gauche
+    t.rect(4, 22, 20, 27, "jean")
+    t.ligne_h(22, 4, 20, (84, 96, 132))
+    t.cadre(4, 22, 20, 27, "contour")
+    # mollets qui descendent, et les pieds
+    t.rect(5, 28, 9, 33, "jean")
+    t.cadre(5, 28, 9, 33, "contour")
+    t.rect(2, 32, 9, 34, "contour")
     # torse
-    t.rect(10, 12, 24, 27, pull)
-    t.ligne_v(10, 12, 27, "contour")
-    t.ligne_h(12, 10, 24, "contour")
-    t.ligne_v(24, 12, 27, "contour")
-    # tête
-    t.rect(11, 2, 22, 12, "peau")
-    t.cadre(11, 2, 22, 12, "contour")
-    t.rect(11, 1, 22, 4, cheveux)
-    t.cadre(11, 1, 22, 4, "contour")
-    t.point(13, 7, "contour")                 # l'oeil, rivé sur le match
-    t.rect(12, 10, 14, 10, "contour")         # la bouche, ouverte
+    t.rect(11, 9, 24, 23, pull)
+    t.ligne_h(9, 11, 24, "contour")
+    t.ligne_v(11, 9, 23, "contour")
+    t.ligne_v(24, 9, 23, "contour")
+    # tete
+    t.rect(12, 0, 22, 9, "peau")
+    t.cadre(12, 0, 22, 9, "contour")
+    t.rect(12, 0, 22, 2, cheveux)
+    t.cadre(12, 0, 22, 2, "contour")
+    t.point(14, 5, "contour")                  # l'oeil, rive sur le match
+    t.rect(13, 7, 15, 7, "contour")            # la bouche, ouverte
     # bras
     if bras_leve:
-        t.rect(6, 6, 11, 8, pull)             # il gueule sur l'arbitre
-        t.cadre(6, 6, 11, 8, "contour")
-        t.rect(4, 4, 7, 8, "peau")
-        t.cadre(4, 4, 7, 8, "contour")
+        t.rect(7, 4, 12, 6, pull)              # il gueule sur l arbitre
+        t.cadre(7, 4, 12, 6, "contour")
+        t.rect(4, 1, 8, 6, "peau")
+        t.cadre(4, 1, 8, 6, "contour")
     else:
-        t.rect(5, 16, 12, 19, pull)
-        t.cadre(5, 16, 12, 19, "contour")
-        t.rect(3, 16, 6, 19, "peau")
-        t.cadre(3, 16, 6, 19, "contour")
+        t.rect(6, 13, 12, 16, pull)
+        t.cadre(6, 13, 12, 16, "contour")
+        t.rect(3, 13, 7, 16, "peau")
+        t.cadre(3, 13, 7, 16, "contour")
     return t
 
 
 def daron():
-    t = Toile(32, 38)
+    t = Toile(32, 35)
     _personne(t, "pull_daron", "cheveux", bras_leve=True)
     return t.enregistrer("daron")
 
 
 def maitresse():
-    t = Toile(32, 38)
+    t = Toile(32, 35)
     _personne(t, "pull_maitresse", "cheveux_f", bras_leve=False)
-    # cheveux plus longs
-    t.rect(19, 4, 23, 14, "cheveux_f")
-    t.cadre(19, 4, 23, 14, "contour")
+    # cheveux plus longs, dans le dos
+    t.rect(20, 2, 24, 12, "cheveux_f")
+    t.cadre(20, 2, 24, 12, "contour")
     return t.enregistrer("maitresse")
 
 
