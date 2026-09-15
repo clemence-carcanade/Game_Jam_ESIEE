@@ -35,8 +35,10 @@ class Chat(arcade.Sprite):
                 animations.images("repos")[0],
                 scale=C.ECHELLE_CHAT, center_x=x, center_y=y,
             )
+            # on retrecit la boite sur le corps : la mesure inclut la queue,
+            # et un chat ne meurt pas parce que sa queue a touche un pic
             largeur, hauteur, decalage = animations.boite_du_chat("repos")
-            self.definir_boite_de_collision(largeur, hauteur, decalage)
+            self.definir_boite_de_collision(largeur * 0.7, hauteur, decalage)
         else:
             carre = arcade.Texture.create_empty(
                 "chat", (C.LARGEUR_CHAT, C.HAUTEUR_CHAT), C.COULEUR_CHAT

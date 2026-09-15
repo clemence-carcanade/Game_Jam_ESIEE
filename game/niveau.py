@@ -39,11 +39,21 @@ from game import constantes as C
 #: doit descendre jusqu'à l'assise du canapé, sous la case du dessus.
 DECALAGE = {"daron": -34, "maitresse": -34}
 
-#: les images du décor sont dessinées en 32 px et affichées x2, comme le chat
-ECHELLE_DECOR = C.TAILLE_TUILE / 32
+#: Deux sources d'images, dans cet ordre :
+#:   assets/images/packs/  les packs achetes, decoupes par outils/importe_packs.py
+#:                         (tuiles de 16 px, NON versionnes : voir leurs licences)
+#:   assets/images/decor/  le decor dessine par outils/dessine_decor.py
+#:                         (tuiles de 32 px, versionne, sert de secours)
+#: Chaque image garde son echelle : une tuile de 16 px s'affiche x4, une de
+#: 32 px s'affiche x2. Dans les deux cas, une tuile = une case du jeu.
+DOSSIER_PACKS = C.DOSSIER_IMAGES / "packs"
 DOSSIER_DECOR = C.DOSSIER_IMAGES / "decor"
+ECHELLE_PACK = C.TAILLE_TUILE / 16
+ECHELLE_DESSIN = C.TAILLE_TUILE / 32
+ECHELLE_DECOR = ECHELLE_DESSIN          # garde le nom utilise ailleurs
 
 _textures = {}
+_echelles = {}
 
 
 def _carre(largeur, hauteur, couleur, x, y, nom):
@@ -54,11 +64,24 @@ def _carre(largeur, hauteur, couleur, x, y, nom):
 
 
 def _texture(nom):
-    """Charge ``assets/images/decor/<nom>.png``, ou None si elle n'existe pas."""
+    """Charge ``<nom>.png``, du pack en priorite, sinon du decor dessine."""
     if nom not in _textures:
-        chemin = DOSSIER_DECOR / f"{nom}.png"
-        _textures[nom] = arcade.load_texture(chemin) if chemin.is_file() else None
+        pack = DOSSIER_PACKS / f"{nom}.png"
+        dessin = DOSSIER_DECOR / f"{nom}.png"
+        if pack.is_file():
+            _textures[nom] = arcade.load_texture(pack)
+            _echelles[nom] = ECHELLE_PACK
+        elif dessin.is_file():
+            _textures[nom] = arcade.load_texture(dessin)
+            _echelles[nom] = ECHELLE_DESSIN
+        else:
+            _textures[nom] = None
     return _textures[nom]
+
+
+def _echelle(nom):
+    """L'echelle d'affichage de cette image (x4 pour un pack, x2 pour un dessin)."""
+    return _echelles.get(nom, ECHELLE_DESSIN)
 
 
 def _image(nom, x, y_bas=None, y_haut=None):
@@ -72,8 +95,9 @@ def _image(nom, x, y_bas=None, y_haut=None):
     if texture is None:
         return None
 
-    hauteur = texture.height * ECHELLE_DECOR
-    sprite = arcade.Sprite(texture, scale=ECHELLE_DECOR, center_x=x)
+    echelle = _echelle(nom)
+    hauteur = texture.height * echelle
+    sprite = arcade.Sprite(texture, scale=echelle, center_x=x)
     if y_haut is not None:
         sprite.center_y = y_haut - hauteur / 2
     else:
@@ -103,6 +127,40 @@ def _nom_du_mur(carte, ligne, colonne):
     return "mur"
 
 
+def _voisin(carte, ligne, colonne, dl, dc):
+    """Le caractère de la case voisine, ou None hors de la carte."""
+    l, c = ligne + dl, colonne + dc
+    if 0 <= l < len(carte) and 0 <= c < len(carte[l]):
+        return carte[l][c]
+    return None
+
+
+def _coin_du_meuble(carte, ligne, colonne):
+    """Cette case est-elle le coin bas-gauche du meuble ?
+
+    Un canapé s'écrit avec 3 x 3 fois le même caractère. Une seule image est
+    dessinée, depuis ce coin : sinon on empile neuf canapés.
+    """
+    ici = carte[ligne][colonne]
+    return (
+        _voisin(carte, ligne, colonne, 0, -1) != ici
+        and _voisin(carte, ligne, colonne, 1, 0) != ici
+    )
+
+
+def _sommet_du_meuble(carte, ligne, colonne):
+    """Cette case est-elle la rangée du dessus ? C'est là qu'on pose le pied."""
+    return _voisin(carte, ligne, colonne, -1, 0) != carte[ligne][colonne]
+
+
+def _largeur_du_meuble(carte, ligne, colonne):
+    ici = carte[ligne][colonne]
+    largeur = 1
+    while _voisin(carte, ligne, colonne, 0, largeur) == ici:
+        largeur += 1
+    return largeur
+
+
 def _morceau(nom, carte, ligne, colonne):
     """Choisit le morceau gauche / milieu / droite d'un meuble selon ses voisins.
 
@@ -110,6 +168,11 @@ def _morceau(nom, carte, ligne, colonne):
     la deuxième ``canape_m``, la troisième ``canape_d``. Rien à faire de plus
     dans le fichier de niveau.
     """
+    # un pack fournit le meuble entier en une seule image : on la prefere
+    # toujours aux morceaux gauche/milieu/droite du decor dessine.
+    if (DOSSIER_PACKS / f"{nom}.png").is_file():
+        return nom
+
     def case(l, c):
         if 0 <= l < len(carte) and 0 <= c < len(carte[l]):
             return carte[l][c]
@@ -146,17 +209,17 @@ def _morceau(nom, carte, ligne, colonne):
 #:   "gamelle"    zone : c'est là que le chat peut manger
 MOBILIER = {
     "1": ("gamelle_vide", 0.45, C.COULEUR_GAMELLE, "gamelle"),
-    "2": ("table_verre", 0.25, C.COULEUR_VERRE, "verre"),
+    "2": ("table_basse", 1.0, C.COULEUR_VERRE, "verre"),
     "3": ("canape", 1.0, C.COULEUR_CANAPE, "plateforme"),
-    "4": ("etagere", 1.0, C.COULEUR_BUFFET, "mur"),
+    "4": ("commode", 1.0, C.COULEUR_BUFFET, "mur"),
     "5": ("television", 0.9, C.COULEUR_TELE, "decor"),
     "6": ("plante", 1.3, C.COULEUR_PLANTE, "decor"),
     "7": ("tapis", 0.12, C.COULEUR_TAPIS, "decor"),
-    "8": ("maitresse", 1.2, C.COULEUR_MAITRESSE, "decor"),
-    "9": ("rambarde", 0.8, C.COULEUR_RAMBARDE, "decor"),
-    # elements accroches au mur : ils ne touchent jamais le chat
-    "f": ("fenetre", 1.5, C.COULEUR_VERRE, "mural"),
-    "c": ("cadre", 0.8, C.COULEUR_BUFFET, "mural"),
+    "8": ("lampadaire", 1.2, C.COULEUR_MAITRESSE, "decor"),
+    # accroches au mur : ils ne touchent jamais le chat
+    "9": ("horloge", 0.8, C.COULEUR_RAMBARDE, "mural"),
+    "f": ("miroir", 1.5, C.COULEUR_VERRE, "mural"),
+    "c": ("tableau", 0.8, C.COULEUR_BUFFET, "mural"),
 }
 
 
@@ -309,13 +372,9 @@ def _placer(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) -> None:
 
     elif caractere == C.CAR_MAITRE:
         niveau.depart_maitre = (x, y)
-        # TODO (maitre.py) : remplacer par la vraie classe Maitre
-        daron = _image("daron", x, y - tuile / 2)
-        if daron is None:
-            daron = _carre(tuile, int(tuile * 1.2), C.COULEUR_MAITRE,
-                           x, y - tuile / 2 + tuile * 1.2 / 2, "maitre")
-        daron.nom = "maitre"
-        niveau.decor.append(daron)
+        # TODO (maitre.py) : le maitre n'est pas dessine pour l'instant. Les
+        # personnages dessines a la main juraient avec les meubles du pack ;
+        # c'est a celui qui fait maitre.py de fournir le bon sprite.
 
     elif caractere in MOBILIER:
         _placer_mobilier(niveau, caractere, x, y, carte, ligne, colonne)
@@ -326,83 +385,82 @@ def _placer(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) -> None:
 
 
 def _placer_mobilier(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) -> None:
-    """Pose un meuble.
+    """Pose un meuble : son image d'un cote, sa forme de collision de l'autre.
 
-    L'image va toujours dans ``decor`` ; la **forme de collision** est un
-    rectangle invisible pose a cote. Les deux sont separes exprès : les pieds
-    de la table en verre ne doivent pas bloquer le chat, seul son plateau
-    compte.
+    Un meuble occupe souvent plusieurs cases (un canape, c'est 3 x 3 fois le
+    meme caractere dans le fichier de niveau). Trois regles :
+
+    * **l'image** n'est dessinee qu'une fois, depuis la case en bas a gauche du
+      meuble, et centree sur toute sa largeur ;
+    * **la collision** est posee case par case : un mur remplit chaque case,
+      une plateforme ne se met que sur la rangee du dessus ;
+    * les deux sont separees expres : les pieds d'une table ne doivent pas
+      bloquer le chat, seul son plateau compte.
+
+    Sans image disponible, on retombe sur un rectangle de couleur : le niveau
+    reste jouable, il est juste moche.
     """
     tuile = C.TAILLE_TUILE
     nom, hauteur_tuiles, couleur, comportement = MOBILIER[caractere]
     invisible = (0, 0, 0, 0)
 
-    hauteur = max(4, int(tuile * hauteur_tuiles))
-    image = None
-    if carte is not None:
-        morceau = _morceau(nom, carte, ligne, colonne)
-        # une image plus large qu'une case n'est dessinee que sur sa case gauche
-        texture = _texture(morceau)
-        if texture is not None and texture.width > 32:
-            voisin_gauche = colonne > 0 and carte[ligne][colonne - 1] == caractere
-            if voisin_gauche:
-                niveau.scriptes.setdefault(caractere, []).append((x, y))
-                return
-            # elle demarre a gauche du groupe : on la recentre dessus
-            x += (texture.width * ECHELLE_DECOR - tuile) / 2
-        if comportement == "verre":
-            image = _image(morceau, x, y_haut=y + tuile / 2)
-        else:
-            image = _image(morceau, x, y_bas=y - tuile / 2)
-    if image is not None:
-        niveau.decor.append(image)
-        hauteur = image.height
-        meuble = _carre(tuile, hauteur, invisible, x, y - tuile / 2 + hauteur / 2, nom)
-    else:
-        # pas encore d'image : on garde le rectangle de couleur, ça reste jouable
-        meuble = _carre(tuile, hauteur, couleur, x, y - tuile / 2 + hauteur / 2, nom)
-    meuble.nom = nom
     niveau.scriptes.setdefault(caractere, []).append((x, y))
 
-    if comportement == "mural":
-        # accroche au mur : le sprite est pose sur sa case, sans collision
-        if image is None:
-            niveau.decor.append(meuble)
+    # --- l'image ---
+    texture = None
+    if carte is not None:
+        morceau = _morceau(nom, carte, ligne, colonne)
+        texture = _texture(morceau)
 
-    elif comportement == "decor":
-        if image is None:
-            niveau.decor.append(meuble)
+        if texture is not None and _coin_du_meuble(carte, ligne, colonne):
+            centre = x + (_largeur_du_meuble(carte, ligne, colonne) - 1) * tuile / 2
+            plat = texture.height * _echelle(morceau) <= tuile
+            if comportement == "verre" and plat:
+                image = _image(morceau, centre, y_haut=y + tuile / 2)
+            else:
+                image = _image(morceau, centre, y_bas=y - tuile / 2)
+            niveau.decor.append(image)
 
-    elif comportement == "plateforme":
-        if image is None:
-            niveau.decor.append(meuble)
-        # on se pose sur le dessus du meuble, sans se cogner dedans par en bas
-        dessus = _carre(tuile, tuile // 4, invisible if image is not None else couleur,
-                        x, y + tuile / 2 - tuile / 8, nom + "_dessus")
+    avec_image = texture is not None
+    teinte = invisible if avec_image else couleur
+
+    if not avec_image and comportement in ("mural", "decor", "plateforme"):
+        hauteur = max(4, int(tuile * hauteur_tuiles))
+        secours = _carre(tuile, hauteur, couleur, x, y - tuile / 2 + hauteur / 2, nom)
+        secours.nom = nom
+        niveau.decor.append(secours)
+
+    # --- la collision ---
+    if comportement in ("mural", "decor"):
+        return                              # on le traverse : rien a poser
+
+    if comportement == "mur":
+        niveau.murs.append(_carre(tuile, tuile, teinte, x, y, nom))
+        return
+
+    if carte is not None and not _sommet_du_meuble(carte, ligne, colonne):
+        return                              # on ne pose le pied que sur le dessus
+
+    if comportement == "plateforme":
+        epaisseur = tuile // 4
+        dessus = _carre(tuile, epaisseur, teinte, x, y + tuile / 2 - epaisseur / 2,
+                        nom + "_dessus")
         niveau.plateformes.append(dessus)
 
-    elif comportement == "mur":
-        # la collision reste une case pleine, quelle que soit l'image
-        niveau.murs.append(_carre(tuile, tuile, invisible if image is not None else couleur,
-                                  x, y, nom))
-
     elif comportement == "verre":
-        # seul le plateau arrete le chat : les pieds ne sont que du dessin
-        epaisseur = 8 if image is not None else hauteur
-        plateau = _carre(
-            tuile, epaisseur, invisible if image is not None else couleur,
-            x, y + tuile / 2 - epaisseur / 2, nom
-        )
+        epaisseur = tuile // 6
+        plateau = _carre(tuile, epaisseur, teinte, x, y + tuile / 2 - epaisseur / 2, nom)
         plateau.nom = nom
         niveau.plateformes.append(plateau)
-        # la zone glissante déborde d'une tuile vers le haut, sinon le chat
-        # posé dessus ne la touche pas (il est *au-dessus* du plateau)
-        glisse = _carre(tuile, tuile, (0, 0, 0, 0), x, y + tuile / 2, nom + "_glisse")
+        # la zone glissante deborde vers le haut : le chat est *au-dessus* du plateau
+        glisse = _carre(tuile, tuile, invisible, x, y + tuile, nom + "_glisse")
         glisse.role = "verre"
         niveau.zones.append(glisse)
 
     elif comportement == "gamelle":
-        meuble.role = "gamelle"
-        meuble.remplie = False
-        meuble.image = image          # pour la remplacer par la gamelle pleine
-        niveau.zones.append(meuble)
+        hauteur = max(4, int(tuile * hauteur_tuiles))
+        bol = _carre(tuile, hauteur, teinte, x, y - tuile / 2 + hauteur / 2, nom)
+        bol.nom = nom
+        bol.role = "gamelle"
+        bol.remplie = False
+        niveau.zones.append(bol)

@@ -41,7 +41,7 @@ VIES_DEPART = 7
 GRAVITE = 1.0
 LARGEUR_CHAT = 48              # taille du carré de secours, sans les sprites
 HAUTEUR_CHAT = 48
-ECHELLE_CHAT = 2.0             # x2 comme le decor : meme taille de pixel partout
+ECHELLE_CHAT = 4.0             # meme monde que les meubles : un chat = une case
 VITESSE_CHAT = 6.0             # vitesse horizontale maximale
 ACCELERATION_SOL = 1.2
 ACCELERATION_AIR = 0.7         # on contrôle moins bien le chat en l'air
