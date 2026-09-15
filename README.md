@@ -204,6 +204,14 @@ chat, palette limitée en haut du script. Pour changer la couleur du canapé ou 
 forme de la télé : une ligne dans le script, puis on relance. Aucun logiciel de
 dessin nécessaire, et les diffs restent lisibles.
 
+**Pourquoi pas les packs itch.io ?** Parce que le dépôt est public, et que leurs
+licences l'interdisent explicitement — Bitglow : *« You may NOT redistribute the
+assets as standalone files »* ; nacl1234 : *« Not permitted: make the original or
+lightly modified source files available for download »*. Ces packs ont servi de
+**référence visuelle** (leur palette, leurs proportions), ce qui est libre. Si
+l'équipe veut vraiment les utiliser tels quels, il faut passer le dépôt en privé
+et les garder hors de Git.
+
 Deux mécanismes automatiques dans `game/niveau.py` :
 
 - **les morceaux de meubles.** Trois cases `333` deviennent `canape_g`,

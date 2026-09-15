@@ -150,6 +150,9 @@ MOBILIER = {
     "7": ("tapis", 0.12, C.COULEUR_TAPIS, "decor"),
     "8": ("maitresse", 1.2, C.COULEUR_MAITRESSE, "decor"),
     "9": ("rambarde", 0.8, C.COULEUR_RAMBARDE, "decor"),
+    # elements accroches au mur : ils ne touchent jamais le chat
+    "f": ("fenetre", 1.5, C.COULEUR_VERRE, "mural"),
+    "c": ("cadre", 0.8, C.COULEUR_BUFFET, "mural"),
 }
 
 
@@ -225,18 +228,28 @@ def construire(carte, metadonnees=None) -> Niveau:
     niveau.hauteur = nb_lignes * tuile
     niveau.largeur = max(len(ligne) for ligne in carte) * tuile
 
+    # 1re passe : le papier peint, sur toute la carte. Il doit etre pose avant
+    # les meubles, sinon la case voisine repasse par-dessus une grande image.
+    for numero_ligne, ligne in enumerate(carte):
+        for colonne, caractere in enumerate(ligne):
+            if caractere == C.CAR_MUR:
+                continue
+            x = colonne * tuile + tuile / 2
+            y = (nb_lignes - 1 - numero_ligne) * tuile + tuile / 2
+            sur_le_sol = (
+                numero_ligne + 1 < nb_lignes
+                and carte[numero_ligne + 1][colonne] == C.CAR_MUR
+            )
+            fond = _image("mur_bas" if sur_le_sol else "mur", x, y - tuile / 2)
+            if fond is not None:
+                niveau.decor.append(fond)
+
+    # 2e passe : tout le reste
     for numero_ligne, ligne in enumerate(carte):
         for colonne, caractere in enumerate(ligne):
             # la 1re ligne du fichier est en haut, l'origine d'arcade est en bas
             x = colonne * tuile + tuile / 2
             y = (nb_lignes - 1 - numero_ligne) * tuile + tuile / 2
-
-            # papier peint derrière tout ce qui n'est pas un mur plein
-            if caractere != C.CAR_MUR:
-                fond = _image("mur", x, y - tuile / 2)
-                if fond is not None:
-                    niveau.decor.append(fond)
-
             _placer(niveau, caractere, x, y, carte, numero_ligne, colonne)
 
     return niveau
@@ -324,6 +337,15 @@ def _placer_mobilier(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) ->
     image = None
     if carte is not None:
         morceau = _morceau(nom, carte, ligne, colonne)
+        # une image plus large qu'une case n'est dessinee que sur sa case gauche
+        texture = _texture(morceau)
+        if texture is not None and texture.width > 32:
+            voisin_gauche = colonne > 0 and carte[ligne][colonne - 1] == caractere
+            if voisin_gauche:
+                niveau.scriptes.setdefault(caractere, []).append((x, y))
+                return
+            # elle demarre a gauche du groupe : on la recentre dessus
+            x += (texture.width * ECHELLE_DECOR - tuile) / 2
         if comportement == "verre":
             image = _image(morceau, x, y_haut=y + tuile / 2)
         else:
@@ -338,7 +360,12 @@ def _placer_mobilier(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) ->
     meuble.nom = nom
     niveau.scriptes.setdefault(caractere, []).append((x, y))
 
-    if comportement == "decor":
+    if comportement == "mural":
+        # accroche au mur : le sprite est pose sur sa case, sans collision
+        if image is None:
+            niveau.decor.append(meuble)
+
+    elif comportement == "decor":
         if image is None:
             niveau.decor.append(meuble)
 
@@ -346,7 +373,8 @@ def _placer_mobilier(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) ->
         if image is None:
             niveau.decor.append(meuble)
         # on se pose sur le dessus du meuble, sans se cogner dedans par en bas
-        dessus = _carre(tuile, tuile // 4, couleur, x, y + tuile / 2 - tuile / 8, nom + "_dessus")
+        dessus = _carre(tuile, tuile // 4, invisible if image is not None else couleur,
+                        x, y + tuile / 2 - tuile / 8, nom + "_dessus")
         niveau.plateformes.append(dessus)
 
     elif comportement == "mur":

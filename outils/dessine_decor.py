@@ -23,58 +23,66 @@ TUILE = 32
 # ---------------------------------------------------------------------------
 P = {
     "vide": (0, 0, 0, 0),
-    "contour": (38, 30, 44),
-    "ombre": (58, 46, 66),
+    "contour": (59, 41, 32),
+    "ombre": (120, 100, 84),
 
-    "mur": (72, 62, 92),
-    "mur_clair": (84, 74, 106),
-    "mur_sombre": (60, 52, 78),
-    "plinthe": (96, 84, 120),
+    # murs : beige chaud, lambris clair en bas (comme dans un vrai salon)
+    "mur": (242, 229, 175),
+    "mur_clair": (250, 240, 200),
+    "mur_sombre": (184, 175, 137),
+    "lambris": (217, 217, 217),
+    "lambris_clair": (230, 227, 227),
+    "lambris_sombre": (180, 180, 180),
 
-    "parquet": (122, 84, 56),
-    "parquet_clair": (146, 104, 70),
-    "parquet_sombre": (96, 64, 42),
+    # parquet miel
+    "parquet": (184, 136, 75),
+    "parquet_clair": (215, 175, 115),
+    "parquet_sombre": (163, 120, 64),
 
-    "bois": (128, 88, 52),
-    "bois_clair": (158, 112, 70),
-    "bois_sombre": (92, 60, 34),
+    "bois": (136, 95, 66),
+    "bois_clair": (168, 124, 88),
+    "bois_sombre": (98, 66, 44),
 
-    "canape": (150, 74, 84),
-    "canape_clair": (178, 96, 106),
-    "canape_sombre": (110, 52, 60),
+    # canape beige
+    "canape": (191, 161, 140),
+    "canape_clair": (221, 197, 180),
+    "canape_sombre": (136, 95, 66),
 
-    "metal": (140, 142, 158),
-    "metal_clair": (178, 180, 196),
-    "metal_sombre": (96, 98, 114),
+    "metal": (188, 188, 188),
+    "metal_clair": (224, 224, 224),
+    "metal_sombre": (140, 140, 140),
 
-    "verre": (168, 214, 232, 150),
-    "verre_clair": (224, 244, 252, 190),
+    "verre": (198, 226, 236, 140),
+    "verre_clair": (238, 250, 255, 190),
 
-    "ecran": (40, 48, 62),
-    "pelouse": (72, 132, 74),
-    "pelouse_clair": (96, 160, 96),
+    "ecran": (17, 12, 12),
+    "ecran_bleu": (27, 138, 167),
+    "pelouse": (86, 138, 78),
+    "pelouse_clair": (118, 170, 104),
 
-    "feuille": (66, 132, 78),
-    "feuille_clair": (92, 170, 102),
-    "pot": (164, 92, 60),
+    "feuille": (74, 124, 76),
+    "feuille_clair": (108, 164, 104),
+    "pot": (176, 114, 82),
 
-    "tapis": (128, 76, 106),
-    "tapis_clair": (160, 104, 136),
+    "tapis": (230, 221, 215),
+    "tapis_clair": (245, 240, 236),
+    "tapis_sombre": (157, 145, 137),
 
-    "croquette": (138, 88, 44),
-    "croquette_clair": (168, 114, 62),
-    "sac": (206, 178, 132),
-    "sac_sombre": (168, 140, 98),
+    "croquette": (150, 96, 50),
+    "croquette_clair": (184, 126, 70),
+    "sac": (214, 186, 140),
+    "sac_sombre": (176, 148, 106),
 
-    "peau": (232, 186, 148),
-    "cheveux": (62, 46, 40),
-    "cheveux_f": (128, 70, 52),
-    "pull_daron": (74, 104, 150),
-    "pull_maitresse": (176, 90, 128),
-    "jean": (58, 66, 96),
+    "peau": (236, 194, 158),
+    "cheveux": (72, 54, 46),
+    "cheveux_f": (140, 78, 58),
+    "pull_daron": (86, 116, 160),
+    "pull_maitresse": (186, 104, 138),
+    "jean": (68, 78, 110),
 
-    "beton": (118, 114, 128),
-    "beton_clair": (142, 138, 152),
+    "beton": (150, 146, 158),
+    "beton_clair": (176, 172, 184),
+    "ciel": (146, 196, 222),
 }
 
 
@@ -122,13 +130,64 @@ class Toile:
 def mur():
     t = Toile()
     t.rect(0, 0, 31, 31, "mur")
-    # papier peint : rayures tres discretes, sinon ca mange tout l'ecran
     for x in range(5, 32, 11):
         t.ligne_v(x, 0, 31, "mur_clair")
-    # quelques points de matiere
     for x, y in ((3, 7), (14, 3), (27, 11), (9, 19), (21, 25), (30, 17), (17, 14)):
         t.point(x, y, "mur_sombre")
     return t.enregistrer("mur")
+
+
+def mur_bas():
+    """La rangee de mur qui touche le sol : lambris et plinthe."""
+    t = Toile()
+    t.rect(0, 0, 31, 9, "mur")
+    for x in range(5, 32, 11):
+        t.ligne_v(x, 0, 9, "mur_clair")
+    # lambris
+    t.rect(0, 10, 31, 31, "lambris")
+    t.ligne_h(10, 0, 31, "lambris_clair")
+    t.ligne_h(11, 0, 31, "lambris_sombre")
+    for x in (0, 10, 21, 31):
+        t.ligne_v(x, 12, 27, "lambris_sombre")
+        t.ligne_v(min(x + 1, 31), 12, 27, "lambris_clair")
+    # plinthe
+    t.rect(0, 28, 31, 31, "lambris_sombre")
+    t.ligne_h(28, 0, 31, "lambris_clair")
+    return t.enregistrer("mur_bas")
+
+
+def fenetre():
+    """Une fenetre, pour que le haut du salon ne soit pas un mur vide."""
+    t = Toile(64, 48)
+    t.rect(0, 0, 63, 47, "bois")
+    t.cadre(0, 0, 63, 47, "contour")
+    t.rect(3, 3, 60, 44, "ciel")
+    # reflets et croisillons
+    t.rect(6, 6, 28, 20, (168, 210, 232))
+    t.rect(34, 6, 57, 20, (168, 210, 232))
+    t.rect(30, 3, 33, 44, "bois_clair")
+    t.ligne_h(23, 3, 60, "bois_clair")
+    t.ligne_h(24, 3, 60, "bois")
+    t.cadre(3, 3, 60, 44, "bois_sombre")
+    # rebord
+    t.rect(0, 45, 63, 47, "bois_clair")
+    return t.enregistrer("fenetre")
+
+
+def cadre():
+    """Un cadre au mur : la photo de famille, sans le chat dessus."""
+    t = Toile(32, 26)
+    t.rect(0, 0, 31, 25, "bois_sombre")
+    t.cadre(0, 0, 31, 25, "contour")
+    t.rect(3, 3, 28, 22, (236, 226, 206))
+    # trois silhouettes
+    t.rect(8, 12, 12, 21, "pull_daron")
+    t.rect(9, 8, 11, 12, "peau")
+    t.rect(15, 13, 19, 21, "pull_maitresse")
+    t.rect(16, 9, 18, 13, "peau")
+    t.rect(22, 16, 26, 21, "canape_sombre")
+    t.cadre(3, 3, 28, 22, "bois_sombre")
+    return t.enregistrer("cadre")
 
 
 def sol():
@@ -148,9 +207,12 @@ def sol():
 
 def plafond():
     t = Toile()
-    t.rect(0, 0, 31, 31, "mur_sombre")
-    t.ligne_h(31, 0, 31, "plinthe")
-    t.ligne_h(30, 0, 31, "contour")
+    t.rect(0, 0, 31, 31, "lambris")
+    t.ligne_h(0, 0, 31, "lambris_sombre")
+    # corniche
+    t.rect(0, 26, 31, 31, "lambris_clair")
+    t.ligne_h(26, 0, 31, "lambris_sombre")
+    t.ligne_h(31, 0, 31, "ombre")
     return t.enregistrer("plafond")
 
 
@@ -251,15 +313,15 @@ def table_verre(partie):
 # ---------------------------------------------------------------------------
 def television():
     t = Toile(32, 29)
-    t.rect(1, 0, 30, 20, "contour")
-    t.rect(2, 1, 29, 19, "ecran")
+    t.rect(1, 0, 30, 20, "ecran")
+    t.rect(2, 1, 29, 19, "ecran_bleu")
     # le match : pelouse, ligne blanche, deux joueurs
     t.rect(2, 12, 29, 19, "pelouse")
     t.ligne_h(12, 2, 29, "pelouse_clair")
     t.ligne_v(16, 12, 19, "pelouse_clair")
     t.rect(9, 9, 10, 13, (230, 230, 240))
     t.rect(21, 10, 22, 13, (220, 90, 90))
-    t.rect(3, 2, 12, 3, (70, 82, 102))         # reflet sur l'écran
+    t.rect(3, 2, 12, 3, (86, 178, 202))        # reflet sur l'écran
     # pied
     t.rect(14, 21, 17, 25, "metal_sombre")
     t.rect(9, 26, 22, 28, "metal")
@@ -300,15 +362,23 @@ def plante():
 # Le tapis
 # ---------------------------------------------------------------------------
 def tapis(partie):
-    t = Toile(32, 8)
-    t.rect(0, 2, 31, 7, "tapis")
+    t = Toile(32, 9)
+    t.rect(0, 2, 31, 8, "tapis")
     t.ligne_h(2, 0, 31, "tapis_clair")
-    for x in range(1, 32, 6):
-        t.rect(x, 4, x + 2, 5, "tapis_clair")
+    t.ligne_h(8, 0, 31, "tapis_sombre")
+    # motif
+    for x in range(2, 32, 8):
+        t.rect(x, 4, x + 3, 6, "tapis_sombre")
+        t.rect(x + 1, 5, x + 2, 5, "tapis_clair")
+    # franges aux deux bouts
     if partie == "g":
-        t.rect(0, 2, 1, 7, "tapis_clair")
+        t.rect(0, 2, 1, 8, "tapis_sombre")
+        for y in range(2, 9, 2):
+            t.point(0, y, "tapis_clair")
     if partie == "d":
-        t.rect(30, 2, 31, 7, "tapis_clair")
+        t.rect(30, 2, 31, 8, "tapis_sombre")
+        for y in range(2, 9, 2):
+            t.point(31, y, "tapis_clair")
     return t.enregistrer(f"tapis_{partie}")
 
 
@@ -440,7 +510,7 @@ def maitresse():
 
 # ---------------------------------------------------------------------------
 def tout_dessiner():
-    mur(); sol(); plafond()
+    mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
     for partie in "gmd":
         canape(partie); table_verre(partie); tapis(partie); balcon(partie)
         etagere(partie, "haut"); etagere(partie, "bas")
