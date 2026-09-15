@@ -204,14 +204,13 @@ python outils/importe_packs.py     # découpe les packs -> assets/images/packs/
 python outils/dessine_decor.py     # redessine le secours -> assets/images/decor/
 ```
 
-**Pourquoi les packs ne sont pas dans Git.** Le dépôt est public et leurs
-licences l'interdisent explicitement — Bitglow : *« You may NOT redistribute the
-assets as standalone files »* ; nacl1234 : *« Not permitted: make the original or
-lightly modified source files available for download »*. Chacun télécharge donc
-les packs de son côté, les laisse dans son dossier de téléchargements, et lance
-`importe_packs.py` **une fois**. Sans ça, le jeu tourne avec le décor dessiné :
-plus laid, mais jouable. Si l'équipe veut vraiment versionner les packs, il faut
-passer le dépôt en privé.
+**Les images des packs sont versionnées**, décision de l'équipe : le jeu n'est
+pas vendu et personne ne veut télécharger cinq packs avant de pouvoir lancer le
+projet. À savoir quand même : les licences de Bitglow et de nacl1234 interdisent
+la redistribution de leurs fichiers, et le dépôt est public. Si le projet devait
+être diffusé ailleurs qu'en soutenance, il faudrait soit passer le dépôt en
+privé, soit retirer `assets/images/packs/` et laisser `importe_packs.py` faire le
+travail chez chacun.
 
 Une tuile du pack fait 16 px et s'affiche x4 ; une tuile dessinée fait 32 px et
 s'affiche x2. Dans les deux cas, **une tuile = une case du jeu**, et chaque

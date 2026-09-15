@@ -219,6 +219,9 @@ MOBILIER = {
     # accroches au mur : ils ne touchent jamais le chat
     "9": ("horloge", 0.8, C.COULEUR_RAMBARDE, "mural"),
     "f": ("miroir", 1.5, C.COULEUR_VERRE, "mural"),
+    "w": ("fenetre", 2.0, C.COULEUR_VERRE, "mural"),
+    "b": ("bibliotheque", 1.0, C.COULEUR_BUFFET, "mur"),
+    "p": ("porte", 4.0, C.COULEUR_BUFFET, "mural"),
     "c": ("tableau", 0.8, C.COULEUR_BUFFET, "mural"),
 }
 

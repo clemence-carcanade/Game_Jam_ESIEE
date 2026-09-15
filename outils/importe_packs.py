@@ -33,6 +33,11 @@ DECOUPES = {
     "tapis":        ("livingroom_LRK.png", 21, 18, 4, 1),
 
     # décoration
+    "bibliotheque": ("cabinets_LRK.png", 1, 1, 3, 3),
+    "vaisselier":   ("cabinets_LRK.png", 13, 1, 3, 3),
+    "fenetre":      ("doorswindowsstairs_LRK.png", 13, 1, 3, 2),
+    "porte":        ("doorswindowsstairs_LRK.png", 7, 1, 2, 4),
+
     "plante":       ("decorations_LRK.png", 1, 5, 1, 2),
     "tableau":      ("decorations_LRK.png", 7, 6, 2, 1),
     "horloge":      ("decorations_LRK.png", 1, 8, 1, 1),
