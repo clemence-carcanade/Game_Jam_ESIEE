@@ -45,6 +45,13 @@ PLATEFORMES = [
     # l'arbre a chat, a droite
     (1494, 448, 1602),           # plateforme du milieu
     (1494, 368, 1602),           # le sommet
+    # --- tremplins ajoutes pour monter jusqu'au dernier etage ---
+    (620, 560, 780),             # RDC -> vers l'etage 1 (au-dessus du canape)
+    (860, 560, 1010),            # relais central
+    (1080, 470, 1240),           # relais vers l'etage 2, centre-droit
+    (900, 385, 1080),            # dernier tremplin sous le couloir de l'etage 2
+    (300, 400, 460),             # une montee cote gauche (cuisine -> SdB -> etage 2)
+    (200, 190, 420),             # SdB -> etage 2 gauche
 ]
 
 # --- de quoi animer l'ambiance (pixels d'image) -----------------------------
