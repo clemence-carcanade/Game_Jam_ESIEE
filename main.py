@@ -1,49 +1,42 @@
 import arcade
+import settings
+from views.menu import MenuView
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Jeu de base - Arcade"
 
-GRAVITY = 0.5
-PLAYER_JUMP_SPEED = 10
-PLAYER_MOVEMENT_SPEED = 5
-
-class MyGame(arcade.Window):
+class GameView(arcade.View):
     def __init__(self):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        super().__init__()
 
         # Fond blanc
         arcade.set_background_color(arcade.color.WHITE)
 
-        # Variables du joueur
+        # Variables du personnage
         self.player_x = 100
         self.player_y = 150
         self.player_change_x = 0
         self.player_change_y = 0
-
-        # Taille du joueur (rectangle)
         self.player_width = 30
         self.player_height = 50
 
-        # Hauteur du sol
+        # Sol
         self.ground_height = 50
         self.is_on_ground = True
 
     def on_draw(self):
         self.clear()
 
-        # Dessin du sol (rectangle noir)
+        # Dessin du sol
         arcade.draw_polygon_filled(
             [
                 (0, 0),
-                (SCREEN_WIDTH, 0),
-                (SCREEN_WIDTH, self.ground_height),
+                (settings.SCREEN_WIDTH, 0),
+                (settings.SCREEN_WIDTH, self.ground_height),
                 (0, self.ground_height),
             ],
             arcade.color.BLACK,
         )
 
-        # Dessin du personnage (rectangle bleu)
+        # Dessin du personnage
         arcade.draw_polygon_filled(
             [
                 (
@@ -66,24 +59,28 @@ class MyGame(arcade.Window):
             arcade.color.BLUE,
         )
 
-    def on_update(self, delta_time):
-        # Application de la gravité
-        self.player_change_y -= GRAVITY
+        # Info ÉCHAP
+        arcade.draw_text(
+            "ÉCHAP pour revenir au menu",
+            10,
+            settings.SCREEN_HEIGHT - 25,
+            arcade.color.GRAY,
+            font_size=12,
+        )
 
-        # Mise à jour des positions
+    def on_update(self, delta_time):
+        self.player_change_y -= settings.GRAVITY
         self.player_x += self.player_change_x
         self.player_y += self.player_change_y
 
-        # Collision avec le sol
         min_y = self.ground_height + self.player_height / 2
         if self.player_y <= min_y:
             self.player_y = min_y
             self.player_change_y = 0
             self.is_on_ground = True
 
-        # Limites de l'écran (gauche / droite)
         min_x = self.player_width / 2
-        max_x = SCREEN_WIDTH - self.player_width / 2
+        max_x = settings.SCREEN_WIDTH - self.player_width / 2
         if self.player_x < min_x:
             self.player_x = min_x
         elif self.player_x > max_x:
@@ -91,12 +88,15 @@ class MyGame(arcade.Window):
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.Q:
-            self.player_change_x = -PLAYER_MOVEMENT_SPEED
+            self.player_change_x = -settings.PLAYER_MOVEMENT_SPEED
         elif key == arcade.key.D:
-            self.player_change_x = PLAYER_MOVEMENT_SPEED
+            self.player_change_x = settings.PLAYER_MOVEMENT_SPEED
         elif key == arcade.key.SPACE and self.is_on_ground:
-            self.player_change_y = PLAYER_JUMP_SPEED
+            self.player_change_y = settings.PLAYER_JUMP_SPEED
             self.is_on_ground = False
+        elif key == arcade.key.ESCAPE:
+            menu_view = MenuView()
+            self.window.show_view(menu_view)
 
     def on_key_release(self, key, modifiers):
         if key in (arcade.key.Q, arcade.key.D):
@@ -104,7 +104,11 @@ class MyGame(arcade.Window):
 
 
 def main():
-    window = MyGame()
+    window = arcade.Window(
+        settings.SCREEN_WIDTH, settings.SCREEN_HEIGHT, settings.SCREEN_TITLE
+    )
+    menu_view = MenuView()
+    window.show_view(menu_view)
     arcade.run()
 
 
