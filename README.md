@@ -190,6 +190,40 @@ de tuile, sa couleur et son comportement (`decor`, `plateforme`, `mur`, `verre`,
 `gamelle`). Le décor est dessiné **derrière** tout le reste et ne bloque jamais
 le chat.
 
+## Le décor
+
+Le décor n'est pas un pack téléchargé : il est **dessiné en code**, dans
+`outils/dessine_decor.py`.
+
+```bash
+python outils/dessine_decor.py     # réécrit assets/images/decor/*.png
+```
+
+Tuiles de 32 x 32 pixels affichées x2 dans le jeu, même taille de pixel que le
+chat, palette limitée en haut du script. Pour changer la couleur du canapé ou la
+forme de la télé : une ligne dans le script, puis on relance. Aucun logiciel de
+dessin nécessaire, et les diffs restent lisibles.
+
+Deux mécanismes automatiques dans `game/niveau.py` :
+
+- **les morceaux de meubles.** Trois cases `333` deviennent `canape_g`,
+  `canape_m`, `canape_d` ; un meuble sur deux rangées utilise en plus
+  `etagere_haut_*` et `etagere_bas_*`. Rien à écrire dans le fichier de niveau.
+- **les murs.** Une case `#` prend la texture `sol` si le dessus est vide,
+  `plafond` si le dessous est vide, `mur` sinon.
+
+Deux pièges à connaître si tu ajoutes des images :
+
+- **L'image et la collision sont séparées.** L'image va dans `decor`, la forme
+  de collision est un rectangle invisible posé à côté. Sans ça, les pieds de la
+  table en verre bloqueraient le chat alors que seul le plateau compte.
+- **On positionne par l'image, jamais par `sprite.bottom`.** Arcade aligne
+  alors la boîte de collision, qui ignore les pixels transparents : une image à
+  moitié vide se retrouve décalée.
+
+Si un PNG manque, le meuble redevient un rectangle de couleur et le jeu tourne
+quand même.
+
 ## Format des niveaux
 
 `niveaux/niveau_N.txt` — première ligne les métadonnées en JSON, puis la carte.
@@ -229,12 +263,7 @@ niveau 1 de démonstration. Restent à écrire, par leurs responsables :
 - `ui.py` — HUD (7 empreintes de pattes), menus, écrans de transition
 - `niveaux/niveau_2.txt` à `niveau_7.txt`
 - une caméra, si un niveau dépasse un écran (aujourd'hui : 20 x 11 tuiles)
-- **les sprites du décor** : tout le mobilier est encore un rectangle de
-  couleur. Les packs repérés (Pet Virtual Mobile, Cat Room, PixelInterior
-  LivingRoom/Kitchen, House Interior 32x32, Top-Down Modern City) doivent être
-  téléchargés à la main depuis itch.io, puis déposés dans `assets/images/`.
-  Ensuite, seul `MOBILIER` est à changer : remplacer la couleur par une texture,
-  le reste du code ne bouge pas.
+- les sprites des niveaux 2 à 7 (le décor du salon, lui, est fait)
 
 `niveaux/niveau_1.txt` est une carte de démonstration : elle sert à valider le
 moteur, elle n'a pas encore été jouée par un humain.
