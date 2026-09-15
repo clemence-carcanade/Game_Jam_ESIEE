@@ -51,6 +51,25 @@ assets/images/, sons/   les médias
 tests/test_collisions.py  25 tests du moteur, sans ouvrir de fenêtre
 ```
 
+## Attention : deux architectures coexistent
+
+La branche `dev` contient aujourd'hui **deux organisations de fichiers** :
+
+| | |
+|---|---|
+| `game/` + `niveaux/` | le moteur, l'architecture du brief Sept Vies |
+| `settings.py` + `views/` + `entities/` | le menu et l'ossature poussés en parallèle |
+
+Rien n'a été supprimé, et ça tourne : `main.py` ouvre le menu de `views/menu.py`,
+et `ENTRÉE` lance `game.jeu.VueJeu`. Mais il y a deux fichiers de constantes
+(`settings.py` et `game/constantes.py`) et deux dossiers pour les vues.
+
+**L'équipe doit trancher, vite.** Le plus simple est de déplacer `views/menu.py`
+en `game/ui.py` et de supprimer `settings.py` au profit de `game/constantes.py`,
+comme prévu par le brief. Tant que ce n'est pas fait, la taille de la fenêtre
+est définie dans `game/constantes.py` et recopiée dans `settings.py` : si l'une
+change, changer l'autre.
+
 ## Le moteur de collisions
 
 Tout ce qui se touche passe par `game/collisions.py`. Il ne connaît que des
