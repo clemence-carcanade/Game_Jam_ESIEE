@@ -68,6 +68,11 @@ class VueJeu(arcade.View):
         self.gamelle = self.niveau.trouver_zone("gamelle")
         self.sortie = self.niveau.trouver_zone("sortie")
         self._construire_faux_pieges()
+
+        self.medecin = None
+        if self.niveau.docteur and self.gamelle is not None:
+            from game.medecin import Medecin
+            self.medecin = Medecin(self.gamelle.center_x, sol=C.TAILLE_TUILE)
         if self.niveau.aide:
             self.afficher(self.niveau.aide)
 
@@ -100,6 +105,8 @@ class VueJeu(arcade.View):
         self._sortir_du_sac()
         self._vivre_les_faux_pieges(delta_time)
         self._oter_le_deguisement(delta_time)
+        if self.medecin is not None:
+            self.medecin.mettre_a_jour(delta_time)
 
         if contacts.atterrissage:
             self.chat.signaler_atterrissage()
@@ -183,16 +190,24 @@ class VueJeu(arcade.View):
         effet, chat = zone.effet, self.chat
         zone.recharge = effet.get("recharge", 2.5)
 
+        genre = effet.get("effet", "message")
+
+        # le medecin dort ? alors ses methodes de soin sont devenues des fins.
+        if (genre == "soin" and self.niveau.docteur
+                and self.gamelle is not None and self.gamelle.remplie):
+            self.griller_une_vie(effet.get("cause", "le cabinet"))
+            return
+
         if "texte" in effet:
             self.afficher(effet["texte"])
-
-        genre = effet.get("effet", "message")
         if genre == "projection":
             # lance en l'air facon poupee, pousse par un autre chat...
             chat.change_x, chat.change_y = effet.get("vitesse", (0, 16))
             chat.minuteur_sac = 0.0
         elif genre == "soin":
             # le medecin le soigne, le maitre le rattrape : retour case depart
+            if self.medecin is not None:
+                self.medecin.soigner(chat.center_x)
             chat.replacer_au_depart()
         elif genre == "deguisement":
             # maquille facon poupee : humiliant, pas dangereux
@@ -231,6 +246,8 @@ class VueJeu(arcade.View):
             # il resterait plante devant et empecherait le chat de manger
             for objet in renverse:
                 objet.remove_from_sprite_lists()
+            if self.medecin is not None:
+                self.medecin.endormir()
             self.afficher(self.niveau.message_piege
                           or "Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent.")
 
@@ -247,7 +264,9 @@ class VueJeu(arcade.View):
         if not arcade.check_for_collision(self.chat, self.gamelle):
             return
 
-        if self.gamelle.remplie:
+        if self.gamelle.remplie and self.niveau.docteur:
+            self.afficher("Il dort profondement. A toi de choisir ta fin.")
+        elif self.gamelle.remplie:
             self.griller_une_vie("les croquettes avariees")
         else:
             self.afficher(self.niveau.message_attente
@@ -318,6 +337,11 @@ class VueJeu(arcade.View):
         self.clear()
         self.niveau.dessiner()
         self.images_pieges.draw(pixelated=True)
+        if self.medecin is not None:
+            arcade.draw_sprite(self.medecin, pixelated=True)
+            if self.medecin.endormi:
+                arcade.draw_text("Zzz", self.medecin.center_x + 30,
+                                 self.medecin.top + 6, (240, 220, 120), 16, bold=True)
         arcade.draw_sprite(self.chat, pixelated=True)
         self._dessiner_indicateur_action()
 

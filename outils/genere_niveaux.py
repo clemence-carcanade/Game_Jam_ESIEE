@@ -139,23 +139,32 @@ NIVEAUX = [
     ),
     dict(
         n=6, titre="Le cabinet medical", maitre="le docteur",
-        aide="Le flacon d anesthesiant est en haut. Endors le medecin d abord, sinon il soigne tout.",
-        piege="Le medecin s est endormi sur son bureau.",
+        aide="Il soigne TOUT. Trouve les somniferes tout en haut, fais-les-lui tomber dessus, puis choisis ta fin.",
+        piege="Les somniferes tombent sur le medecin. Il glisse de sa chaise. Il ronfle.",
         mort="Cette fois, personne n est venu recoudre.",
-        piege_image="medecin",
-        message_attente="Le medecin est reveille. Il te recoudrait. Le flacon d abord.",
+        piege_image="aucune", objet_image="somniferes", docteur=True,
+        message_attente="Le medecin veille. Il recoud tout. Les somniferes d abord.",
         marches=[(8, 17, 18), (6, 14, 16), (4, 11, 13), (2, 8, 10)],
         meubles=[("2", 8, 9, 17, 18), ("=", 6, 6, 14, 16), ("=", 4, 4, 11, 13),
                  ("=", 2, 2, 8, 10), ("4", 7, 9, 2, 4), ("5", 8, 9, 5, 6),
                  ("p", 6, 9, 19, 20), ("w", 1, 2, 2, 4)],
         objet=9, pousse="g", piege_colonne=7, depart=15,
-        deco=[(9, "8", 8), (9, "6", 13), (2, "9", 6), (3, "c", 5), (3, "c", 6)],
+        deco=[(2, "9", 6), (3, "c", 5), (3, "c", 6)],
         lettres={
-            "s": dict(pos=[(9, 10)], declenchement="action", effet="soin", image="scalpel",
+            "s": dict(pos=[(9, 10)], declenchement="action", effet="soin",
+                      image="scalpel", cause="le scalpel",
                       texte="Le scalpel. Precis. Le medecin le recoud en huit minutes, montre en main."),
-            "q": dict(pos=[(9, 12)], declenchement="action", effet="soin", image="seringue",
+            "q": dict(pos=[(9, 12)], declenchement="action", effet="soin",
+                      image="seringue", cause="la seringue du medecin",
                       texte="La seringue du medecin. Reanime. Et vaccine, en prime."),
-            "d": dict(pos=[(9, 16)], declenchement="action", effet="soin", image="patient",
+            "t": dict(pos=[(9, 9)], declenchement="action", effet="soin",
+                      image="defibrillateur", cause="le defibrillateur",
+                      texte="Il mord les palettes du defibrillateur. Le medecin le relance d un coup de machine."),
+            "a": dict(pos=[(9, 13)], declenchement="action", effet="soin",
+                      image="medicaments", cause="l armoire a pharmacie",
+                      texte="Il avale la moitie de l armoire a pharmacie. Lavage d estomac. Encore rate."),
+            "d": dict(pos=[(9, 16)], declenchement="action", effet="soin",
+                      image="patient", cause="la maladie du patient",
                       texte="Il leche le patient contagieux. Gueri en une nuit. Ce medecin est trop fort."),
         },
     ),
@@ -301,6 +310,10 @@ def ecrire():
                 entree["piege_image"] = spec["piege_image"]
             if spec.get("message_attente"):
                 entree["message_attente"] = spec["message_attente"]
+            if spec.get("docteur"):
+                entree["docteur"] = True
+            if spec.get("objet_image"):
+                entree["objet_image"] = spec["objet_image"]
         entree["carte"] = ["".join(ligne) for ligne in carte]
         entree["faux_pieges"] = {
             lettre: {cle: valeur for cle, valeur in effet.items() if cle != "pos"}

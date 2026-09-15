@@ -742,6 +742,40 @@ def marmite():
     return t.enregistrer("marmite")
 
 
+def somniferes():
+    t = Toile(18, 20)
+    t.rect(5, 1, 13, 4, "metal_sombre")             # le bouchon
+    t.rect(3, 5, 15, 18, (150, 190, 230))
+    t.cadre(3, 5, 15, 18, "contour")
+    t.rect(5, 8, 13, 14, (240, 245, 250))           # l'etiquette
+    t.rect(7, 10, 8, 12, "contour")                 # une lune
+    t.point(9, 10, "contour")
+    return t.enregistrer("somniferes")
+
+
+def defibrillateur():
+    t = Toile(26, 18)
+    t.rect(2, 4, 23, 16, (210, 60, 60))
+    t.cadre(2, 4, 23, 16, "contour")
+    t.rect(5, 7, 12, 13, (240, 240, 245))           # l'ecran
+    # l'eclair
+    for i, (x, y) in enumerate(((8, 8), (9, 9), (8, 10), (9, 11), (10, 12))):
+        t.point(x, y, (240, 200, 60))
+    t.rect(15, 7, 20, 9, "metal_clair")             # les palettes
+    t.rect(15, 11, 20, 13, "metal_clair")
+    return t.enregistrer("defibrillateur")
+
+
+def medicaments():
+    t = Toile(24, 26)
+    t.rect(2, 2, 21, 24, (240, 240, 245))           # l'armoire a pharmacie
+    t.cadre(2, 2, 21, 24, "contour")
+    t.rect(9, 6, 14, 19, (210, 60, 60))             # la croix
+    t.rect(5, 11, 18, 15, (210, 60, 60))
+    t.ligne_h(24, 2, 21, "contour")
+    return t.enregistrer("medicaments")
+
+
 # ---------------------------------------------------------------------------
 def tout_dessiner():
     mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
@@ -752,6 +786,7 @@ def tout_dessiner():
     vieille(); enfant(); chef(); medecin(); chat_gris(); panier_linge()
     maquillage(); griffures(); couteau(); scalpel(); seringue(); patient()
     papillon(); pelote(); coussin(); aquarium(); cable(); marmite()
+    somniferes(); defibrillateur(); medicaments()
     gamelle(False); gamelle(True)
     fichiers = sorted(p.name for p in DOSSIER.glob("*.png"))
     print(f"{len(fichiers)} images ecrites dans {DOSSIER} :")

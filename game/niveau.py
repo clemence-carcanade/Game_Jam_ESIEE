@@ -247,6 +247,8 @@ class Niveau:
     survivre: bool = False          # niveau 7 : mourir n'est plus le but
     piege_image: str = ""           # l'image de la zone mortelle (aquarium...)
     message_attente: str = ""       # E sur le piege pas encore arme
+    docteur: bool = False           # niveau 6 : quelqu'un soigne toutes les morts
+    objet_image: str = ""           # l'image de l'objet a pousser (somniferes...)
     faux_pieges: dict = field(default_factory=dict)   # lettre -> effet scripte
     message_piege: str = ""         # ce qu'on lit quand le piege s'arme
     message_mort: str = ""          # ce qu'on lit en grillant une vie
@@ -313,6 +315,8 @@ def construire(carte, metadonnees=None) -> Niveau:
         survivre=metadonnees.get("survivre", False),
         piege_image=metadonnees.get("piege_image", ""),
         message_attente=metadonnees.get("message_attente", ""),
+        docteur=metadonnees.get("docteur", False),
+        objet_image=metadonnees.get("objet_image", ""),
         message_piege=metadonnees.get("message_piege", ""),
         message_mort=metadonnees.get("message_mort", ""),
     )
@@ -377,7 +381,7 @@ def _placer(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) -> None:
         niveau.mortels.append(mortel)
 
     elif caractere == C.CAR_POUSSABLE:
-        objet = _image("sac", x, y - tuile / 2)
+        objet = _image(niveau.objet_image or "sac", x, y - tuile / 2)
         if objet is None:
             objet = _carre(tuile - 8, tuile - 8, C.COULEUR_POUSSABLE, x, y, "poussable")
         objet.amortit = True          # un pouf : il amortit les chutes
@@ -440,6 +444,8 @@ def _placer_mobilier(niveau, caractere, x, y, carte=None, ligne=0, colonne=0) ->
     # la marmite du restaurant, le cable de l'influenceur...
     if comportement == "gamelle" and niveau.piege_image:
         nom = niveau.piege_image
+        if nom == "aucune":
+            nom = "_zone_invisible"          # aucune texture : zone muette
 
     niveau.scriptes.setdefault(caractere, []).append((x, y))
 
