@@ -19,6 +19,7 @@ from game import constantes as C
 from game import niveau as module_niveau
 from game.chat import Chat
 from game.collisions import MoteurCollisions
+from game.effets import Effets
 
 #: distance a laquelle le chat peut attraper un objet devant lui
 PORTEE_ACTION = 14.0
@@ -37,6 +38,7 @@ class VueJeu(arcade.View):
         self.chat = None
         self.collisions = None
         self.pause_mort = 0.0        # temps d'affichage du chat allonge
+        self.effets = Effets()
         self.rejouer = False         # au niveau 7, mourir fait recommencer
         self.gamelle = None          # la zone du piege a armer
         self.sortie = None           # niveau 7 : la ou il faut arriver vivant
@@ -97,6 +99,7 @@ class VueJeu(arcade.View):
         if self.pause_mort > 0:
             self.pause_mort -= delta_time
             self.chat.mettre_a_jour_animation(delta_time)
+            self.effets.mettre_a_jour(delta_time)
             if self.pause_mort <= 0:
                 if getattr(self, "rejouer", False):
                     self.charger_niveau(self.numero_niveau)   # niveau 7 : on recommence
@@ -116,6 +119,7 @@ class VueJeu(arcade.View):
         self._oter_le_deguisement(delta_time)
         if self.medecin is not None:
             self.medecin.mettre_a_jour(delta_time)
+        self.effets.mettre_a_jour(delta_time)
 
         if contacts.atterrissage:
             self.chat.signaler_atterrissage()
@@ -208,6 +212,7 @@ class VueJeu(arcade.View):
 
         if "texte" in effet:
             self.afficher(effet["texte"])
+        self.effets.pouf(chat.center_x, chat.top, (230, 235, 255), 8)
         if genre == "projection":
             # lance en l'air facon poupee, pousse par un autre chat...
             chat.change_x, chat.change_y = effet.get("vitesse", (0, 16))
@@ -310,6 +315,9 @@ class VueJeu(arcade.View):
         self.chat.vivant = False
         self.chat.change_x = self.chat.change_y = 0
         self.pause_mort = 1.6
+        self.effets.pouf(self.chat.center_x, self.chat.center_y, (255, 224, 120), 22)
+        self.effets.trembler(11)
+        self.audio_mort()
 
         if self.niveau.survivre:
             self.afficher(self.niveau.message_mort
@@ -341,10 +349,18 @@ class VueJeu(arcade.View):
         self.minuteur_message = 2.5
 
     # ------------------------------------------------------------------
+    def audio_mort(self) -> None:
+        """Crochet pour le son de mort (audio_manager, plus tard)."""
+
     def on_draw(self) -> None:
         self.clear()
+        dx, dy = self.effets.decalage()
         if self.fond is not None:
+            self.fond.center_x += dx
+            self.fond.center_y += dy
             arcade.draw_sprite(self.fond, pixelated=True)
+            self.fond.center_x -= dx
+            self.fond.center_y -= dy
         self.niveau.dessiner()
         self.images_pieges.draw(pixelated=True)
         if self.medecin is not None:
@@ -353,6 +369,7 @@ class VueJeu(arcade.View):
                 arcade.draw_text("Zzz", self.medecin.center_x + 30,
                                  self.medecin.top + 6, (240, 220, 120), 16, bold=True)
         arcade.draw_sprite(self.chat, pixelated=True)
+        self.effets.dessiner()
         self._dessiner_indicateur_action()
 
         if self.debug:

@@ -213,6 +213,7 @@ class Chat(arcade.Sprite):
             self._minuteur_image = 0.0
 
         images = animations.images(self._animation, vers_la_gauche=self.regarde < 0)
+        self._etirer()
 
         self._minuteur_image += delta_time
         if self._minuteur_image >= animations.duree(self._animation):
@@ -223,6 +224,21 @@ class Chat(arcade.Sprite):
                 self._image = 0
 
         self.texture = images[self._image]
+
+    def _etirer(self) -> None:
+        """Squash & stretch : etire en montant, aplati en retombant/atterrissant.
+
+        C'est le petit mensonge d'animation qui rend un saut vivant : le corps
+        s'allonge quand il file vers le haut, s'ecrase a l'impact.
+        """
+        base = C.ECHELLE_CHAT
+        if self._minuteur_reception > 0:
+            etir = -0.28 * (self._minuteur_reception / 0.18)   # ecrase a l'atterrissage
+        elif not self.au_sol:
+            etir = max(-0.2, min(0.22, self.change_y * 0.02))  # suit la vitesse
+        else:
+            etir = 0.0
+        self.scale = (base * (1 - etir), base * (1 + etir))
 
     def replacer_au_depart(self) -> None:
         """Remet le chat à sa position de départ (nouvelle vie, redémarrage)."""
