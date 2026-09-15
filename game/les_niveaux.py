@@ -28,8 +28,8 @@ NIVEAUX = [
         message_mort="Ecrase sous l arbre a chat. Personne n a rien vu.",
         message_attente="L arbre a chat est encore debout. Fais-le basculer d abord.",
         depart="salon",
-        objet="arbre_haut", pousse="g", objet_image="arbre_chat_objet", objet_anim="bascule",
-        piege="chatterie", piege_largeur=120,
+        objet="planche_salon", pousse="d", objet_image="arbre_chat_objet", objet_anim="bascule",
+        piege=(905, 846), piege_largeur=150,
         faux_pieges={
             "k": dict(pos="arbre_bas", declenchement="contact", recharge=9.0,
                       effet="projection", vitesse=(-9, 14), image="chat_gris",
