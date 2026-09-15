@@ -832,6 +832,92 @@ def couvercle():
 
 
 # ---------------------------------------------------------------------------
+# Dangers "evidents" qui ratent : de quoi voir plein de facons de mourir.
+# ---------------------------------------------------------------------------
+def prise():
+    t = Toile(18, 18)
+    t.rect(2, 2, 15, 15, (235, 235, 240))
+    t.cadre(2, 2, 15, 15, "contour")
+    t.point(7, 7, "contour"); t.point(10, 7, "contour")   # les trous
+    t.rect(7, 10, 10, 11, "contour")
+    t.point(5, 3, (255, 220, 90)); t.point(13, 5, (255, 200, 60))  # etincelles
+    return t.enregistrer("prise")
+
+
+def fenetre_ouverte():
+    t = Toile(30, 34)
+    t.rect(2, 2, 27, 31, (60, 66, 96))              # le ciel de nuit
+    t.cadre(2, 2, 27, 31, "bois")
+    t.rect(2, 2, 27, 6, "bois")                     # le battant releve
+    t.ligne_v(14, 6, 31, "bois")
+    for x,y in ((7,12),(20,9),(12,20),(23,24)): t.point(x,y,(230,230,245))  # etoiles
+    return t.enregistrer("fenetre_ouverte")
+
+
+def four():
+    t = Toile(28, 26)
+    t.rect(2, 2, 25, 24, (200, 200, 208))
+    t.cadre(2, 2, 25, 24, "contour")
+    t.rect(5, 9, 22, 21, (40, 30, 30))             # la porte vitree
+    t.cadre(5, 9, 22, 21, "contour")
+    t.rect(8, 14, 19, 19, (230, 120, 50))          # les flammes
+    t.rect(10, 12, 17, 15, (245, 190, 70))
+    t.rect(6, 4, 9, 6, "contour"); t.rect(12, 4, 15, 6, "contour")  # boutons
+    return t.enregistrer("four")
+
+
+def poison():
+    t = Toile(18, 24)
+    t.rect(6, 1, 11, 5, "metal_sombre")            # le bouchon
+    t.rect(3, 6, 14, 22, (110, 160, 90))           # la bouteille
+    t.cadre(3, 6, 14, 22, "contour")
+    t.rect(6, 10, 11, 18, (230, 230, 235))         # l'etiquette
+    t.point(8, 12, "contour"); t.point(9, 12, "contour")   # tete de mort
+    t.rect(7, 14, 10, 15, "contour")
+    return t.enregistrer("poison")
+
+
+def gaz():
+    t = Toile(24, 26)
+    t.rect(6, 8, 17, 24, (210, 90, 60))            # la bonbonne
+    t.cadre(6, 8, 17, 24, "contour")
+    t.rect(9, 4, 14, 8, "metal_sombre")            # la valve
+    t.rect(10, 1, 13, 4, "metal")
+    for x,y in ((3,6),(19,4),(2,12)): t.point(x,y,(200,220,200))   # fuite
+    return t.enregistrer("gaz")
+
+
+def cordelette():
+    t = Toile(20, 22)
+    for i in range(18):
+        t.point(9 + (i%3==0), 2+i, "sac_sombre")   # la corde qui pend
+        t.point(10 + (i%3==0), 2+i, "sac")
+    t.rect(6, 18, 13, 21, "sac_sombre")            # un noeud coulant en bas
+    t.cadre(6, 18, 13, 21, "contour")
+    return t.enregistrer("cordelette")
+
+
+def bougie():
+    t = Toile(16, 22)
+    t.rect(5, 8, 10, 20, (235, 225, 200))          # la cire
+    t.cadre(5, 8, 10, 20, "contour")
+    t.rect(7, 4, 8, 8, "contour")                  # la meche
+    t.rect(6, 0, 9, 5, (245, 190, 70))             # la flamme
+    t.point(7, 1, (255, 230, 120))
+    return t.enregistrer("bougie")
+
+
+def verre_casse():
+    t = Toile(24, 14)
+    for x0 in (3, 10, 17):
+        for i in range(6):
+            t.point(x0 + i - i//2, 12 - i, (180, 220, 230))
+            t.point(x0 + i - i//2, 13 - i, "contour")
+    t.rect(2, 12, 22, 13, (150, 190, 200))         # les debris au sol
+    return t.enregistrer("verre_casse")
+
+
+# ---------------------------------------------------------------------------
 def tout_dessiner():
     mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
     for partie in "gmd":
@@ -843,6 +929,7 @@ def tout_dessiner():
     papillon(); pelote(); coussin(); aquarium(); cable(); marmite()
     somniferes(); defibrillateur(); medicaments()
     arbre_chat_objet(); jouet_bain(); ring_light(); couvercle()
+    prise(); fenetre_ouverte(); four(); poison(); gaz(); cordelette(); bougie(); verre_casse()
     gamelle(False); gamelle(True)
     fichiers = sorted(p.name for p in DOSSIER.glob("*.png"))
     print(f"{len(fichiers)} images ecrites dans {DOSSIER} :")
