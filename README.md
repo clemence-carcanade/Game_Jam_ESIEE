@@ -88,7 +88,7 @@ que les niveaux doivent désactiver :
 
 | Réflexe | Effet | Comment le niveau doit le battre |
 |---|---|---|
-| `reflexe_pattes` | encaisse les chutes jusqu'à 5 tuiles (3 sans le réflexe) | étourdir le chat, ou le faire tomber de plus haut |
+| `reflexe_pattes` | **aucune chute ne le tue** (3 tuiles suffisent une fois le réflexe coupé) | étourdir le chat |
 | `reflexe_moustaches` | esquive ce qui est mortel au lieu de mourir | couper les moustaches |
 | `reflexe_agrippe` | impossible de tomber en marchant : il s'accroche au rebord | scotcher ses pattes (pour tomber, il faut sauter) |
 
@@ -143,6 +143,53 @@ Deux points à ne pas casser :
 Si `assets/images/chat.png` est absent, le chat redevient un carré orange et
 le jeu tourne quand même.
 
+## Le niveau 1 : le salon
+
+> 20h. Les mêmes croquettes que tous les soirs, le daron devant son match, la
+> maîtresse qui commente. Le chat en a assez.
+
+Trois **faux pièges**, qui ont l'air mortels et ne le sont pas — c'est la règle
+n°1 : si la mort était évidente, le joueur gagnerait sans réfléchir.
+
+| Faux piège | Ce qui se passe |
+|---|---|
+| sauter du balcon | le chat retombe sur ses pattes, toujours |
+| la table « en verre » | ce n'est qu'un film plastique : ça glisse, ça ne casse pas |
+| la tête dans le sac de croquettes | il fonce droit devant, percute un mur, se dégage |
+
+Un seul **vrai piège** : manger les croquettes du fond du sac, celles qui
+sentent. Encore faut-il les faire tomber dans la gamelle.
+
+La solution, en trois actions : monter sur le canapé puis sur la table, sauter
+sur le buffet, pousser le sac — il se renverse dans la gamelle — puis redescendre
+et appuyer sur `E` devant la gamelle.
+
+Le sol du salon est volontairement continu d'un mur à l'autre : un sac poussé du
+mauvais côté retombe toujours par terre et reste récupérable. **Aucune situation
+ne bloque le niveau** — ne pas casser ça en ajoutant du mobilier posé au sol.
+
+## Le mobilier des niveaux
+
+Les caractères `1` à `9` sont du mobilier, décrit dans `MOBILIER`
+(`game/niveau.py`). Chaque meuble a un comportement :
+
+| | Meuble | Comportement |
+|---|---|---|
+| `1` | gamelle | zone où le chat peut manger (`E`) |
+| `2` | table « en verre » | plateforme + **surface glissante** |
+| `3` | canapé | plateforme : on monte dessus |
+| `4` | buffet | solide de tous les côtés |
+| `5` | télévision | décor, on le traverse |
+| `6` | plante | décor |
+| `7` | tapis | décor |
+| `8` | la maîtresse | décor |
+| `9` | rambarde du balcon | décor |
+
+Pour ajouter un meuble : une ligne dans `MOBILIER`, avec sa hauteur en fraction
+de tuile, sa couleur et son comportement (`decor`, `plateforme`, `mur`, `verre`,
+`gamelle`). Le décor est dessiné **derrière** tout le reste et ne bloque jamais
+le chat.
+
 ## Format des niveaux
 
 `niveaux/niveau_N.txt` — première ligne les métadonnées en JSON, puis la carte.
@@ -182,8 +229,12 @@ niveau 1 de démonstration. Restent à écrire, par leurs responsables :
 - `ui.py` — HUD (7 empreintes de pattes), menus, écrans de transition
 - `niveaux/niveau_2.txt` à `niveau_7.txt`
 - une caméra, si un niveau dépasse un écran (aujourd'hui : 20 x 11 tuiles)
-- les sprites des décors, des maîtres et des objets (tout est encore
-  rectangle de couleur, seul le chat est animé)
+- **les sprites du décor** : tout le mobilier est encore un rectangle de
+  couleur. Les packs repérés (Pet Virtual Mobile, Cat Room, PixelInterior
+  LivingRoom/Kitchen, House Interior 32x32, Top-Down Modern City) doivent être
+  téléchargés à la main depuis itch.io, puis déposés dans `assets/images/`.
+  Ensuite, seul `MOBILIER` est à changer : remplacer la couleur par une texture,
+  le reste du code ne bouge pas.
 
 `niveaux/niveau_1.txt` est une carte de démonstration : elle sert à valider le
 moteur, elle n'a pas encore été jouée par un humain.

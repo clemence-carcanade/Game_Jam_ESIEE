@@ -257,10 +257,16 @@ class MoteurCollisions:
             )
 
     def _chute_fatale(self, hauteur: float) -> bool:
-        if self._amorti_par_un_objet():
-            return False                      # un pouf en dessous, tout va bien
+        """Un chat retombe toujours sur ses pattes.
+
+        Tant que le reflexe est actif, **aucune** chute ne tue : c'est la regle
+        n.2 du jeu, le corps du chat resiste. Pour le tuer par une chute, le
+        niveau doit d'abord couper le reflexe (etourdir le chat).
+        """
         if getattr(self.chat, "reflexe_pattes", False):
-            return hauteur > C.CHUTE_MORTELLE_AVEC_PATTES
+            return False
+        if self._amorti_par_un_objet():
+            return False                      # quelque chose de mou en dessous
         return hauteur > C.CHUTE_MORTELLE
 
     def _amorti_par_un_objet(self) -> bool:

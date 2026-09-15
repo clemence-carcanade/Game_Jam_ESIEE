@@ -136,7 +136,7 @@ contacts = jouer(chat, moteur, 120)
 verifier("esquive au lieu de mourir", contacts.vivant, f"mort={contacts.mort!r}")
 verifier("esquive signalée", contacts.esquive)
 
-print("\n8. Réflexe des pattes : encaisse 4 tuiles, pas 7")
+print("\n8. Réflexe des pattes : aucune chute ne tue tant qu il est actif")
 chat, moteur, *_ = decor(100, 4 * 64 + 96)
 chat.reflexe_pattes = True
 contacts = jouer(chat, moteur, 200)
@@ -145,7 +145,7 @@ verifier("survit à 4 tuiles avec le réflexe", contacts.vivant, f"mort={contact
 chat, moteur, *_ = decor(100, 7 * 64 + 96)
 chat.reflexe_pattes = True
 contacts = jouer(chat, moteur, 200)
-verifier("meurt à 7 tuiles malgré le réflexe", contacts.mort == "la chute", f"-> {contacts.mort!r}")
+verifier("survit meme a 7 tuiles avec le réflexe", contacts.vivant, f"-> {contacts.mort!r}")
 
 chat, moteur, *_ = decor(100, 4 * 64 + 96)
 chat.reflexe_pattes = False

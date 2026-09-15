@@ -53,18 +53,29 @@ MEMOIRE_SAUT = 0.12            # un saut demandé trop tôt est mémorisé
 COUPURE_SAUT = 0.45            # relâcher la touche raccourcit le saut
 
 # ---------------------------------------------------------------------------
+# Surfaces glissantes (la fameuse table "en verre" du salon)
+# ---------------------------------------------------------------------------
+GLISSE_FREINAGE = 0.06         # le chat ne freine presque plus
+GLISSE_ACCELERATION = 0.35     # et il a du mal a repartir
+
+# ---------------------------------------------------------------------------
+# Faux piege : la tete coincee dans le sac de croquettes
+# ---------------------------------------------------------------------------
+DUREE_DANS_LE_SAC = 2.5        # secondes a foncer droit devant sans rien voir
+
+# ---------------------------------------------------------------------------
 # Chutes
 # ---------------------------------------------------------------------------
 # Un chat retombe sur ses pattes : tant que le réflexe est actif, il encaisse
 # des chutes bien plus hautes. Tout le niveau 1 consiste à dépasser ce seuil.
-CHUTE_MORTELLE = 3 * TAILLE_TUILE              # sans le réflexe des pattes
-CHUTE_MORTELLE_AVEC_PATTES = 5 * TAILLE_TUILE  # avec le réflexe
+# Avec le reflexe des pattes, aucune chute ne tue : il faut couper le reflexe.
+CHUTE_MORTELLE = 3 * TAILLE_TUILE              # une fois le reflexe coupe
 MARGE_HORS_NIVEAU = 200        # tombé plus bas que ça = sorti du niveau
 
 # ---------------------------------------------------------------------------
 # Objets poussables (poufs, caisses, paniers)
 # ---------------------------------------------------------------------------
-VITESSE_POUSSEE = 3.0          # un pouf se pousse moins vite qu'on ne court
+VITESSE_POUSSEE = 3.0          # un objet se pousse moins vite qu'on ne court
 PILE_POUSSABLE_MAX = 6         # nombre d'objets qu'on peut pousser d'un coup
 
 # ---------------------------------------------------------------------------
@@ -93,6 +104,17 @@ COULEUR_MORTEL = (220, 70, 70)
 COULEUR_POUSSABLE = (200, 170, 120)
 COULEUR_BOUTON = (120, 200, 140)
 COULEUR_PORTE = (160, 140, 200)
+# Mobilier du salon (placeholders : remplacer par les tuiles des packs)
+COULEUR_CANAPE = (150, 80, 90)
+COULEUR_BUFFET = (120, 85, 55)
+COULEUR_TELE = (45, 45, 60)
+COULEUR_PLANTE = (70, 140, 80)
+COULEUR_TAPIS = (140, 100, 130)
+COULEUR_VERRE = (150, 205, 225)
+COULEUR_GAMELLE = (215, 175, 90)
+COULEUR_MAITRESSE = (205, 130, 165)
+COULEUR_RAMBARDE = (110, 110, 125)
+
 COULEUR_TEXTE = arcade.color.WHITE
 COULEUR_TEXTE_FADE = (150, 150, 160)
 

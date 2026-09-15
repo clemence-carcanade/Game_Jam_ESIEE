@@ -20,6 +20,9 @@ from game import niveau as module_niveau
 from game.chat import Chat
 from game.collisions import MoteurCollisions
 
+#: distance a laquelle le chat peut attraper un objet devant lui
+PORTEE_ACTION = 14.0
+
 
 class VueJeu(arcade.View):
     def __init__(self, numero_niveau: int = 1):
@@ -34,6 +37,7 @@ class VueJeu(arcade.View):
         self.chat = None
         self.collisions = None
         self.pause_mort = 0.0        # temps d'affichage du chat allonge
+        self.gamelle = None          # la zone ou le chat peut manger
         self.charger_niveau(numero_niveau)
 
     # ------------------------------------------------------------------
@@ -58,6 +62,8 @@ class VueJeu(arcade.View):
             largeur_niveau=self.niveau.largeur,
         )
 
+        self.gamelle = self.niveau.trouver_zone("gamelle")
+
     def on_show_view(self) -> None:
         self.window.background_color = C.COULEUR_FOND
 
@@ -79,6 +85,10 @@ class VueJeu(arcade.View):
         self.chat.calculer_deplacement(delta_time, au_sol)
         contacts = self.collisions.mettre_a_jour(descendre=self.chat.veut_descendre)
 
+        self._surfaces_glissantes(contacts)
+        self._remplir_la_gamelle()
+        self._sortir_du_sac()
+
         if contacts.atterrissage:
             self.chat.signaler_atterrissage()
         if contacts.esquive:
@@ -88,6 +98,67 @@ class VueJeu(arcade.View):
             self.griller_une_vie(contacts.mort)
 
         self.chat.mettre_a_jour_animation(delta_time)
+
+    # ------------------------------------------------------------------
+    # Le salon : verre glissant, gamelle, sac de croquettes
+    # ------------------------------------------------------------------
+    def _surfaces_glissantes(self, contacts) -> None:
+        """La table du salon n'est pas en verre, c'est un film plastique."""
+        self.chat.sur_surface_glissante = any(
+            getattr(zone, "role", "") == "verre" for zone in contacts.zones
+        )
+
+    def _remplir_la_gamelle(self) -> None:
+        """Un objet renverse dans la gamelle y deverse son contenu."""
+        if self.gamelle is None or self.gamelle.remplie:
+            return
+
+        renverse = arcade.check_for_collision_with_list(
+            self.gamelle, self.niveau.poussables
+        )
+        if renverse:
+            self.gamelle.remplie = True
+            self.gamelle.color = C.COULEUR_POUSSABLE
+            # le sac se vide entierement dans la gamelle : on le retire, sinon
+            # il resterait plante devant et empecherait le chat de manger
+            for objet in renverse:
+                objet.remove_from_sprite_lists()
+            self.afficher("Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent.")
+
+    def _sortir_du_sac(self) -> None:
+        """Le chat coince dans le sac s'arrete des qu'il percute quelque chose."""
+        if self.chat.dans_le_sac and abs(self.chat.change_x) < 0.5:
+            self.chat.liberer_du_sac()
+            self.afficher("Le chat percute le mur. Il se degage. Toujours vivant.")
+
+    def manger(self) -> None:
+        """Le seul vrai danger du salon."""
+        if self.gamelle is None:
+            return
+        if not arcade.check_for_collision(self.chat, self.gamelle):
+            return
+
+        if self.gamelle.remplie:
+            self.griller_une_vie("les croquettes avariees")
+        else:
+            self.afficher("Les memes croquettes que tous les soirs. Meme pas de quoi s etouffer.")
+
+    def se_coincer_dans_le_sac(self) -> bool:
+        """Faux piege : le chat met la tete dans le sac et fonce dans le decor.
+
+        On regarde **devant** le chat : un objet solide ne le chevauche jamais,
+        le moteur les a separes. Sans ce decalage, E ne marcherait jamais.
+        """
+        depart = self.chat.center_x
+        self.chat.center_x += self.chat.regarde * PORTEE_ACTION
+        touche = arcade.check_for_collision_with_list(self.chat, self.niveau.poussables)
+        self.chat.center_x = depart
+
+        if not touche:
+            return False
+        self.chat.coincer_dans_le_sac()
+        self.afficher("Le chat a la tete dans le sac. Il ne voit plus rien.")
+        return True
 
     def griller_une_vie(self, cause: str) -> None:
         """Le chat change de vie : c'est l'objectif du niveau, pas un échec."""
@@ -138,12 +209,30 @@ class VueJeu(arcade.View):
 
         if touche in C.TOUCHES_SAUT:
             self.chat.demander_saut()
+        elif touche in C.TOUCHES_ACTION:
+            self.interagir()
         elif touche in C.TOUCHES_RECOMMENCER:
             self.charger_niveau(self.numero_niveau)
         elif touche in C.TOUCHES_DEBUG:
             self.debug = not self.debug
         elif touche in C.TOUCHES_PAUSE:
             arcade.exit()
+
+    def interagir(self) -> None:
+        """Touche E : le chat essaie quelque chose la ou il est.
+
+        La gamelle passe avant le sac : une fois les croquettes renversees, le
+        sac vide traine juste a cote, et ce serait rageant de rater le repas.
+        """
+        if self.chat.dans_le_sac:
+            return
+        if self.gamelle is not None and self.gamelle.remplie:
+            if arcade.check_for_collision(self.chat, self.gamelle):
+                self.manger()
+                return
+        if self.se_coincer_dans_le_sac():
+            return
+        self.manger()
 
     def on_key_release(self, touche: int, modificateurs: int) -> None:
         if touche in C.TOUCHES_GAUCHE:

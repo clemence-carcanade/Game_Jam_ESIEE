@@ -1,12 +1,12 @@
-{"titre": "Chez Leo, 6 ans", "maitre": "leo", "aide": "Leo a capitonne le sol sous l etagere. Tant qu un pouf traine dessous, le chat ne risque rien."}
+{"titre": "Salon, 20h : encore les memes croquettes", "maitre": "le daron", "aide": "E pour interagir. Tout ici a l air dangereux. Presque tout."}
 ####################
 #..................#
-#..........C.M.....#
-#.........#####....#
-#...............===#
 #..................#
-#...............===#
 #..................#
-#...............===#
-#....OOOOOO........#
+#..................#
+#...9..............#
+#====..........O...#
+#.............444..#
+#..==..8M222..444..#
+#5C..77333.......16#
 ####################

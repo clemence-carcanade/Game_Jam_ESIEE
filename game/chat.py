@@ -62,6 +62,8 @@ class Chat(arcade.Sprite):
         # --- état ---
         self.regarde = 1            # 1 = droite, -1 = gauche
         self.au_sol = False
+        self.sur_surface_glissante = False   # remis a jour a chaque image
+        self.minuteur_sac = 0.0              # le chat a le sac de croquettes sur la tete
 
         # --- réflexes (actifs au départ : c'est tout le problème du joueur) ---
         self.reflexe_pattes = True
@@ -90,8 +92,25 @@ class Chat(arcade.Sprite):
     # ------------------------------------------------------------------
     # Calcul des vitesses (appelé avant le moteur de collisions)
     # ------------------------------------------------------------------
+    @property
+    def dans_le_sac(self) -> bool:
+        return self.minuteur_sac > 0
+
+    def coincer_dans_le_sac(self) -> None:
+        """Faux piege : le chat fonce droit devant, sans rien voir."""
+        self.minuteur_sac = C.DUREE_DANS_LE_SAC
+
+    def liberer_du_sac(self) -> None:
+        self.minuteur_sac = 0.0
+
     def calculer_deplacement(self, delta_time: float, au_sol: bool) -> None:
         self.au_sol = au_sol
+
+        if self.dans_le_sac:
+            # Il ne voit rien : il court droit devant et le joueur n'y peut rien.
+            self.minuteur_sac -= delta_time
+            self.veut_gauche = self.regarde < 0
+            self.veut_droite = self.regarde > 0
 
         if au_sol:
             self._coyote = C.TEMPS_COYOTE
@@ -111,6 +130,8 @@ class Chat(arcade.Sprite):
             self.regarde = direction
 
         acceleration = C.ACCELERATION_SOL if au_sol else C.ACCELERATION_AIR
+        if self.sur_surface_glissante and au_sol:
+            acceleration = C.GLISSE_ACCELERATION
         cible = direction * C.VITESSE_CHAT
 
         if direction:
@@ -120,8 +141,11 @@ class Chat(arcade.Sprite):
             elif self.change_x > cible:
                 self.change_x = max(cible, self.change_x - acceleration)
         else:
-            # aucune touche : le chat freine (moins vite en l'air)
+            # aucune touche : le chat freine (moins vite en l'air, presque pas
+            # sur une surface glissante)
             freinage = C.FREINAGE if au_sol else C.FREINAGE * 0.3
+            if self.sur_surface_glissante and au_sol:
+                freinage = C.GLISSE_FREINAGE
             if abs(self.change_x) <= freinage:
                 self.change_x = 0.0
             elif self.change_x > 0:
