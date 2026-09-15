@@ -15,12 +15,10 @@ HAUTEUR_IMAGE = 941
 
 # --- les sols pleins et murs : on ne les traverse jamais --------------------
 # (x gauche, y du dessus, x droite, y du dessous)
+# le sol du bas et les murs restent durs ; les planchers d'etage sont ailleurs
+# (dans PLATEFORMES) pour qu'on puisse sauter a travers par le bas.
 SOLIDES = [
     (40, 846, 1624, 878),        # le sol du rez-de-chaussee, d'un mur a l'autre
-    (40, 545, 388, 572),         # le sol de la salle de bain (etage 1, gauche)
-    (1234, 545, 1624, 572),      # le sol de la chatterie (etage 1, droite)
-    (40, 278, 1155, 305),        # le sol de la chambre et du couloir (etage 2)
-    (1205, 266, 1624, 294),      # le sol de la piece haute droite (etage 2)
     (0, 32, 40, 878),            # le mur exterieur gauche
     (1624, 32, 1672, 878),       # le mur exterieur droit
     (0, 20, 1672, 40),           # le plafond
@@ -29,6 +27,12 @@ SOLIDES = [
 # --- les plateformes traversables : on ne peut qu'atterrir dessus -----------
 # (x gauche, y du dessus, x droite)
 PLATEFORMES = [
+    # les planchers d'etage : solides par le haut, traversables par le bas.
+    # On saute a travers depuis l'etage du dessous, on redescend avec la touche bas.
+    (40, 545, 388),              # plancher de la salle de bain (etage 1, gauche)
+    (1234, 545, 1624),           # plancher de la chatterie (etage 1, droite)
+    (40, 278, 1155),             # plancher de la chambre et du couloir (etage 2)
+    (1205, 266, 1624),           # plancher de la piece haute droite (etage 2)
     # les planches en bois eclairees, qui relient les etages
     (338, 494, 594),             # planche de la salle de bain
     (654, 518, 908),             # planche centrale basse
