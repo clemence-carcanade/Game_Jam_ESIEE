@@ -105,6 +105,8 @@ class VueJeu(arcade.View):
         self.sortie = self.niveau.trouver_zone("sortie")
         if self.niveau.famille:
             self.transition = 5.0
+        if getattr(self, "audio", None) is not None:
+            self.audio.jouer_musique(self.numero_niveau)
         self._construire_faux_pieges()
 
         # la fille (niveau 3) : elle poursuit et rejette le chat
