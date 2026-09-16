@@ -276,10 +276,10 @@ class VueJeu(arcade.View):
         arcade.draw_lrbt_rectangle_filled(x - 11, x + 11, y - 3, y + 19, (20, 18, 26))
         arcade.draw_lrbt_rectangle_outline(x - 11, x + 11, y - 3, y + 19, (240, 220, 120), 2)
         arcade.draw_text("E", x, y, (240, 220, 120), 14, anchor_x="center", bold=True)
-        # le nom de l'item, juste au-dessus
-        larg = 8 + len(libelle) * 7
-        arcade.draw_lrbt_rectangle_filled(x - larg/2, x + larg/2, y + 22, y + 42, (20, 18, 26, 220))
-        arcade.draw_text(libelle, x, y + 26, (250, 240, 200), 12, anchor_x="center", bold=True)
+        # le nom de l'item, juste au-dessus, avec un contour au lieu d'un fond
+        for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+            arcade.draw_text(libelle, x + dx, y + 26 + dy, (20, 18, 26), 12, anchor_x="center", bold=True)
+        arcade.draw_text(libelle, x, y + 26, (255, 240, 190), 12, anchor_x="center", bold=True)
 
     # ------------------------------------------------------------------
     # Les faux pieges scriptes
@@ -571,9 +571,12 @@ class VueJeu(arcade.View):
             x = min(max(self.chat.center_x, 220), C.LARGEUR_FENETRE - 220)
             y = self.chat.top + 48
             larg = 12 + len(self.message) * 6.5
-            a = int(230 * min(1, self.minuteur_message))
-            arcade.draw_lrbt_rectangle_filled(x - larg/2, x + larg/2, y - 4, y + 20, (20, 18, 26, a))
-            arcade.draw_text(self.message, x, y, (250, 245, 230, 255), 12,
+            a = int(255 * min(1, self.minuteur_message))
+            # un discret contour sombre pour rester lisible sur le decor, sans fond
+            for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                arcade.draw_text(self.message, x + dx, y + dy, (20, 18, 26, a), 12,
+                                 anchor_x="center", width=int(larg), align="center")
+            arcade.draw_text(self.message, x, y, (255, 250, 235, a), 12,
                              anchor_x="center", width=int(larg), align="center")
 
     # ------------------------------------------------------------------
