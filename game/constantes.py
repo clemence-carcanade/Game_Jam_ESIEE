@@ -82,7 +82,7 @@ SATIETE_DIGESTION = 0.0      # ce que la satiete redescend par seconde (0 = nive
 
 # Niveau 1 en mode Doodle Jump (scroller vertical, rebond automatique)
 REBOND_DOODLE = 19.0          # vitesse verticale rendue a chaque atterrissage
-DOODLE_NB_PLATEFORMES = 32    # hauteur de la tour a grimper
+DOODLE_NB_PLATEFORMES = 22    # hauteur de la tour a grimper
 DOODLE_ESPACE_MIN = 70        # ecart vertical mini entre deux etageres
 DOODLE_ESPACE_MAX = 115       # ... et maxi (doit rester sous la hauteur de rebond)
 
