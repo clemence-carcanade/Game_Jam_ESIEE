@@ -165,7 +165,9 @@ class VueJeu(arcade.View):
         chemin_trans = C.DOSSIER_IMAGES / "transitions" / f"niveau{self.numero_niveau}.png"
         if chemin_trans.is_file():
             self.transition_image = arcade.load_texture(chemin_trans)
-        if self.niveau.famille or self.transition_image is not None:
+        # on ne montre l'ecran de transition que s'il existe une planche BD :
+        # plus jamais de fond fonce avec du texte au milieu.
+        if self.transition_image is not None:
             self.transition = 5.0
         if getattr(self, "audio", None) is not None:
             self.audio.jouer_musique(self.numero_niveau)
@@ -601,35 +603,21 @@ class VueJeu(arcade.View):
         arcade.draw_text(f"{int(self.vie_barre)}", L/2, y+4, (255,255,255), 13, anchor_x="center", bold=True)
 
     def _dessiner_transition(self) -> None:
-        """L'ecran entre deux niveaux : une planche BD, ou l'ancien lore texte."""
-        L, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
-        # une planche BD est fournie pour ce niveau : on l'affiche plein cadre
-        if self.transition_image is not None:
-            a = int(255 * min(1.0, self.transition, 5.0 - self.transition + 1))
-            arcade.draw_lrbt_rectangle_filled(0, L, 0, H, (10, 8, 12, 255))
-            arcade.draw_texture_rect(self.transition_image, arcade.LBWH(0, 0, L, H),
-                                     pixelated=False, alpha=a)
-            if self.transition < 4.2:
-                arcade.draw_text("Espace / Entree pour continuer", L / 2, H * 0.04,
-                                 (240, 240, 245), 15, anchor_x="center", bold=True)
-            return
+        """L'ecran entre deux niveaux : une planche BD plein cadre, rien d'autre.
 
-        fondu = min(1.0, self.transition, 5.0 - self.transition + 1)
-        arcade.draw_lrbt_rectangle_filled(0, L, 0, H, (16, 14, 22, int(240 * min(1, self.transition))))
-        cx = L / 2
-        arcade.draw_text(f"Vie {self.numero_niveau} sur {C.NOMBRE_NIVEAUX}",
-                         cx, H * 0.70, (150, 150, 165), 18, anchor_x="center")
-        arcade.draw_text("Nouvelle famille", cx, H * 0.60, (200, 180, 120), 22,
-                         anchor_x="center", bold=True)
-        arcade.draw_text(self.niveau.famille, cx, H * 0.52, (255, 250, 235), 34,
-                         anchor_x="center", bold=True)
-        arcade.draw_text("Probleme", cx, H * 0.38, (210, 120, 120), 22,
-                         anchor_x="center", bold=True)
-        arcade.draw_text(self.niveau.probleme, cx, H * 0.30, (255, 220, 220), 26,
-                         anchor_x="center", width=int(L * 0.8), align="center", multiline=True)
+        On ne dessine que si une planche existe (la transition n'est d'ailleurs
+        armee que dans ce cas) : plus aucun fond fonce avec du texte au milieu.
+        """
+        if self.transition_image is None:
+            return
+        L, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
+        a = int(255 * min(1.0, self.transition, 5.0 - self.transition + 1))
+        arcade.draw_lrbt_rectangle_filled(0, L, 0, H, (10, 8, 12, 255))
+        arcade.draw_texture_rect(self.transition_image, arcade.LBWH(0, 0, L, H),
+                                 pixelated=False, alpha=a)
         if self.transition < 4.2:
-            arcade.draw_text("Espace / Entree pour continuer", cx, H * 0.12,
-                             (150, 150, 165), 15, anchor_x="center")
+            arcade.draw_text("Espace / Entree pour continuer", L / 2, H * 0.04,
+                             (240, 240, 245), 15, anchor_x="center", bold=True)
 
     def _dessiner_indicateur_action(self) -> None:
         """Un simple E au-dessus du chat quand une action est possible.
