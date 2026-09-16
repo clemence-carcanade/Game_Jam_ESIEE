@@ -15,7 +15,7 @@ NIVEAUX = [
         message_mort="Etouffe avec les croquettes. Une vie de moins, une maison de plus.",
         message_attente="Les memes croquettes que tous les soirs. Meme pas de quoi s etouffer.",
         depart="salon",
-        perso=dict(image="daron", pos="canape"),
+        perso=dict(image="daron", pos="tv"),
         pousseurs=[
             dict(min="canape", max="tv", vitesse=2.4),
             dict(min="chambre", max="couloir", vitesse=1.8),
@@ -66,7 +66,7 @@ NIVEAUX = [
         message_mort="Noye dans l aquarium. Elle croira a un jeu.",
         message_attente="",
         depart="salon",
-        piege="aquarium", piege_image="aucune", piege_anime="aquarium_anime", piege_largeur=120, piege_direct=True, libelle_piege="L aquarium",
+        piege="aquarium", piege_image="aucune", piege_largeur=120, piege_direct=True, libelle_piege="L aquarium",
         fille="salle_droite",
         pousseurs=[
             dict(min="frigo", max="planche_centre", vitesse=2.6),
