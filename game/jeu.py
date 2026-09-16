@@ -571,9 +571,6 @@ class VueJeu(arcade.View):
         self._dessiner_barre_satiete()
         arcade.draw_text("Dirige gauche / droite (Q D ou fleches) - le chat rebondit tout seul",
                          W / 2, 18, C.COULEUR_TEXTE, 14, anchor_x="center")
-        if self.minuteur_message > 0 and self.message:
-            arcade.draw_text(self.message, W / 2, H * 0.5, (255, 240, 220), 22,
-                             anchor_x="center", bold=True)
         if self.transition > 0:
             self._dessiner_transition()
 
@@ -635,21 +632,19 @@ class VueJeu(arcade.View):
                              (150, 150, 165), 15, anchor_x="center")
 
     def _dessiner_indicateur_action(self) -> None:
-        """Un E au-dessus du chat, avec le nom de l'action, quand E fera qqch."""
+        """Un simple E au-dessus du chat quand une action est possible.
+
+        Plus de libelle : seule la touche E s'affiche, sans texte descriptif.
+        """
         if not self._action_possible():
             return
         x = self.chat.center_x
         y = self.chat.top + 16
-        libelle = self._libelle_action()
 
-        # le petit E dans son cadre
+        # le petit E dans son cadre, sans le nom de l'item
         arcade.draw_lrbt_rectangle_filled(x - 11, x + 11, y - 3, y + 19, (20, 18, 26))
         arcade.draw_lrbt_rectangle_outline(x - 11, x + 11, y - 3, y + 19, (240, 220, 120), 2)
         arcade.draw_text("E", x, y, (240, 220, 120), 14, anchor_x="center", bold=True)
-        # le nom de l'item, juste au-dessus, avec un contour au lieu d'un fond
-        for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-            arcade.draw_text(libelle, x + dx, y + 26 + dy, (20, 18, 26), 12, anchor_x="center", bold=True)
-        arcade.draw_text(libelle, x, y + 26, (255, 240, 190), 12, anchor_x="center", bold=True)
 
     # ------------------------------------------------------------------
     # Les faux pieges scriptes
