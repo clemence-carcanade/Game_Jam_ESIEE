@@ -1,10 +1,7 @@
-"""Sept Vies — point d'entrée.
+"""Sept Vies -- point d'entree.
 
-    python main.py            le menu, puis le niveau 1
-    python main.py 3          directement le niveau 3 (pratique en test)
-
-Ce fichier ne contient aucune logique de jeu : il ouvre la fenêtre et affiche
-la première vue. Le moteur est dans le paquet ``game/``.
+    python main.py        le menu, puis le jeu
+    python main.py 3      directement le niveau 3 (debug)
 """
 
 import sys
@@ -13,7 +10,6 @@ import arcade
 
 from game import constantes as C
 from game.jeu import VueJeu
-from views.menu import MenuView
 
 
 def main() -> None:
@@ -25,10 +21,10 @@ def main() -> None:
         center_window=True,
     )
 
-    # Un numéro de niveau en argument saute le menu et lance la partie.
     if len(sys.argv) > 1:
         fenetre.show_view(VueJeu(int(sys.argv[1])))
     else:
+        from views.menu import MenuView
         fenetre.show_view(MenuView())
 
     arcade.run()

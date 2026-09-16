@@ -19,6 +19,15 @@ from game import constantes as C
 NOMS = ("saut", "atterrissage", "mort", "piege", "reincarnation", "win")
 EXTENSIONS = (".wav", ".ogg", ".mp3")
 
+#: volume general du jeu, de 0.0 a 1.0, regle depuis les parametres du menu.
+#: partage par toutes les instances Audio (variable de module).
+VOLUME = 0.7
+
+
+def regler_volume(valeur):
+    global VOLUME
+    VOLUME = max(0.0, min(1.0, valeur))
+
 
 class Audio:
     def __init__(self):
@@ -46,7 +55,7 @@ class Audio:
             return
         self.arreter_musique()
         self._musique_en_cours = piste
-        self._lecteur_musique = arcade.play_sound(piste, volume=0.35, loop=True)
+        self._lecteur_musique = arcade.play_sound(piste, volume=0.4 * VOLUME, loop=True)
 
     def arreter_musique(self):
         if self._lecteur_musique is not None:
@@ -72,10 +81,10 @@ class Audio:
             return
         son = self._sons.get(nom)
         if son is not None:
-            arcade.play_sound(son, volume=volume)
+            arcade.play_sound(son, volume=volume * VOLUME)
 
     def demarrer_ambiance(self):
         """Compat : lance l'ambiance par defaut (le menu s'en sert)."""
         if self._ambiance and not self.muet and self._lecteur_musique is None:
             self._musique_en_cours = self._ambiance
-            self._lecteur_musique = arcade.play_sound(self._ambiance, volume=0.3, loop=True)
+            self._lecteur_musique = arcade.play_sound(self._ambiance, volume=0.4 * VOLUME, loop=True)
