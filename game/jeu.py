@@ -367,10 +367,11 @@ class VueJeu(arcade.View):
         for i in range(40):
             cote = -1 if i % 2 == 0 else 1
             depart = -60 - random.random() * 500 if cote > 0 else self.niveau.largeur + 60 + random.random() * 500
-            chemin = C.DOSSIER_IMAGES / "decor" / "chat_gris.png"
-            t = arcade.load_texture(chemin) if chemin.is_file() else \
-                arcade.Texture.create_empty("c", (24, 16), (150, 150, 160))
-            chat = arcade.Sprite(t if cote > 0 else t.flip_left_right(), scale=2.6)
+            from game.entites import frames
+            droite, gauche = frames("course")
+            jeu = droite if cote > 0 else gauche
+            chat = arcade.Sprite(jeu[i % len(jeu)], scale=2.4)
+            chat.frames_horde = jeu
             chat.center_x = depart
             chat.bottom = sol + random.random() * 90
             chat.vx = (5 + random.random() * 4) * cote
@@ -382,6 +383,8 @@ class VueJeu(arcade.View):
         for chat in self.horde:
             chat.center_x += chat.vx
             chat.center_y += math.sin(self.ambiance.t * 20 + chat.center_x) * 1.5
+            fr = chat.frames_horde
+            chat.texture = fr[int(self.ambiance.t * 14 + chat.center_x) % len(fr)]
             if chat.center_x < -120 or chat.center_x > self.niveau.largeur + 120:
                 chat.remove_from_sprite_lists()
         if self.chat.vivant and arcade.check_for_collision_with_list(self.chat, self.horde):
