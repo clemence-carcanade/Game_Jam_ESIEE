@@ -244,7 +244,7 @@ class VueJeu(arcade.View):
         mobile_precedente = False
         for _ in range(C.DOODLE_NB_PLATEFORMES):
             y += rng.randint(C.DOODLE_ESPACE_MIN, C.DOODLE_ESPACE_MAX)
-            larg = rng.choice((140, 165, 190))
+            larg = rng.choice((130, 155, 180))
             # zigzag centre sur l ecran : une etagere a gauche du milieu, la
             # suivante a droite, pour forcer des sauts alternes gauche/droite
             sens = -sens
@@ -252,9 +252,9 @@ class VueJeu(arcade.View):
             plat = barre(x, y, larg)
             # une etagere sur deux coulisse horizontalement (jamais deux de
             # suite) : il faut viser un rebond sur une cible en mouvement
-            if not mobile_precedente and rng.random() < 0.5:
-                course = rng.randint(35, 55)
-                plat.vx = rng.choice((-1, 1)) * (1.8 + rng.random() * 1.0)
+            if not mobile_precedente and rng.random() < 0.62:
+                course = rng.randint(40, 58)
+                plat.vx = rng.choice((-1, 1)) * (2.0 + rng.random() * 1.0)
                 plat.xmin = max(larg / 2 + 10, x - course)
                 plat.xmax = min(W - larg / 2 - 10, x + course)
                 mobile_precedente = True

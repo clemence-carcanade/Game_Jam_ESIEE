@@ -69,7 +69,7 @@ DUREE_DANS_LE_SAC = 2.5        # secondes a foncer droit devant sans rien voir
 # ---------------------------------------------------------------------------
 VIE_MAX = 100.0
 PIMENT_DEGATS = 16.0          # ce qu'un piment retire a la barre de vie
-VIE_REGEN = 7.0              # ce que la barre remonte par seconde (difficulte)
+VIE_REGEN = 12.0             # ce que la barre remonte par seconde (difficulte)
 PIMENT_RESPAWN = 1.6         # secondes avant qu'un piment mange reapparaisse
 
 # ---------------------------------------------------------------------------
