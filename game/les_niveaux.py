@@ -9,6 +9,7 @@ ancre nommee de maison.ANCRES ou un couple (x, y) en pixels de l'image.
 NIVEAUX = [
     dict(
         titre="Salon, 20h : encore les memes croquettes", maitre="le daron",
+        famille='Le daron et sa femme', probleme='Croquettes tous les soirs, matchs de foot hurles',
         aide="Le sac de croquettes est sur la table, a droite. Pousse-le jusque dans la gamelle.",
         message_piege="Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent.",
         message_mort="Etouffe avec les croquettes. Une vie de moins, une maison de plus.",
@@ -24,6 +25,7 @@ NIVEAUX = [
     ),
     dict(
         titre="La vieille demeure : cent chats, un chat noir", maitre="la vieille",
+        famille='La vieille aux cent chats', probleme='Cent chats, une seule gamelle, rien a soi',
         aide="Un chat noir t attend tout en haut. Rejoins-le malgre la nuee, et fais E.",
         message_piege="",
         message_mort="Le chat noir cligne des yeux. Une vie s en va, doucement.",
@@ -56,6 +58,7 @@ NIVEAUX = [
     ),
     dict(
         titre="La chambre de l enfant riche", maitre="l enfant",
+        famille='Les parents riches', probleme='Confie a leur petite fille insupportable',
         aide="L aquarium est en haut a droite. Rejoins-le et fais E -- mais la petite te poursuit et te rejette sans cesse.",
         message_piege="",
         message_mort="Noye dans l aquarium. Elle croira a un jeu.",
@@ -85,6 +88,7 @@ NIVEAUX = [
     ),
     dict(
         titre="L appart de l influenceur", maitre="l influenceur",
+        famille='L influenceur', probleme='Filme non-stop pour des videos nulles',
         aide="L influenceur te filme (le cercle). Sors de son champ, rejoins le cable, et fais E. Dans le champ, il te sauve.",
         message_piege="Le cable est denude. Il gresille.",
         message_mort="Electrocute en direct. Trois cent mille vues.",
@@ -109,6 +113,7 @@ NIVEAUX = [
     ),
     dict(
         titre="La cuisine du restaurant, en plein rush", maitre="le chef",
+        famille='Personne : la rue', probleme='Sans toit, sans maitre, attire par les cuisines',
         aide="La marmite bout dans la cuisine. Fais tomber le couvercle du plan de travail, et saute.",
         message_piege="La marmite est ouverte. Personne ne regarde.",
         message_mort="Tombe dans l eau bouillante. Le service continue.",
@@ -135,6 +140,7 @@ NIVEAUX = [
     ),
     dict(
         titre="Le cabinet medical", maitre="le docteur",
+        famille='Le veterinaire', probleme='Bete de foire du cabinet, soigne de force',
         aide="Il soigne TOUT. Les somniferes sont sur la plateforme du couloir : fais-les-lui tomber dessus.",
         message_piege="Les somniferes tombent sur le medecin. Il glisse. Il ronfle.",
         message_mort="Cette fois, personne n est venu recoudre.",
@@ -168,6 +174,7 @@ NIVEAUX = [
     ),
     dict(
         titre="Chez lui : il ne veut plus mourir", maitre="la famille",
+        famille='La bonne famille, enfin', probleme='Aucun. Et c est ca, le probleme',
         aide="Cette fois il faut rentrer vivant. Evite les guirlandes de la fete. Ils t attendent pres de la paniere, a l etage.",
         message_mort="Pas comme ca. Pas maintenant. On recommence.",
         survivre=True, reflexes_coupes=["moustaches"],

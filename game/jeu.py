@@ -67,6 +67,7 @@ class VueJeu(arcade.View):
         self.horde = arcade.SpriteList()   # cent chats qui deferlent (niveau 2)
         self.horde_lancee = False
         self.flammes = []                  # jets de feu de la cuisine (niveau 5)
+        self.transition = 0.0              # ecran de lore entre les niveaux
         self.audio = Audio()
         self.audio.demarrer_ambiance()
         self.ralenti = 0.0           # court ralenti a la mort
@@ -102,6 +103,8 @@ class VueJeu(arcade.View):
 
         self.gamelle = self.niveau.trouver_zone("gamelle")
         self.sortie = self.niveau.trouver_zone("sortie")
+        if self.niveau.famille:
+            self.transition = 5.0
         self._construire_faux_pieges()
 
         # la fille (niveau 3) : elle poursuit et rejette le chat
@@ -161,6 +164,11 @@ class VueJeu(arcade.View):
     # ------------------------------------------------------------------
     def on_update(self, delta_time: float) -> None:
         self.minuteur_message = max(0.0, self.minuteur_message - delta_time)
+
+        if self.transition > 0:
+            self.transition -= delta_time
+            self.ambiance.mettre_a_jour(delta_time)
+            return
 
         # TODO (vies.py) : cette pause et l'enchainement des niveaux
         # appartiennent au systeme de vies. Ici, juste de quoi voir l'animation.
@@ -271,6 +279,26 @@ class VueJeu(arcade.View):
             return (getattr(self.niveau, "libelle_piege", "")
                     or LIBELLES.get(self.niveau.piege_image, "Le piege"))
         return "Le sac de croquettes"
+
+    def _dessiner_transition(self) -> None:
+        """L'ecran de lore : la nouvelle famille et son probleme."""
+        L, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
+        fondu = min(1.0, self.transition, 5.0 - self.transition + 1)
+        arcade.draw_lrbt_rectangle_filled(0, L, 0, H, (16, 14, 22, int(240 * min(1, self.transition))))
+        cx = L / 2
+        arcade.draw_text(f"Vie {self.numero_niveau} sur {C.NOMBRE_NIVEAUX}",
+                         cx, H * 0.70, (150, 150, 165), 18, anchor_x="center")
+        arcade.draw_text("Nouvelle famille", cx, H * 0.60, (200, 180, 120), 22,
+                         anchor_x="center", bold=True)
+        arcade.draw_text(self.niveau.famille, cx, H * 0.52, (255, 250, 235), 34,
+                         anchor_x="center", bold=True)
+        arcade.draw_text("Probleme", cx, H * 0.38, (210, 120, 120), 22,
+                         anchor_x="center", bold=True)
+        arcade.draw_text(self.niveau.probleme, cx, H * 0.30, (255, 220, 220), 26,
+                         anchor_x="center", width=int(L * 0.8), align="center", multiline=True)
+        if self.transition < 4.2:
+            arcade.draw_text("Espace / Entree pour continuer", cx, H * 0.12,
+                             (150, 150, 165), 15, anchor_x="center")
 
     def _dessiner_indicateur_action(self) -> None:
         """Un E au-dessus du chat, avec le nom de l'action, quand E fera qqch."""
@@ -628,6 +656,11 @@ class VueJeu(arcade.View):
 
     # ------------------------------------------------------------------
     def on_key_press(self, touche: int, modificateurs: int) -> None:
+        if self.transition > 0:
+            if touche in (arcade.key.SPACE, arcade.key.ENTER, arcade.key.RETURN):
+                self.transition = 0.0
+            return
+
         if touche in C.TOUCHES_GAUCHE:
             self.chat.veut_gauche = True
         elif touche in C.TOUCHES_DROITE:

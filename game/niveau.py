@@ -238,6 +238,8 @@ class Niveau:
 
     titre: str = ""
     maitre: str = ""
+    famille: str = ""
+    probleme: str = ""
     aide: str = ""
     largeur: float = 0.0
     hauteur: float = 0.0
@@ -323,6 +325,8 @@ def construire_maison(definition, numero=1) -> Niveau:
     niveau = Niveau(
         titre=definition.get("titre", ""),
         maitre=definition.get("maitre", ""),
+        famille=definition.get("famille", ""),
+        probleme=definition.get("probleme", ""),
         aide=definition.get("aide", ""),
         reflexes_coupes=definition.get("reflexes_coupes", []),
         survivre=definition.get("survivre", False),
