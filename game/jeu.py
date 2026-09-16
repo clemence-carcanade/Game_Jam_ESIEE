@@ -448,7 +448,7 @@ class VueJeu(arcade.View):
                     self.chat.change_y = C.REBOND_DOODLE
                     self.chat.au_sol = True
                     self.effets.pouf(self.chat.center_x, plat.top, (210, 180, 120), 5)
-                    self.audio.jouer("saut", 0.2)
+                    self.audio.jouer("boing", 0.35)     # le rebond du Doodle Jump
                     break
 
         # 3. la camera suit le chat vers le haut, sans jamais redescendre
@@ -730,6 +730,7 @@ class VueJeu(arcade.View):
             # le medecin surgit directement sur le chat, le recoud : retour depart
             if self.medecin is not None:
                 self.effets.pouf(chat.center_x, chat.center_y, (140, 240, 170), 16)
+                self.audio.jouer("reincarnation", 0.6)   # il te ramene a la vie
                 self.medecin.soigner(chat.center_x)
             chat.replacer_au_depart()
         elif genre == "deguisement":
@@ -998,6 +999,7 @@ class VueJeu(arcade.View):
             self.termine = True
             self.afficher("Sept vies, sept maisons. Il ne lui en restait qu'une.")
             return
+        self.audio.jouer("reincarnation", 0.7)   # il se reincarne dans la maison suivante
         self.charger_niveau(self.numero_niveau + 1)
 
     def afficher(self, texte: str) -> None:

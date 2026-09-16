@@ -16,7 +16,7 @@ import arcade
 
 from game import constantes as C
 
-NOMS = ("saut", "atterrissage", "mort", "piege", "reincarnation", "win")
+NOMS = ("saut", "atterrissage", "mort", "piege", "reincarnation", "win", "boing")
 EXTENSIONS = (".wav", ".ogg", ".mp3")
 
 #: volume general du jeu, de 0.0 a 1.0, regle depuis les parametres du menu.
