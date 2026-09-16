@@ -238,19 +238,26 @@ class VueJeu(arcade.View):
         self.doodle_base_y = base.top
 
         y = base_y
+        x_prec = W / 2
         for _ in range(C.DOODLE_NB_PLATEFORMES):
             y += rng.randint(C.DOODLE_ESPACE_MIN, C.DOODLE_ESPACE_MAX)
-            larg = rng.choice((150, 180, 210))
-            x = rng.randint(int(larg / 2) + 10, int(W - larg / 2 - 10))
+            larg = rng.choice((200, 240, 280))
+            # la suivante reste a portee horizontale de la precedente (pas de
+            # traversee de tout l ecran entre deux rebonds)
+            bord = int(larg / 2) + 10
+            x = x_prec + rng.randint(-150, 150)
+            x = max(bord, min(W - bord, x))
+            x_prec = x
             plats.append(barre(x, y, larg))
             if rng.random() < 0.55:                                # un sac pose dessus
                 croq = module_niveau._image("catfood", x, y_bas=y + 9)
                 if croq is not None:
                     self.croquettes.append(croq)
 
-        y += 150                                                    # le sommet
-        plats.append(barre(W / 2, y, 260, 22, (120, 86, 56)))
-        self.distributeur = module_niveau._image("distributeur", W / 2, y_bas=y + 11)
+        y += 95                                                     # le sommet, a portee
+        sx = max(170, min(W - 170, x_prec + rng.randint(-90, 90)))
+        plats.append(barre(sx, y, 320, 22, (120, 86, 56)))
+        self.distributeur = module_niveau._image("distributeur", sx, y_bas=y + 11)
         self.monde_haut = y + 220
 
         # la tour devient la geometrie ; pas de murs (defilement + rebouclage)
