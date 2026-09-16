@@ -233,8 +233,9 @@ class VueJeu(arcade.View):
             return arcade.Sprite(tex, center_x=cx, center_y=cy)
 
         base_y = 90
-        plats.append(barre(W / 2, base_y, W, 26, (120, 86, 56)))   # sol de depart
-        self.doodle_base_y = base_y
+        base = barre(W / 2, base_y, W, 26, (120, 86, 56))          # sol de depart
+        plats.append(base)
+        self.doodle_base_y = base.top
 
         y = base_y
         for _ in range(C.DOODLE_NB_PLATEFORMES):
@@ -257,8 +258,9 @@ class VueJeu(arcade.View):
         self.niveau.murs = arcade.SpriteList()
 
         self.chat.center_x = W / 2
-        self.chat.center_y = base_y + 30
-        self.chat.change_x = self.chat.change_y = 0.0
+        self.chat.bottom = self.doodle_base_y      # pose sur le sol, pas dedans
+        self.chat.change_x = 0.0
+        self.chat.change_y = C.REBOND_DOODLE       # premier rebond immediat
         self.camera_y = 0.0
         self.camera_doodle = arcade.Camera2D()
         self.gui_camera = arcade.Camera2D()
@@ -405,8 +407,9 @@ class VueJeu(arcade.View):
     def _respawn_doodle(self) -> None:
         """Le chat a rate un rebond : on le remet en bas de la tour."""
         self.chat.center_x = C.LARGEUR_FENETRE / 2
-        self.chat.center_y = self.doodle_base_y + 30
-        self.chat.change_x = self.chat.change_y = 0.0
+        self.chat.bottom = self.doodle_base_y
+        self.chat.change_x = 0.0
+        self.chat.change_y = C.REBOND_DOODLE
         self.camera_y = 0.0
         self.afficher("Rate ! On repart du bas.")
 
