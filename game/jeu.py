@@ -79,6 +79,7 @@ class VueJeu(arcade.View):
         self.gui_camera = None
         self.doodle_base_y = 0.0
         self.transition = 0.0              # ecran de lore entre les niveaux
+        self.transition_image = None       # planche BD de transition (si fournie)
         self.audio = Audio()
         self.audio.demarrer_ambiance()
         self.ralenti = 0.0           # court ralenti a la mort
@@ -158,7 +159,13 @@ class VueJeu(arcade.View):
                 self.piege_frames.append(arcade.load_texture(C.DOSSIER_IMAGES / "decor" / f"{nom_anime}_{i}.png"))
                 i += 1
 
-        if self.niveau.famille:
+        # l'ecran de transition : une planche BD par niveau si elle existe,
+        # sinon l'ancien ecran de lore (texte sur fond sombre).
+        self.transition_image = None
+        chemin_trans = C.DOSSIER_IMAGES / "transitions" / f"niveau{self.numero_niveau}.png"
+        if chemin_trans.is_file():
+            self.transition_image = arcade.load_texture(chemin_trans)
+        if self.niveau.famille or self.transition_image is not None:
             self.transition = 5.0
         if getattr(self, "audio", None) is not None:
             self.audio.jouer_musique(self.numero_niveau)
@@ -554,8 +561,19 @@ class VueJeu(arcade.View):
         arcade.draw_text(f"{int(self.vie_barre)}", L/2, y+4, (255,255,255), 13, anchor_x="center", bold=True)
 
     def _dessiner_transition(self) -> None:
-        """L'ecran de lore : la nouvelle famille et son probleme."""
+        """L'ecran entre deux niveaux : une planche BD, ou l'ancien lore texte."""
         L, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
+        # une planche BD est fournie pour ce niveau : on l'affiche plein cadre
+        if self.transition_image is not None:
+            a = int(255 * min(1.0, self.transition, 5.0 - self.transition + 1))
+            arcade.draw_lrbt_rectangle_filled(0, L, 0, H, (10, 8, 12, 255))
+            arcade.draw_texture_rect(self.transition_image, arcade.LBWH(0, 0, L, H),
+                                     pixelated=False, alpha=a)
+            if self.transition < 4.2:
+                arcade.draw_text("Espace / Entree pour continuer", L / 2, H * 0.04,
+                                 (240, 240, 245), 15, anchor_x="center", bold=True)
+            return
+
         fondu = min(1.0, self.transition, 5.0 - self.transition + 1)
         arcade.draw_lrbt_rectangle_filled(0, L, 0, H, (16, 14, 22, int(240 * min(1, self.transition))))
         cx = L / 2
