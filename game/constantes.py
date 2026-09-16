@@ -73,6 +73,14 @@ VIE_REGEN = 7.0              # ce que la barre remonte par seconde (difficulte)
 PIMENT_RESPAWN = 1.6         # secondes avant qu'un piment mange reapparaisse
 
 # ---------------------------------------------------------------------------
+# Niveau 1 : l escalade jusqu au distributeur de croquettes (se gaver a mort)
+# ---------------------------------------------------------------------------
+SATIETE_MAX = 100.0
+CROQUETTE_GAVE = 6.0         # ce qu une croquette ramassee ajoute a la satiete
+DISTRIBUTEUR_GAVE = 48.0     # ce que le distributeur deverse par seconde au contact
+SATIETE_DIGESTION = 0.0      # ce que la satiete redescend par seconde (0 = niveau facile)
+
+# ---------------------------------------------------------------------------
 # Chutes
 # ---------------------------------------------------------------------------
 # Un chat retombe sur ses pattes : tant que le réflexe est actif, il encaisse

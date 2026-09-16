@@ -69,6 +69,9 @@ class VueJeu(arcade.View):
         self.flammes = []                  # jets de feu de la cuisine (niveau 5)
         self.vie_barre = C.VIE_MAX         # niveau 5 : barre a vider en mangeant des piments
         self.piments = arcade.SpriteList()
+        self.satiete = 0.0                 # niveau 1 : barre a remplir en se gavant
+        self.croquettes = arcade.SpriteList()
+        self.distributeur = None
         self.transition = 0.0              # ecran de lore entre les niveaux
         self.audio = Audio()
         self.audio.demarrer_ambiance()
@@ -117,6 +120,22 @@ class VueJeu(arcade.View):
                                        center_x=x, center_y=y + 14)
             piment.repop = 0.0
             self.piments.append(piment)
+
+        # niveau 1 : l escalade et le distributeur (barre de satiete a remplir)
+        self.satiete = 0.0
+        self.croquettes = arcade.SpriteList()
+        for pos in getattr(self.niveau, "croquettes", []):
+            x, y = self.niveau.point(pos)
+            croq = module_niveau._image("catfood", x, y_bas=y)
+            if croq is None:
+                croq = arcade.Sprite(arcade.Texture.create_empty("c", (18, 24), (150, 96, 50)),
+                                     center_x=x, center_y=y + 12)
+            self.croquettes.append(croq)
+        self.distributeur = None
+        nom_distri = getattr(self.niveau, "distributeur", "")
+        if nom_distri:
+            x, y = self.niveau.point(nom_distri)
+            self.distributeur = module_niveau._image("distributeur", x, y_bas=y)
 
         # l'animation du piege mortel (aquarium, cable) posee sur sa zone
         self.piege_frames = []
@@ -241,6 +260,7 @@ class VueJeu(arcade.View):
         self._vivre_la_horde(delta_time)
         self._vivre_les_flammes(delta_time)
         self._vivre_les_piments(delta_time)
+        self._vivre_les_croquettes(delta_time)
         if self.chat_noir is not None:
             self.chat_noir.mettre_a_jour(delta_time)
         if self.fille is not None and self.fille.mettre_a_jour(delta_time, self.chat):
@@ -308,6 +328,19 @@ class VueJeu(arcade.View):
             return (getattr(self.niveau, "libelle_piege", "")
                     or LIBELLES.get(self.niveau.piege_image, "Le piege"))
         return "Le sac de croquettes"
+
+    def _dessiner_barre_satiete(self) -> None:
+        """La barre de satiete a REMPLIR (niveau 1) : pleine = le ventre lache."""
+        L = C.LARGEUR_FENETRE
+        x, y, larg, haut = L/2 - 200, C.HAUTEUR_FENETRE - 60, 400, 22
+        arcade.draw_lrbt_rectangle_filled(x, x+larg, y, y+haut, (24, 20, 30))
+        ratio = self.satiete / C.SATIETE_MAX
+        couleur = (150, 96, 50) if ratio < 0.7 else (210, 90, 60)
+        arcade.draw_lrbt_rectangle_filled(x, x + larg*ratio, y, y+haut, couleur)
+        arcade.draw_lrbt_rectangle_outline(x, x+larg, y, y+haut, (240, 230, 220), 2)
+        arcade.draw_text("Escalade jusqu au distributeur et gave-toi de croquettes !",
+                         L/2, y + haut + 8, (255, 240, 220), 15, anchor_x="center", bold=True)
+        arcade.draw_text(f"{int(self.satiete)} %", L/2, y+4, (255,255,255), 13, anchor_x="center", bold=True)
 
     def _dessiner_barre_vie(self) -> None:
         """La barre de vie a vider (niveau 5) : plus elle est basse, mieux c'est."""
@@ -601,6 +634,31 @@ class VueJeu(arcade.View):
         if self.chat.vivant and arcade.check_for_collision_with_list(self.chat, self.horde):
             self.griller_une_vie("cent chats affames")
 
+    def _vivre_les_croquettes(self, delta_time: float) -> None:
+        """Niveau 1 : ramasser les croquettes et se gaver au distributeur.
+
+        La satiete monte a chaque croquette gobee et deborde vite au pied du
+        distributeur ; a fond, le petit ventre lache et le chat change de vie.
+        """
+        if self.distributeur is None or not self.chat.vivant:
+            return
+        if C.SATIETE_DIGESTION:
+            self.satiete = max(0.0, self.satiete - C.SATIETE_DIGESTION * delta_time)
+        # les croquettes semees sur les etageres, gobees une seule fois
+        for croq in self.croquettes:
+            if croq.alpha == 255 and arcade.check_for_collision(self.chat, croq):
+                self.satiete = min(C.SATIETE_MAX, self.satiete + C.CROQUETTE_GAVE)
+                croq.alpha = 0
+                self.effets.pouf(croq.center_x, croq.center_y, (200, 150, 90), 6)
+                self.audio.jouer("atterrissage", 0.3)
+        # le gros distributeur, tout en haut : il deverse tant qu on le touche
+        if arcade.check_for_collision(self.chat, self.distributeur):
+            self.satiete = min(C.SATIETE_MAX, self.satiete + C.DISTRIBUTEUR_GAVE * delta_time)
+            if int(self.ambiance.t * 20) % 4 == 0:
+                self.effets.pouf(self.chat.center_x, self.chat.center_y + 6, (200, 150, 90), 3)
+        if self.satiete >= C.SATIETE_MAX:
+            self.griller_une_vie("un ventre trop plein")
+
     def _vivre_les_piments(self, delta_time: float) -> None:
         """Niveau 5 : manger les piments vide la barre ; elle remonte toute seule."""
         if not len(self.piments) or not self.chat.vivant:
@@ -689,6 +747,9 @@ class VueJeu(arcade.View):
         self.pousseurs.draw(pixelated=True)
         self.horde.draw(pixelated=True)
         self._dessiner_les_flammes()
+        if self.distributeur is not None:
+            arcade.draw_sprite(self.distributeur, pixelated=True)
+        self.croquettes.draw(pixelated=True)
         self.piments.draw(pixelated=True)
         if self.piege_frames and self.gamelle is not None:
             fr = self.piege_frames[int(self.ambiance.t * 12) % len(self.piege_frames)]
@@ -747,6 +808,8 @@ class VueJeu(arcade.View):
 
         if len(self.piments):
             self._dessiner_barre_vie()
+        if self.distributeur is not None:
+            self._dessiner_barre_satiete()
 
         if self.transition > 0:
             self._dessiner_transition()

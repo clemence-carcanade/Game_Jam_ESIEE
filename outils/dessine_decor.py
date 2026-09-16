@@ -948,6 +948,42 @@ def cloche():
     return t.enregistrer("cloche")
 
 
+def distributeur():
+    """Le gros distributeur de croquettes programmable, tout en haut du mur."""
+    t = Toile(32, 52)
+    # la tremie du haut, pleine de croquettes vues a travers une vitre
+    t.rect(4, 2, 27, 16, "metal")
+    t.rect(6, 4, 25, 14, "croquette")
+    for x in range(7, 25, 3):
+        for y in range(5, 14, 3):
+            t.point(x, y, "croquette_clair")
+    t.cadre(4, 2, 27, 16, "contour")
+    # le corps metal
+    t.rect(6, 16, 25, 40, "metal")
+    t.ligne_v(8, 17, 39, "metal_clair")
+    t.ligne_v(23, 17, 39, "metal_sombre")
+    t.cadre(6, 16, 25, 40, "contour")
+    # l ecran programmable, qui clignote en bleu
+    t.rect(9, 19, 22, 27, "ecran")
+    t.rect(10, 20, 21, 26, "ecran_bleu")
+    t.rect(11, 22, 14, 23, "ecran")
+    t.rect(16, 22, 20, 23, "ecran")
+    t.cadre(9, 19, 22, 27, "contour")
+    # deux boutons
+    t.rect(9, 30, 12, 33, "croquette_clair")
+    t.rect(19, 30, 22, 33, "metal_clair")
+    t.cadre(9, 30, 12, 33, "contour")
+    t.cadre(19, 30, 22, 33, "contour")
+    # le bec verseur en bas et quelques croquettes qui tombent
+    t.rect(12, 40, 19, 46, "metal_sombre")
+    t.cadre(12, 40, 19, 46, "contour")
+    t.rect(13, 46, 18, 47, "ecran")
+    t.point(14, 49, "croquette")
+    t.point(17, 50, "croquette_clair")
+    t.point(15, 51, "croquette")
+    return t.enregistrer("distributeur")
+
+
 # ---------------------------------------------------------------------------
 def tout_dessiner():
     mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
@@ -961,7 +997,7 @@ def tout_dessiner():
     somniferes(); defibrillateur(); medicaments()
     arbre_chat_objet(); jouet_bain(); ring_light(); couvercle()
     prise(); fenetre_ouverte(); four(); poison(); gaz(); cordelette(); bougie(); verre_casse()
-    lit_baldaquin(); cloche()
+    lit_baldaquin(); cloche(); distributeur()
     gamelle(False); gamelle(True)
     fichiers = sorted(p.name for p in DOSSIER.glob("*.png"))
     print(f"{len(fichiers)} images ecrites dans {DOSSIER} :")

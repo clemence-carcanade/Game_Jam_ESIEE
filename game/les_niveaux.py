@@ -8,20 +8,23 @@ ancre nommee de maison.ANCRES ou un couple (x, y) en pixels de l'image.
 
 NIVEAUX = [
     dict(
-        titre="Salon, 20h : encore les memes croquettes", maitre="le daron",
+        titre="Salon, 20h : escalade jusqu au distributeur", maitre="le daron",
         famille='Le daron et sa femme', probleme='Croquettes tous les soirs, matchs de foot hurles',
-        aide="Le sac de croquettes est sur la table, a droite. Pousse-le jusque dans la gamelle.",
-        message_piege="Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent.",
-        message_mort="Etouffe avec les croquettes. Une vie de moins, une maison de plus.",
-        message_attente="Les memes croquettes que tous les soirs. Meme pas de quoi s etouffer.",
+        aide="Grimpe d etagere en etagere en gobant les croquettes, jusqu au gros distributeur tout en haut. Gave-toi.",
+        message_piege="Le distributeur deverse sans fin. Le ventre se tend, le ventre se tend...",
+        message_mort="Trop de croquettes d un coup. Une vie de moins, une maison de plus.",
+        message_attente="Encore un peu de place dans ce petit ventre. Continue.",
         depart="salon",
         perso=dict(image="daron", pos=(990, 784)),
-        pousseurs=[
-            dict(min="canape", max="tv", vitesse=2.4),
-            dict(min="chambre", max="couloir", vitesse=1.8),
+        # mini-jeu d escalade : ramasser les croquettes en montant, puis se
+        # gaver au distributeur tout en haut jusqu a exploser (barre de satiete)
+        croquettes=[
+            "cuisine", "salon", "planche_salon", "frigo",
+            "sdb", "planche_sdb", "planche_centre", "chatterie",
+            "planche_milieu_g", "planche_milieu_d", "arbre_bas",
+            "chambre", "couloir", "salle_haut",
         ],
-        objet="tv", pousse="d",
-        piege="gamelle_bas", piege_largeur=200, libelle_piege="Les croquettes",
+        distributeur="armoire",
         faux_pieges={},
     ),
     dict(
