@@ -34,6 +34,15 @@ NIVEAUX = [
         depart="salon",
         perso=dict(image="mamie", pos="cuisine"),
         chat_noir="paniere",
+        # la nuee : des dizaines de chats qui deambulent sur les trois etages
+        promenades=[
+            (60, 520, 830), (620, 1080, 830), (1150, 1500, 830), (1520, 1720, 830),
+            (60, 470, 600), (560, 1040, 600), (1120, 1500, 600), (1520, 1720, 600),
+            (60, 500, 300), (620, 1080, 300), (1160, 1500, 300), (1520, 1700, 300),
+            (130, 300, 380), (560, 760, 380), (700, 900, 250), (900, 1120, 480),
+            (1180, 1400, 380), (620, 820, 620), (1200, 1420, 700), (1480, 1680, 480),
+            (300, 480, 620),
+        ],
         pousseurs=[
             dict(min="canape", max="tv", vitesse=2.6, force=17),
             dict(min="cuisine", max="salon", vitesse=2.2),
@@ -43,6 +52,8 @@ NIVEAUX = [
             dict(min="salle_droite", max="gamelle_bas", vitesse=2.4),
             dict(min="arbre_bas", max="arbre_haut", vitesse=2.0),
             dict(min="planche_salon", max="planche_centre", vitesse=2.6),
+            dict(min="frigo", max="sdb", vitesse=2.3, force=16),
+            dict(min="couloir", max="armoire", vitesse=2.7, force=17),
         ],
         faux_pieges={
             "k": dict(pos="arbre_bas", declenchement="contact", recharge=9.0,

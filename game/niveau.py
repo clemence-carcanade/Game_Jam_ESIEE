@@ -341,6 +341,11 @@ def construire_maison(definition, numero=1) -> Niveau:
     niveau.horde = definition.get("horde", False)
     niveau.flammes = definition.get("flammes", [])
     niveau.piments = definition.get("piments", [])
+    # decor vivant (ambiance) : chats qui deambulent, lampes, ecrans, papillons
+    niveau.promenades = definition.get("promenades", [])
+    niveau.lampes = definition.get("lampes", [])
+    niveau.ecrans = definition.get("ecrans", [])
+    niveau.papillons = definition.get("papillons", [])
     niveau.piege_direct = definition.get("piege_direct", False)
     niveau.piege_anime = definition.get("piege_anime", "")
     per = definition.get("perso")
