@@ -984,6 +984,21 @@ def distributeur():
     return t.enregistrer("distributeur")
 
 
+def planche():
+    """Une planche d etagere en bois, etiree horizontalement pour les plateformes."""
+    t = Toile(64, 18)
+    t.rect(0, 0, 63, 17, "bois")
+    t.rect(0, 0, 63, 1, "bois_clair")        # rebord eclaire en haut
+    t.rect(0, 15, 63, 17, "bois_sombre")     # ombre portee en bas
+    # veines du bois : quelques petits traits horizontaux
+    for y in (5, 9, 12):
+        for x in range(2, 62, 7):
+            t.point(x, y, "bois_sombre")
+            t.point(x + 3, y, "bois_clair")
+    t.cadre(0, 0, 63, 17, "contour")         # lisere sombre tout autour
+    return t.enregistrer("planche")
+
+
 # ---------------------------------------------------------------------------
 def tout_dessiner():
     mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
@@ -997,7 +1012,7 @@ def tout_dessiner():
     somniferes(); defibrillateur(); medicaments()
     arbre_chat_objet(); jouet_bain(); ring_light(); couvercle()
     prise(); fenetre_ouverte(); four(); poison(); gaz(); cordelette(); bougie(); verre_casse()
-    lit_baldaquin(); cloche(); distributeur()
+    lit_baldaquin(); cloche(); distributeur(); planche()
     gamelle(False); gamelle(True)
     fichiers = sorted(p.name for p in DOSSIER.glob("*.png"))
     print(f"{len(fichiers)} images ecrites dans {DOSSIER} :")

@@ -196,12 +196,7 @@ class VueJeu(arcade.View):
         # le fond peint : c'est lui, le decor
         self.fond = None
         if self.niveau.fond:
-            chemin_fond = C.DOSSIER_IMAGES / self.niveau.fond
-            # niveau 4 (l'influenceur) : couleurs inversees, ambiance "negatif"
-            invert = chemin_fond.with_name(chemin_fond.stem + "_invert.png")
-            if self.numero_niveau == 4 and invert.is_file():
-                chemin_fond = invert
-            texture = arcade.load_texture(chemin_fond)
+            texture = arcade.load_texture(C.DOSSIER_IMAGES / self.niveau.fond)
             self.fond = arcade.Sprite(texture, scale=self.niveau.largeur / texture.width)
             self.fond.center_x = self.niveau.largeur / 2
             self.fond.center_y = self.niveau.hauteur / 2
@@ -232,10 +227,20 @@ class VueJeu(arcade.View):
         plats = arcade.SpriteList(use_spatial_hash=True)
         self.croquettes = arcade.SpriteList()
 
+        tex_planche = None
+        chemin_planche = C.DOSSIER_IMAGES / "decor" / "planche.png"
+        if chemin_planche.is_file():
+            tex_planche = arcade.load_texture(chemin_planche)
+
         def barre(cx, cy, larg, haut=18, couleur=(150, 104, 66)):
-            tex = arcade.Texture.create_empty(f"_plat_{int(cx)}_{int(cy)}",
-                                              (int(larg), int(haut)), couleur)
-            p = arcade.Sprite(tex, center_x=cx, center_y=cy)
+            if tex_planche is not None:                # jolie planche en bois etiree
+                p = arcade.Sprite(tex_planche, center_x=cx, center_y=cy)
+                p.width = larg
+                p.height = haut
+            else:                                      # secours : une barre unie
+                tex = arcade.Texture.create_empty(f"_plat_{int(cx)}_{int(cy)}",
+                                                  (int(larg), int(haut)), couleur)
+                p = arcade.Sprite(tex, center_x=cx, center_y=cy)
             p.vx = 0.0                  # etagere fixe par defaut
             return p
 
@@ -962,10 +967,12 @@ class VueJeu(arcade.View):
         arcade.draw_sprite(self.chat, pixelated=True)
         if self.camera_active:
             dedans = self._dans_le_champ()
-            couleur = (120, 240, 160, 40) if dedans else (240, 120, 120, 30)
+            # couleurs inversees : rouge quand le chat est DANS le champ, vert
+            # quand il est en DEHORS
+            couleur = (240, 120, 120, 40) if dedans else (120, 240, 160, 30)
             arcade.draw_circle_filled(self.champ_x, self.champ_y, self.champ_rayon, couleur)
             arcade.draw_circle_outline(self.champ_x, self.champ_y, self.champ_rayon,
-                                       (150, 255, 190) if dedans else (255, 150, 150), 3)
+                                       (255, 150, 150) if dedans else (150, 255, 190), 3)
         self.effets.dessiner()
         if self.flash > 0:
             arcade.draw_lrbt_rectangle_filled(
