@@ -45,14 +45,14 @@ class IntroView(arcade.View):
 
     def on_update(self, delta_time):
         if not self.frames:
-            self._menu()
+            self._suite()
             return
         self.minuteur += delta_time
         if self.minuteur >= CADENCE:
             self.minuteur -= CADENCE
             self.index += 1
             if self.index >= len(self.frames):
-                self._menu()
+                self._suite()
 
     def on_draw(self):
         self.clear()
@@ -65,12 +65,13 @@ class IntroView(arcade.View):
                          anchor_x="right")
 
     def on_key_press(self, key, modifiers):
-        self._menu()
+        self._suite()
 
     def on_mouse_press(self, x, y, button, modifiers):
-        self._menu()
+        self._suite()
 
-    def _menu(self):
+    def _suite(self):
+        """Une fois l'intro finie (ou passee), on lance le jeu."""
         self._arreter_son()
-        from views.menu import MenuView
-        self.window.show_view(MenuView())
+        from game.jeu import VueJeu
+        self.window.show_view(VueJeu(1))

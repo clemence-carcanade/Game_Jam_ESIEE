@@ -24,8 +24,8 @@ def main() -> None:
     if len(sys.argv) > 1:
         fenetre.show_view(VueJeu(int(sys.argv[1])))
     else:
-        from views.intro import IntroView
-        fenetre.show_view(IntroView())
+        from views.menu import MenuView
+        fenetre.show_view(MenuView())
 
     arcade.run()
 

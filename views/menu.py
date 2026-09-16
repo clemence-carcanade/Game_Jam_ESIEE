@@ -149,9 +149,9 @@ class MenuView(arcade.View):
 
         @play_button.event("on_click")
         def on_click_play(event):
-            from game.jeu import VueJeu
+            from views.intro import IntroView
             self.manager.disable()
-            self.window.show_view(VueJeu(1))
+            self.window.show_view(IntroView())
 
         settings_button = self.create_custom_button("SETTINGS", button_width, button_height, y_offset=OFFSET_Y)
         self.v_box.add(settings_button)
