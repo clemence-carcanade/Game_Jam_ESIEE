@@ -245,7 +245,7 @@ class VueJeu(arcade.View):
             # la suivante reste a portee horizontale de la precedente (pas de
             # traversee de tout l ecran entre deux rebonds)
             bord = int(larg / 2) + 10
-            x = x_prec + rng.randint(-150, 150)
+            x = x_prec + rng.randint(-200, 200)
             x = max(bord, min(W - bord, x))
             x_prec = x
             plats.append(barre(x, y, larg))
