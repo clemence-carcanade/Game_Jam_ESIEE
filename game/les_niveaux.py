@@ -83,7 +83,7 @@ NIVEAUX = [
         message_mort="Noye dans l aquarium. Elle croira a un jeu.",
         message_attente="",
         depart="salon",
-        piege="aquarium", piege_image="aucune", piege_largeur=120, piege_direct=True, libelle_piege="L aquarium",
+        piege="aquarium", piege_image="aucune", piege_largeur=120, piege_direct=True, libelle_piege="Se noyer dans l aquarium",
         fille="salle_droite",
         pousseurs=[
             dict(min="frigo", max="planche_centre", vitesse=2.6),
@@ -108,13 +108,13 @@ NIVEAUX = [
     dict(
         titre="L appart de l influenceur", maitre="l influenceur",
         famille='L influenceur', probleme='Filme non-stop pour des videos nulles',
-        aide="L influenceur te filme (le cercle). Sors de son champ, rejoins le cable, et fais E. Dans le champ, il te sauve.",
+        aide="L influenceur te filme (le cadre carre, visible sur son ecran). Sors de son champ, rejoins le cable, et fais E. Dans le champ, il te sauve.",
         message_piege="Le cable est denude. Il gresille.",
         message_mort="Electrocute en direct. Trois cent mille vues.",
         message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         depart="salon",
         perso=dict(image="influenceur", pos="salon"),
-        piege=(1540, 270), piege_image="aucune", piege_anime="cable_anime", piege_largeur=130, piege_direct=True, camera=True, libelle_piege="Le cable",
+        piege=(1540, 270), piege_image="aucune", piege_anime="cable_anime", piege_largeur=130, piege_direct=True, camera=True, libelle_piege="Se prendre dans le cable",
         pousseurs=[
             dict(min="cuisine", max="salle_droite", vitesse=3.0, force=18),
             dict(min="planche_milieu_g", max="planche_milieu_d", vitesse=2.8),

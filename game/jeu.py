@@ -539,17 +539,28 @@ class VueJeu(arcade.View):
         return pres_du_sac
 
     def _libelle_action(self) -> str:
-        """Le nom de ce que le chat peut faire ici (affiche au-dessus de lui)."""
+        """L'action a faire ici, SEULEMENT si elle est reellement fatale.
+
+        On n'annonce que ce qui fait vraiment griller une vie (le vrai piege,
+        le chat noir, un soin devenu mortel pendant que le medecin dort).
+        Les leurres, eux, n'affichent que le E, sans texte -- a toi de tenter.
+        """
         if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
-            return "Le chat noir"
+            return "Rejoindre le chat noir"
         for zone in self.faux_pieges:
             if (zone.effet["declenchement"] == "action" and zone.recharge <= 0
                     and arcade.check_for_collision(self.chat, zone)):
-                return LIBELLES.get(zone.effet.get("image", ""), "Essayer")
+                eff = zone.effet
+                # un soin ne tue que si le medecin dort : alors on l'annonce
+                if (eff.get("effet") == "soin" and self.niveau.docteur
+                        and self.medecin is not None and self.medecin.endormi):
+                    return eff.get("libelle_action") or f"En finir avec {eff.get('cause', 'ca')}"
+                return ""                         # leurre : juste le E
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
-            return (getattr(self.niveau, "libelle_piege", "")
-                    or LIBELLES.get(self.niveau.piege_image, "Le piege"))
-        return "Le sac de croquettes"
+            if getattr(self.niveau, "piege_direct", False) or self.gamelle.remplie:
+                return getattr(self.niveau, "libelle_piege", "") or "En finir ici"
+            return ""
+        return ""                                 # le sac : pas de texte
 
     def _draw_doodle(self) -> None:
         """Rendu du Doodle Jump : la cuisine fixe en fond, la tour sous la camera."""
@@ -620,19 +631,29 @@ class VueJeu(arcade.View):
                              (240, 240, 245), 15, anchor_x="center", bold=True)
 
     def _dessiner_indicateur_action(self) -> None:
-        """Un simple E au-dessus du chat quand une action est possible.
+        """Un E au-dessus du chat quand une action est possible.
 
-        Plus de libelle : seule la touche E s'affiche, sans texte descriptif.
+        Le nom de l'action ne s'affiche que si elle est fatale (le vrai piege) :
+        les leurres ne montrent que le E, sans texte.
         """
         if not self._action_possible():
             return
         x = self.chat.center_x
         y = self.chat.top + 16
 
-        # le petit E dans son cadre, sans le nom de l'item
+        # le petit E dans son cadre
         arcade.draw_lrbt_rectangle_filled(x - 11, x + 11, y - 3, y + 19, (20, 18, 26))
         arcade.draw_lrbt_rectangle_outline(x - 11, x + 11, y - 3, y + 19, (240, 220, 120), 2)
         arcade.draw_text("E", x, y, (240, 220, 120), 14, anchor_x="center", bold=True)
+
+        # l'action fatale, nommee juste au-dessus (contour sombre, pas de fond)
+        libelle = self._libelle_action()
+        if libelle:
+            for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                arcade.draw_text(libelle, x + dx, y + 26 + dy, (20, 18, 26), 12,
+                                 anchor_x="center", bold=True)
+            arcade.draw_text(libelle, x, y + 26, (255, 240, 190), 12,
+                             anchor_x="center", bold=True)
 
     # ------------------------------------------------------------------
     # Les faux pieges scriptes
