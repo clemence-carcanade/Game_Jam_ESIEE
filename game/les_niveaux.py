@@ -61,7 +61,7 @@ NIVEAUX = [
         message_mort="Noye dans l aquarium. Elle croira a un jeu.",
         message_attente="",
         depart="salon",
-        piege="aquarium", piege_image="aucune", piege_largeur=120, piege_direct=True,
+        piege="aquarium", piege_image="aucune", piege_largeur=120, piege_direct=True, libelle_piege="L aquarium",
         fille="salle_droite",
         pousseurs=[
             dict(min="frigo", max="planche_centre", vitesse=2.6),
@@ -90,7 +90,7 @@ NIVEAUX = [
         message_mort="Electrocute en direct. Trois cent mille vues.",
         message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         depart="salon",
-        piege=(1540, 270), piege_image="aucune", piege_largeur=130, piege_direct=True, camera=True,
+        piege=(1540, 270), piege_image="aucune", piege_largeur=130, piege_direct=True, camera=True, libelle_piege="Le cable",
         pousseurs=[
             dict(min="cuisine", max="salle_droite", vitesse=3.0, force=18),
             dict(min="planche_milieu_g", max="planche_milieu_d", vitesse=2.8),

@@ -260,7 +260,8 @@ class VueJeu(arcade.View):
                     and arcade.check_for_collision(self.chat, zone)):
                 return LIBELLES.get(zone.effet.get("image", ""), "Essayer")
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
-            return LIBELLES.get(self.niveau.piege_image, "Le piege")
+            return (getattr(self.niveau, "libelle_piege", "")
+                    or LIBELLES.get(self.niveau.piege_image, "Le piege"))
         return "Le sac de croquettes"
 
     def _dessiner_indicateur_action(self) -> None:
