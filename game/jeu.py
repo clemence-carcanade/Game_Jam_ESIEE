@@ -368,10 +368,6 @@ class VueJeu(arcade.View):
         self._oter_le_deguisement(delta_time)
         if self.medecin is not None:
             self.medecin.mettre_a_jour(delta_time, self.chat)
-            # il te traque : au contact, il te recoud de force -> retour depart
-            if (not self.medecin.endormi and self.chat.vivant and self.pause_mort <= 0
-                    and arcade.check_for_collision(self.medecin, self.chat)):
-                self._soigne_de_force()
         self.effets.mettre_a_jour(delta_time)
         self.ambiance.mettre_a_jour(delta_time)      # la maison respire, en continu
         if self.camera_active:
@@ -718,8 +714,9 @@ class VueJeu(arcade.View):
             chat.change_x, chat.change_y = effet.get("vitesse", (0, 16))
             chat.minuteur_sac = 0.0
         elif genre == "soin":
-            # le medecin le soigne, le maitre le rattrape : retour case depart
+            # le medecin surgit directement sur le chat, le recoud : retour depart
             if self.medecin is not None:
+                self.effets.pouf(chat.center_x, chat.center_y, (140, 240, 170), 16)
                 self.medecin.soigner(chat.center_x)
             chat.replacer_au_depart()
         elif genre == "deguisement":
@@ -736,14 +733,6 @@ class VueJeu(arcade.View):
         elif genre == "toupie":
             # manque de tomber en tournant sur lui-meme, puis se rattrape
             self.toupie = effet.get("duree", 1.1)
-
-    def _soigne_de_force(self) -> None:
-        """Niveau 6 : le medecin rattrape le chat et le recoud -> retour depart."""
-        self.effets.pouf(self.chat.center_x, self.chat.center_y, (140, 240, 170), 16)
-        self.effets.trembler(6)
-        self.audio.jouer("piege", 0.5)
-        self.chat.replacer_au_depart()
-        self.chat.color = (255, 255, 255)
 
     def _oter_le_deguisement(self, delta_time: float) -> None:
         if getattr(self, "minuteur_deguisement", 0) > 0:

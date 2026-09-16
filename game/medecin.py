@@ -41,40 +41,42 @@ class Medecin(arcade.Sprite):
 
         self.endormi = False
         self._sommeil = 0.0         # temps de sommeil restant
-        self._etapes = []           # les x ou aller, dans l'ordre
+        self._retour_prevu = False  # apres un soin, il retourne a son poste
         self._pause = 0.0
         self._image = 0
         self._minuteur = 0.0
 
     # ------------------------------------------------------------------
     def soigner(self, x_du_chat: float) -> None:
-        """Il accourt, recoud, et retourne a son poste."""
+        """Il ne se deplace pas : il SURGIT directement sur le chat, le recoud,
+        puis repart aussitot a son poste."""
         if self.endormi:
             return
-        self._etapes = [x_du_chat, self.poste_x]
-        self._pause = 0.0
+        self.center_x = x_du_chat            # il apparait pile sur le chat
+        self.bottom = self.sol
+        self._pause = DUREE_SOIN
+        self._retour_prevu = True
 
     def endormir(self) -> None:
         """Les somniferes le terrassent... mais seulement pour un temps."""
         self.endormi = True
         self._sommeil = DUREE_SOMMEIL
-        self._etapes = []
+        self._pause = 0.0
+        self._retour_prevu = False
         self.angle = 90                      # allonge par terre
         self.color = (205, 205, 230)
         self.center_y = self.sol + self.width / 2 - 14
 
     def se_reveiller(self) -> None:
-        """Le somnifere se dissipe : il se releve et reprend sa ronde."""
+        """Le somnifere se dissipe : il se releve a son poste."""
         self.endormi = False
         self._sommeil = 0.0
-        self._etapes = []
+        self._pause = 0.0
+        self._retour_prevu = False
+        self.center_x = self.poste_x
         self.angle = 0
         self.color = (255, 255, 255)
         self.bottom = self.sol
-
-    @property
-    def occupe(self) -> bool:
-        return bool(self._etapes)
 
     @property
     def ratio_sommeil(self) -> float:
@@ -90,32 +92,19 @@ class Medecin(arcade.Sprite):
             return
 
         self._minuteur += delta_time
-        animation = "repos"
 
+        # il ne patrouille jamais : il reste a son poste. La seule fois ou il
+        # bouge, c'est pour surgir sur le chat (soigner), puis il y retourne.
         if self._pause > 0:
             self._pause -= delta_time
-        elif self._etapes:
-            cible = self._etapes[0]
-            ecart = cible - self.center_x
-            if abs(ecart) <= VITESSE:
-                self.center_x = cible
-                self._etapes.pop(0)
-                if self._etapes:             # il vient d'atteindre le chat
-                    self._pause = DUREE_SOIN
-            else:
-                self.center_x += VITESSE if ecart > 0 else -VITESSE
-                animation = "droite" if ecart > 0 else "gauche"
-        elif chat is not None and chat.vivant:
-            # traque active : il marche vers le chat pour le soigner de force
-            ecart = chat.center_x - self.center_x
-            if abs(ecart) > VITESSE:
-                self.center_x += VITESSE if ecart > 0 else -VITESSE
-                animation = "droite" if ecart > 0 else "gauche"
+            if self._pause <= 0 and self._retour_prevu:
+                self.center_x = self.poste_x
+                self._retour_prevu = False
 
-        frames = self.animations[animation] or self.animations["repos"]
-        cadence = 0.12 if animation != "repos" else 0.45
-        if self._minuteur >= cadence:
+        frames = self.animations["repos"]
+        if self._minuteur >= 0.45:
             self._minuteur = 0.0
             self._image += 1
         self.texture = frames[self._image % len(frames)]
+        self.bottom = self.sol
         self.bottom = self.sol
