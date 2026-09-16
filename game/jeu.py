@@ -163,12 +163,12 @@ class VueJeu(arcade.View):
 
     # ------------------------------------------------------------------
     def on_update(self, delta_time: float) -> None:
-        self.minuteur_message = max(0.0, self.minuteur_message - delta_time)
-
         if self.transition > 0:
             self.transition -= delta_time
             self.ambiance.mettre_a_jour(delta_time)
             return
+
+        self.minuteur_message = max(0.0, self.minuteur_message - delta_time)
 
         # TODO (vies.py) : cette pause et l'enchainement des niveaux
         # appartiennent au systeme de vies. Ici, juste de quoi voir l'animation.
@@ -641,7 +641,7 @@ class VueJeu(arcade.View):
                 self.niveau.aide, C.LARGEUR_FENETRE / 2, 16,
                 C.COULEUR_TEXTE_FADE, 13, anchor_x="center",
             )
-        if self.minuteur_message > 0 and self.chat is not None:
+        if self.minuteur_message > 0 and self.chat is not None and self.transition <= 0:
             # au-dessus du chat, en petit, avec un fond pour rester lisible
             x = min(max(self.chat.center_x, 220), C.LARGEUR_FENETRE - 220)
             y = self.chat.top + 48
@@ -653,6 +653,9 @@ class VueJeu(arcade.View):
                                  anchor_x="center", width=int(larg), align="center")
             arcade.draw_text(self.message, x, y, (255, 250, 235, a), 12,
                              anchor_x="center", width=int(larg), align="center")
+
+        if self.transition > 0:
+            self._dessiner_transition()
 
     # ------------------------------------------------------------------
     def on_key_press(self, touche: int, modificateurs: int) -> None:
