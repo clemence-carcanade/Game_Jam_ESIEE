@@ -485,7 +485,7 @@ class VueJeu(arcade.View):
         """
         L, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
         cote = 210
-        mx, my = L - cote - 24, H - cote - 58
+        mx, my = 24, H - cote - 90       # en haut a gauche, sous le titre du niveau
         r = self.champ_rayon
 
         # le boitier du moniteur
