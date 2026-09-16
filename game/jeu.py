@@ -88,6 +88,8 @@ class VueJeu(arcade.View):
         self.gamelle = None          # la zone du piege a armer
         self.sortie = None           # niveau 7 : la ou il faut arriver vivant
         self.termine = False         # le jeu est fini
+        self._attente_medecin = False  # niveau 6 : le chat attend, fige, que le veto le rejoigne
+        self._point_soin = 0.0
         self.charger_niveau(numero_niveau)
 
     # ------------------------------------------------------------------
@@ -203,10 +205,15 @@ class VueJeu(arcade.View):
             x, y = self.niveau.chat_noir
             self.chat_noir = ChatNoir(x, y)
 
+        self._attente_medecin = False
         self.medecin = None
         if self.niveau.docteur and self.gamelle is not None:
             from game.medecin import Medecin
-            self.medecin = Medecin(self.gamelle.center_x, sol=self.gamelle.bottom)
+            # il se tient sur le plancher du bas (sinon il flotte a la hauteur
+            # de la gamelle, qui est en l'air)
+            sol_bas = min((sp.top for sp in self.niveau.murs if sp.width > 500),
+                          default=self.gamelle.bottom)
+            self.medecin = Medecin(self.gamelle.center_x, sol=sol_bas)
 
         # le fond peint : c'est lui, le decor
         self.fond = None
@@ -354,6 +361,10 @@ class VueJeu(arcade.View):
 
         if self.doodle:
             self._update_doodle(delta_time)
+            return
+
+        if self._attente_medecin:
+            self._vivre_attente_medecin(delta_time)
             return
 
         au_sol = self.collisions.est_au_sol()
@@ -727,12 +738,16 @@ class VueJeu(arcade.View):
             chat.change_x, chat.change_y = effet.get("vitesse", (0, 16))
             chat.minuteur_sac = 0.0
         elif genre == "soin":
-            # le medecin surgit directement sur le chat, le recoud : retour depart
+            # le chat se fige la ou il est ; le medecin accourt le recoudre, et
+            # ce n'est qu'a son arrivee que le chat repart au depart (voir
+            # _vivre_attente_medecin). Les croix vertes suivent.
             if self.medecin is not None:
-                self.effets.pouf(chat.center_x, chat.center_y, (140, 240, 170), 16)
-                self.audio.jouer("reincarnation", 0.6)   # il te ramene a la vie
+                self._attente_medecin = True
+                self._point_soin = chat.center_x
+                chat.change_x = chat.change_y = 0.0
                 self.medecin.soigner(chat.center_x)
-            chat.replacer_au_depart()
+            else:
+                chat.replacer_au_depart()
         elif genre == "deguisement":
             # maquille facon poupee : humiliant, pas dangereux
             chat.color = effet.get("teinte", (255, 150, 200))
@@ -955,6 +970,32 @@ class VueJeu(arcade.View):
                     self.griller_une_vie("trop de piments")
                 return
 
+    def _vivre_attente_medecin(self, delta_time: float) -> None:
+        """Niveau 6 : le chat, fige la ou il a tente de mourir, attend que le
+        veterinaire le rejoigne pour le recoudre, puis reapparait au depart."""
+        self.chat.change_x = self.chat.change_y = 0.0     # il ne bouge plus
+        if self.medecin is not None:
+            self.medecin.mettre_a_jour(delta_time, self.chat)
+        self.effets.mettre_a_jour(delta_time)
+        self.ambiance.mettre_a_jour(delta_time)
+        self.chat.mettre_a_jour_animation(delta_time)
+
+        arrive = self.medecin is None or abs(self.medecin.center_x - self._point_soin) < 20
+        if not arrive:
+            # de petites croix vertes montent pendant qu'il accourt
+            self._minuteur_soin = getattr(self, "_minuteur_soin", 0.0) + delta_time
+            if self._minuteur_soin >= 0.12:
+                self._minuteur_soin = 0.0
+                self.effets.soin(self.chat.center_x, self.chat.center_y + 10, 2)
+            return
+
+        # il a rejoint le chat : bouquet de croix vertes, soin, retour au depart
+        self.effets.soin(self.chat.center_x, self.chat.center_y + 10, 14)
+        self.audio.jouer("reincarnation", 0.6)
+        self.chat.replacer_au_depart()
+        self.chat.color = (255, 255, 255)
+        self._attente_medecin = False
+
     def griller_une_vie(self, cause: str) -> None:
         """Le chat change de vie.
 
@@ -1137,6 +1178,8 @@ class VueJeu(arcade.View):
         La gamelle passe avant le sac : une fois les croquettes renversees, le
         sac vide traine juste a cote, et ce serait rageant de rater le repas.
         """
+        if self._attente_medecin:          # le veto s'en occupe, on patiente
+            return
         if self.chat.dans_le_sac:
             return
         if self._pres_du_chat_noir():
