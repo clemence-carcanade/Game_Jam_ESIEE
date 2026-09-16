@@ -67,6 +67,8 @@ class VueJeu(arcade.View):
         self.horde = arcade.SpriteList()   # cent chats qui deferlent (niveau 2)
         self.horde_lancee = False
         self.flammes = []                  # jets de feu de la cuisine (niveau 5)
+        self.vie_barre = C.VIE_MAX         # niveau 5 : barre a vider en mangeant des piments
+        self.piments = arcade.SpriteList()
         self.transition = 0.0              # ecran de lore entre les niveaux
         self.audio = Audio()
         self.audio.demarrer_ambiance()
@@ -103,6 +105,18 @@ class VueJeu(arcade.View):
 
         self.gamelle = self.niveau.trouver_zone("gamelle")
         self.sortie = self.niveau.trouver_zone("sortie")
+
+        # niveau 5 : les piments a manger (la barre de vie a vider)
+        self.vie_barre = C.VIE_MAX
+        self.piments = arcade.SpriteList()
+        for pos in getattr(self.niveau, "piments", []):
+            x, y = self.niveau.point(pos)
+            piment = module_niveau._image("piment", x, y_bas=y)
+            if piment is None:
+                piment = arcade.Sprite(arcade.Texture.create_empty("p", (20, 28), (215, 45, 40)),
+                                       center_x=x, center_y=y + 14)
+            piment.repop = 0.0
+            self.piments.append(piment)
 
         # l'animation du piege mortel (aquarium, cable) posee sur sa zone
         self.piege_frames = []
@@ -226,6 +240,7 @@ class VueJeu(arcade.View):
             self.champ_y += (self.chat.center_y - self.champ_y) * 0.022
         self._vivre_la_horde(delta_time)
         self._vivre_les_flammes(delta_time)
+        self._vivre_les_piments(delta_time)
         if self.chat_noir is not None:
             self.chat_noir.mettre_a_jour(delta_time)
         if self.fille is not None and self.fille.mettre_a_jour(delta_time, self.chat):
@@ -293,6 +308,19 @@ class VueJeu(arcade.View):
             return (getattr(self.niveau, "libelle_piege", "")
                     or LIBELLES.get(self.niveau.piege_image, "Le piege"))
         return "Le sac de croquettes"
+
+    def _dessiner_barre_vie(self) -> None:
+        """La barre de vie a vider (niveau 5) : plus elle est basse, mieux c'est."""
+        L = C.LARGEUR_FENETRE
+        x, y, larg, haut = L/2 - 200, C.HAUTEUR_FENETRE - 60, 400, 22
+        arcade.draw_lrbt_rectangle_filled(x, x+larg, y, y+haut, (30, 20, 24))
+        ratio = self.vie_barre / C.VIE_MAX
+        couleur = (200, 60, 50) if ratio > 0.3 else (240, 180, 60)
+        arcade.draw_lrbt_rectangle_filled(x, x + larg*ratio, y, y+haut, couleur)
+        arcade.draw_lrbt_rectangle_outline(x, x+larg, y, y+haut, (240, 230, 220), 2)
+        arcade.draw_text("Mange les piments : vide ta barre de vie !",
+                         L/2, y + haut + 8, (255, 240, 220), 15, anchor_x="center", bold=True)
+        arcade.draw_text(f"{int(self.vie_barre)}", L/2, y+4, (255,255,255), 13, anchor_x="center", bold=True)
 
     def _dessiner_transition(self) -> None:
         """L'ecran de lore : la nouvelle famille et son probleme."""
@@ -573,6 +601,28 @@ class VueJeu(arcade.View):
         if self.chat.vivant and arcade.check_for_collision_with_list(self.chat, self.horde):
             self.griller_une_vie("cent chats affames")
 
+    def _vivre_les_piments(self, delta_time: float) -> None:
+        """Niveau 5 : manger les piments vide la barre ; elle remonte toute seule."""
+        if not len(self.piments) or not self.chat.vivant:
+            return
+        # la barre remonte petit a petit (c'est la difficulte)
+        self.vie_barre = min(C.VIE_MAX, self.vie_barre + C.VIE_REGEN * delta_time)
+        for piment in self.piments:
+            if piment.alpha < 255:           # piment mange, en attente de repop
+                piment.repop -= delta_time
+                if piment.repop <= 0:
+                    piment.alpha = 255
+                continue
+            if arcade.check_for_collision(self.chat, piment):
+                self.vie_barre = max(0.0, self.vie_barre - C.PIMENT_DEGATS)
+                piment.alpha = 60
+                piment.repop = C.PIMENT_RESPAWN
+                self.effets.pouf(piment.center_x, piment.center_y, (240, 80, 60), 8)
+                self.audio.jouer("piege", 0.4)
+                if self.vie_barre <= 0:
+                    self.griller_une_vie("trop de piments")
+                return
+
     def griller_une_vie(self, cause: str) -> None:
         """Le chat change de vie.
 
@@ -639,6 +689,7 @@ class VueJeu(arcade.View):
         self.pousseurs.draw(pixelated=True)
         self.horde.draw(pixelated=True)
         self._dessiner_les_flammes()
+        self.piments.draw(pixelated=True)
         if self.piege_frames and self.gamelle is not None:
             fr = self.piege_frames[int(self.ambiance.t * 12) % len(self.piege_frames)]
             ech = min(120 / fr.width, 90 / fr.height)
@@ -693,6 +744,9 @@ class VueJeu(arcade.View):
                                  anchor_x="center", width=int(larg), align="center")
             arcade.draw_text(self.message, x, y, (255, 250, 235, a), 12,
                              anchor_x="center", width=int(larg), align="center")
+
+        if len(self.piments):
+            self._dessiner_barre_vie()
 
         if self.transition > 0:
             self._dessiner_transition()

@@ -65,6 +65,14 @@ GLISSE_ACCELERATION = 0.35     # et il a du mal a repartir
 DUREE_DANS_LE_SAC = 2.5        # secondes a foncer droit devant sans rien voir
 
 # ---------------------------------------------------------------------------
+# Mini-jeu des piments (niveau 5) : vider sa barre de vie en mangeant vite
+# ---------------------------------------------------------------------------
+VIE_MAX = 100.0
+PIMENT_DEGATS = 16.0          # ce qu'un piment retire a la barre de vie
+VIE_REGEN = 7.0              # ce que la barre remonte par seconde (difficulte)
+PIMENT_RESPAWN = 1.6         # secondes avant qu'un piment mange reapparaisse
+
+# ---------------------------------------------------------------------------
 # Chutes
 # ---------------------------------------------------------------------------
 # Un chat retombe sur ses pattes : tant que le réflexe est actif, il encaisse
