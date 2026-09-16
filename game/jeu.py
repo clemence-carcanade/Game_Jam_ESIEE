@@ -241,11 +241,11 @@ class VueJeu(arcade.View):
         sens = -1                       # on demarre en partant vers la gauche
         for _ in range(C.DOODLE_NB_PLATEFORMES):
             y += rng.randint(C.DOODLE_ESPACE_MIN, C.DOODLE_ESPACE_MAX)
-            larg = rng.choice((240, 280))
+            larg = rng.choice((150, 175, 200))
             # zigzag centre sur l ecran : une etagere a gauche du milieu, la
             # suivante a droite, pour forcer des sauts alternes gauche/droite
             sens = -sens
-            x = W / 2 + sens * rng.randint(80, 105)
+            x = W / 2 + sens * rng.randint(90, 110)
             x_prec = x
             plats.append(barre(x, y, larg))
             if rng.random() < 0.55:                                # un sac pose dessus
