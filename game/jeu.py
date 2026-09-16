@@ -29,6 +29,22 @@ from game.audio import Audio
 #: distance a laquelle le chat peut attraper un objet devant lui
 PORTEE_ACTION = 14.0
 
+#: libelles affiches au-dessus du chat quand une action est possible
+LIBELLES = {
+    "scalpel": "Le scalpel", "couteau": "Le couteau", "seringue": "La seringue",
+    "defibrillateur": "Le defibrillateur", "medicaments": "La pharmacie",
+    "patient": "Le patient malade", "poison": "Le poison", "aquarium": "L'aquarium",
+    "cable": "Le cable", "marmite": "La marmite", "gamelle_vide": "La gamelle",
+    "vieille": "La charentaise", "enfant": "L'enfant", "chef": "Le chef",
+    "chat_gris": "Un autre chat", "panier_linge": "Le buffet a linge",
+    "maquillage": "Le maquillage", "lit_baldaquin": "Le lit a baldaquin",
+    "cordelette": "Le fil dentaire", "griffures": "Grimper au mur",
+    "fenetre_ouverte": "La fenetre", "prise": "La prise", "gaz": "Le gaz",
+    "four": "Le four", "bougie": "La bougie", "verre_casse": "Le verre casse",
+    "plante": "La plante", "papillon": "Le papillon", "pelote": "La pelote de laine",
+    "somniferes": "Les somniferes", "sac": "Le sac de croquettes",
+}
+
 
 class VueJeu(arcade.View):
     def __init__(self, numero_niveau: int = 1):
@@ -235,14 +251,34 @@ class VueJeu(arcade.View):
         self.chat.center_x = depart
         return pres_du_sac
 
+    def _libelle_action(self) -> str:
+        """Le nom de ce que le chat peut faire ici (affiche au-dessus de lui)."""
+        if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
+            return "Le chat noir"
+        for zone in self.faux_pieges:
+            if (zone.effet["declenchement"] == "action" and zone.recharge <= 0
+                    and arcade.check_for_collision(self.chat, zone)):
+                return LIBELLES.get(zone.effet.get("image", ""), "Essayer")
+        if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
+            return LIBELLES.get(self.niveau.piege_image, "Le piege")
+        return "Le sac de croquettes"
+
     def _dessiner_indicateur_action(self) -> None:
-        """Un petit E au-dessus du chat quand la touche fera quelque chose."""
+        """Un E au-dessus du chat, avec le nom de l'action, quand E fera qqch."""
         if not self._action_possible():
             return
-        x, y = self.chat.center_x, self.chat.top + 14
+        x = self.chat.center_x
+        y = self.chat.top + 16
+        libelle = self._libelle_action()
+
+        # le petit E dans son cadre
         arcade.draw_lrbt_rectangle_filled(x - 11, x + 11, y - 3, y + 19, (20, 18, 26))
         arcade.draw_lrbt_rectangle_outline(x - 11, x + 11, y - 3, y + 19, (240, 220, 120), 2)
         arcade.draw_text("E", x, y, (240, 220, 120), 14, anchor_x="center", bold=True)
+        # le nom de l'item, juste au-dessus
+        larg = 8 + len(libelle) * 7
+        arcade.draw_lrbt_rectangle_filled(x - larg/2, x + larg/2, y + 22, y + 42, (20, 18, 26, 220))
+        arcade.draw_text(libelle, x, y + 26, (250, 240, 200), 12, anchor_x="center", bold=True)
 
     # ------------------------------------------------------------------
     # Les faux pieges scriptes
@@ -529,11 +565,15 @@ class VueJeu(arcade.View):
                 self.niveau.aide, C.LARGEUR_FENETRE / 2, 16,
                 C.COULEUR_TEXTE_FADE, 13, anchor_x="center",
             )
-        if self.minuteur_message > 0:
-            arcade.draw_text(
-                self.message, C.LARGEUR_FENETRE / 2, C.HAUTEUR_FENETRE - 70,
-                C.COULEUR_TEXTE, 18, anchor_x="center",
-            )
+        if self.minuteur_message > 0 and self.chat is not None:
+            # au-dessus du chat, en petit, avec un fond pour rester lisible
+            x = min(max(self.chat.center_x, 220), C.LARGEUR_FENETRE - 220)
+            y = self.chat.top + 48
+            larg = 12 + len(self.message) * 6.5
+            a = int(230 * min(1, self.minuteur_message))
+            arcade.draw_lrbt_rectangle_filled(x - larg/2, x + larg/2, y - 4, y + 20, (20, 18, 26, a))
+            arcade.draw_text(self.message, x, y, (250, 245, 230, 255), 12,
+                             anchor_x="center", width=int(larg), align="center")
 
     # ------------------------------------------------------------------
     def on_key_press(self, touche: int, modificateurs: int) -> None:
