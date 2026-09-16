@@ -6,6 +6,8 @@ lui faire tomber les somniferes dessus : endormi, il ne soigne plus rien, et
 chacune de ses methodes de soin devient une vraie fin.
 """
 
+import math
+
 import arcade
 
 from game import constantes as C
@@ -41,18 +43,18 @@ class Medecin(arcade.Sprite):
 
         self.endormi = False
         self._sommeil = 0.0         # temps de sommeil restant
-        self._etapes = []           # les x ou aller, dans l'ordre (marche)
+        self._cibles = []           # les points (x, bas) ou aller, dans l'ordre
         self._pause = 0.0
         self._image = 0
         self._minuteur = 0.0
 
     # ------------------------------------------------------------------
-    def soigner(self, x_du_chat: float) -> None:
+    def soigner(self, x_du_chat: float, y_bas_du_chat: float) -> None:
         """Il ne patrouille pas, mais des que le chat tente de mourir il ACCOURT
-        jusqu'a lui, le recoud, puis repart a son poste."""
+        jusqu'a lui -- meme en hauteur -- le recoud, puis repart a son poste."""
         if self.endormi:
             return
-        self._etapes = [x_du_chat, self.poste_x]
+        self._cibles = [(x_du_chat, y_bas_du_chat), (self.poste_x, self.sol)]
         self._pause = 0.0
 
     def endormir(self) -> None:
@@ -60,7 +62,7 @@ class Medecin(arcade.Sprite):
         self.endormi = True
         self._sommeil = DUREE_SOMMEIL
         self._pause = 0.0
-        self._etapes = []
+        self._cibles = []
         self.angle = 90                      # allonge par terre
         self.color = (205, 205, 230)
         self.center_y = self.sol + self.width / 2 - 14
@@ -70,7 +72,7 @@ class Medecin(arcade.Sprite):
         self.endormi = False
         self._sommeil = 0.0
         self._pause = 0.0
-        self._etapes = []
+        self._cibles = []
         self.center_x = self.poste_x
         self.angle = 0
         self.color = (255, 255, 255)
@@ -92,21 +94,25 @@ class Medecin(arcade.Sprite):
         self._minuteur += delta_time
         animation = "repos"
 
-        # il reste a son poste, sauf quand un soin est demande : alors il marche
-        # jusqu'au chat (etape 1), le recoud (pause), puis revient (etape 2).
+        # il reste a son poste, sauf pour un soin : il rejoint le chat en ligne
+        # droite (x ET hauteur), le recoud (pause), puis revient a son poste.
         if self._pause > 0:
             self._pause -= delta_time
-        elif self._etapes:
-            cible = self._etapes[0]
-            ecart = cible - self.center_x
-            if abs(ecart) <= VITESSE:
-                self.center_x = cible
-                self._etapes.pop(0)
-                if self._etapes:             # il vient d'atteindre le chat
+        elif self._cibles:
+            cx, cy = self._cibles[0]
+            dx, dy = cx - self.center_x, cy - self.bottom
+            dist = math.hypot(dx, dy)
+            if dist <= VITESSE:
+                self.center_x, self.bottom = cx, cy
+                self._cibles.pop(0)
+                if self._cibles:             # il vient d'atteindre le chat
                     self._pause = DUREE_SOIN
             else:
-                self.center_x += VITESSE if ecart > 0 else -VITESSE
-                animation = "droite" if ecart > 0 else "gauche"
+                self.center_x += VITESSE * dx / dist
+                self.bottom += VITESSE * dy / dist
+                animation = "droite" if dx > 0 else "gauche"
+        else:
+            self.bottom = self.sol           # au repos : bien pose sur le sol
 
         frames = self.animations[animation] or self.animations["repos"]
         cadence = 0.12 if animation != "repos" else 0.45
@@ -114,5 +120,3 @@ class Medecin(arcade.Sprite):
             self._minuteur = 0.0
             self._image += 1
         self.texture = frames[self._image % len(frames)]
-        self.bottom = self.sol
-        self.bottom = self.sol

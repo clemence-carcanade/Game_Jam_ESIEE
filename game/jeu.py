@@ -89,7 +89,7 @@ class VueJeu(arcade.View):
         self.sortie = None           # niveau 7 : la ou il faut arriver vivant
         self.termine = False         # le jeu est fini
         self._attente_medecin = False  # niveau 6 : le chat attend, fige, que le veto le rejoigne
-        self._point_soin = 0.0
+        self._point_soin = (0.0, 0.0)
         self.charger_niveau(numero_niveau)
 
     # ------------------------------------------------------------------
@@ -743,9 +743,9 @@ class VueJeu(arcade.View):
             # _vivre_attente_medecin). Les croix vertes suivent.
             if self.medecin is not None:
                 self._attente_medecin = True
-                self._point_soin = chat.center_x
+                self._point_soin = (chat.center_x, chat.bottom)
                 chat.change_x = chat.change_y = 0.0
-                self.medecin.soigner(chat.center_x)
+                self.medecin.soigner(chat.center_x, chat.bottom)
             else:
                 chat.replacer_au_depart()
         elif genre == "deguisement":
@@ -980,7 +980,11 @@ class VueJeu(arcade.View):
         self.ambiance.mettre_a_jour(delta_time)
         self.chat.mettre_a_jour_animation(delta_time)
 
-        arrive = self.medecin is None or abs(self.medecin.center_x - self._point_soin) < 20
+        arrive = self.medecin is None
+        if not arrive:
+            px, py = self._point_soin
+            arrive = (abs(self.medecin.center_x - px) < 24
+                      and abs(self.medecin.bottom - py) < 40)
         if not arrive:
             # de petites croix vertes montent pendant qu'il accourt
             self._minuteur_soin = getattr(self, "_minuteur_soin", 0.0) + delta_time
