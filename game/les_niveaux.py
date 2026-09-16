@@ -16,17 +16,8 @@ NIVEAUX = [
         message_mort="Trop de croquettes d un coup. Une vie de moins, une maison de plus.",
         message_attente="Encore un peu de place dans ce petit ventre. Continue.",
         depart="salon",
-        perso=dict(image="daron", pos=(990, 784)),
-        # mini-jeu d escalade : ramasser les croquettes en montant, puis se
-        # gaver au distributeur tout en haut jusqu a exploser (barre de satiete)
-        croquettes=[
-            "cuisine", "salon", "planche_salon", "frigo",
-            "sdb", "planche_sdb", "planche_centre", "chatterie",
-            "planche_milieu_g", "planche_milieu_d", "arbre_bas",
-            "chambre", "couloir", "salle_haut",
-        ],
-        distributeur="armoire",
-        faux_pieges={},
+        # mode Doodle Jump : la tour d etageres, les sacs de croquettes et le
+        # distributeur sont generes dans jeu._generer_doodle (rien a poser ici).
     ),
     dict(
         titre="La vieille demeure : cent chats, un chat noir", maitre="la vieille",
@@ -148,7 +139,6 @@ NIVEAUX = [
         message_mort="Le palais en feu, le chat s effondre. Neuf epices, une vie de moins.",
         message_attente="Ta barre de vie remonte. Mange les piments plus vite !",
         depart="salon",
-        perso=dict(image="chef_normal", pos="cuisine"),
         # mini-jeu : engloutir les piments (qui repoussent) pour vider la barre de vie
         piments=[
             "cuisine", "salon", "salle_droite", "canape", "tv", "frigo",
