@@ -90,7 +90,7 @@ NIVEAUX = [
         message_mort="Electrocute en direct. Trois cent mille vues.",
         message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         depart="salon",
-        piege="chatterie", piege_image="cable", piege_largeur=120, piege_direct=True, camera=True,
+        piege=(1540, 270), piege_image="aucune", piege_largeur=130, piege_direct=True, camera=True,
         pousseurs=[
             dict(min="cuisine", max="salle_droite", vitesse=3.0, force=18),
             dict(min="planche_milieu_g", max="planche_milieu_d", vitesse=2.8),
