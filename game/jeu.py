@@ -238,15 +238,14 @@ class VueJeu(arcade.View):
         self.doodle_base_y = base.top
 
         y = base_y
-        x_prec = W / 2
+        sens = -1                       # on demarre en partant vers la gauche
         for _ in range(C.DOODLE_NB_PLATEFORMES):
             y += rng.randint(C.DOODLE_ESPACE_MIN, C.DOODLE_ESPACE_MAX)
-            larg = rng.choice((200, 240, 280))
-            # la suivante reste a portee horizontale de la precedente (pas de
-            # traversee de tout l ecran entre deux rebonds)
-            bord = int(larg / 2) + 10
-            x = x_prec + rng.randint(-200, 200)
-            x = max(bord, min(W - bord, x))
+            larg = rng.choice((240, 280))
+            # zigzag centre sur l ecran : une etagere a gauche du milieu, la
+            # suivante a droite, pour forcer des sauts alternes gauche/droite
+            sens = -sens
+            x = W / 2 + sens * rng.randint(80, 105)
             x_prec = x
             plats.append(barre(x, y, larg))
             if rng.random() < 0.55:                                # un sac pose dessus
@@ -255,7 +254,7 @@ class VueJeu(arcade.View):
                     self.croquettes.append(croq)
 
         y += 95                                                     # le sommet, a portee
-        sx = max(170, min(W - 170, x_prec + rng.randint(-90, 90)))
+        sx = W / 2 + (rng.randint(-40, 40))
         plats.append(barre(sx, y, 320, 22, (120, 86, 56)))
         self.distributeur = module_niveau._image("distributeur", sx, y_bas=y + 11)
         self.monde_haut = y + 220
