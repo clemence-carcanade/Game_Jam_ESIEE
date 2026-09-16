@@ -19,7 +19,7 @@ NIVEAUX = [
             dict(min="chambre", max="couloir", vitesse=1.8),
         ],
         objet="tv", pousse="d",
-        piege="gamelle_bas", piege_largeur=200,
+        piege="gamelle_bas", piege_largeur=200, libelle_piege="Les croquettes",
         faux_pieges={},
     ),
     dict(
