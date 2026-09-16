@@ -560,7 +560,7 @@ class VueJeu(arcade.View):
 
     def afficher(self, texte: str) -> None:
         self.message = texte
-        self.minuteur_message = 2.5
+        self.minuteur_message = 4.0
 
     # ------------------------------------------------------------------
     def on_draw(self) -> None:
