@@ -8,6 +8,7 @@ from game import constantes as C
 
 class SettingsView(arcade.View):
     def on_show_view(self):
+        self.window.set_mouse_visible(False)
         arcade.set_background_color((28, 26, 38))
 
     def _barre_volume(self):

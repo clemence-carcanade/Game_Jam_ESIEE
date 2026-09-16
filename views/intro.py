@@ -25,6 +25,7 @@ class IntroView(arcade.View):
         self.minuteur = 0.0
 
     def on_show_view(self):
+        self.window.set_mouse_visible(False)
         self.window.background_color = arcade.color.BLACK
         self._lecteur = None
         son = C.DOSSIER_SONS / "intro.mp3"

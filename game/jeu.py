@@ -316,6 +316,7 @@ class VueJeu(arcade.View):
             self.fond_doodle = arcade.load_texture(chemin_fond)
 
     def on_show_view(self) -> None:
+        self.window.set_mouse_visible(False)   # pas de curseur en jeu
         self.window.background_color = C.COULEUR_FOND
 
     # ------------------------------------------------------------------

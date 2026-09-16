@@ -129,6 +129,7 @@ class MenuView(arcade.View):
         return button
 
     def on_show_view(self):
+        self.window.set_mouse_visible(True)   # le curseur, seulement dans le menu
         self.manager.enable()
 
         if self.custom_cursor:
