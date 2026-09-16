@@ -11,7 +11,6 @@ import random
 import arcade
 
 from game import constantes as C
-from game import maison
 
 
 class Poussiere:
@@ -43,12 +42,12 @@ class Ambiance:
         self.hauteur = C.HAUTEUR_FENETRE
         self.point = niveau.point
         self.poussieres = [Poussiere(self.largeur, self.hauteur) for _ in range(70)]
-        self.lampes = [self.point(pos) for pos in maison.LAMPES]
-        self.ecrans = [self.point(pos) for pos in maison.ECRANS]
+        self.lampes = [self.point(pos) for pos in getattr(niveau, "lampes", [])]
+        self.ecrans = [self.point(pos) for pos in getattr(niveau, "ecrans", [])]
 
         # les PNJ qui deambulent : un petit sprite qui fait l'aller-retour
         self.promeneurs = []
-        for xg, xd, ysol in maison.PROMENADES:
+        for xg, xd, ysol in getattr(niveau, "promenades", []):
             gx, gy = self.point((xg, ysol))
             dx, _ = self.point((xd, ysol))
             self.promeneurs.append(dict(
@@ -56,9 +55,9 @@ class Ambiance:
                 vx=random.choice((-1, 1)) * 0.7, sens=1,
             ))
         self.papillons = []
-        for x, y, r in maison.PAPILLONS:
+        for x, y, r in getattr(niveau, "papillons", []):
             cx, cy = self.point((x, y))
-            self.papillons.append(dict(cx=cx, cy=cy, r=r * (self.largeur / maison.LARGEUR_IMAGE),
+            self.papillons.append(dict(cx=cx, cy=cy, r=r,
                                        phase=random.uniform(0, math.tau)))
 
     def mettre_a_jour(self, dt):

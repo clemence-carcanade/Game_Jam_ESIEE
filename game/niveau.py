@@ -292,19 +292,20 @@ def charger(numero: int) -> Niveau:
 
     if not 1 <= numero <= len(les_niveaux.NIVEAUX):
         raise ValueError(f"Pas de niveau {numero}")
-    return construire_maison(les_niveaux.NIVEAUX[numero - 1])
+    return construire_maison(les_niveaux.NIVEAUX[numero - 1], numero)
 
 
-def construire_maison(definition) -> Niveau:
-    """La maison est le decor ; le niveau ne fait qu'y poser ses acteurs.
+def construire_maison(definition, numero=1) -> Niveau:
+    """La maison du niveau est le decor ; le niveau y pose ses acteurs.
 
-    Toutes les positions de la definition sont en pixels de l'image de fond
-    (origine en haut a gauche) ou en ancres nommees de game/maison.py.
+    Chaque niveau a sa maison (game/maison.MAISONS) : son fond, sa taille et sa
+    geometrie. Les positions sont en ancres nommees ou en pixels de l'image.
     """
-    from game import maison
+    from game import maison as module_maison
+    maison = module_maison.pour(numero)
 
-    ech = C.LARGEUR_FENETRE / maison.LARGEUR_IMAGE
-    haut = maison.HAUTEUR_IMAGE
+    ech = C.LARGEUR_FENETRE / maison["largeur"]
+    haut = maison["hauteur"]
 
     def x_de(px):
         return px * ech
@@ -315,7 +316,7 @@ def construire_maison(definition) -> Niveau:
     def point(valeur):
         """Une ancre nommee, ou un couple (x, y) en pixels d'image."""
         if isinstance(valeur, str):
-            valeur = maison.ANCRES[valeur]
+            valeur = maison["ancres"][valeur]
         return x_de(valeur[0]), y_de(valeur[1])
 
     invisible = (0, 0, 0, 0)
@@ -333,27 +334,27 @@ def construire_maison(definition) -> Niveau:
     )
     niveau.faux_pieges = definition.get("faux_pieges", {})
     niveau.pousseurs = definition.get("pousseurs", [])
-    niveau.fond = maison.FOND
-    niveau.largeur = maison.LARGEUR_IMAGE * ech
-    niveau.hauteur = maison.HAUTEUR_IMAGE * ech
+    niveau.fond = maison["fond"]
+    niveau.largeur = maison["largeur"] * ech
+    niveau.hauteur = maison["hauteur"] * ech
     x_depart, y_depart = point(definition.get("depart", "salon"))
     niveau.depart_chat = (x_depart, y_depart + 80)   # au-dessus du sol, il retombe
     niveau.point = point                     # les autres modules s'en servent
 
     # la geometrie de la maison, en rectangles invisibles calques sur l'image
-    for x0, y0, x1, y1 in maison.SOLIDES:
+    for x0, y0, x1, y1 in maison["solides"]:
         largeur, hauteur_r = (x1 - x0) * ech, (y1 - y0) * ech
         bloc = _carre(largeur, hauteur_r, invisible,
                       x_de((x0 + x1) / 2), y_de((y0 + y1) / 2) + hauteur_r / 2 - hauteur_r / 2, "solide")
         bloc.center_y = (y_de(y0) + y_de(y1)) / 2
         niveau.murs.append(bloc)
-    for x0, y0, x1 in maison.PLATEFORMES:
+    for x0, y0, x1 in maison["plateformes"]:
         largeur = (x1 - x0) * ech
         plate = _carre(largeur, 10, invisible, x_de((x0 + x1) / 2), y_de(y0) - 5, "plateforme")
         niveau.plateformes.append(plate)
     niveau.rampes = [
         (x_de(x0), y_de(y0), x_de(x1), y_de(y1))
-        for x0, y0, x1, y1 in getattr(maison, "RAMPES", [])
+        for x0, y0, x1, y1 in maison.get("rampes", [])
     ]
 
     # l'objet a pousser
