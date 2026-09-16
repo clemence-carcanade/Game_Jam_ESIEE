@@ -72,8 +72,8 @@ class Pousseur(arcade.Sprite):
         if self._recharge <= 0 and chat.vivant and arcade.check_for_collision(self, chat):
             direction = 1 if chat.center_x >= self.center_x else -1
             chat.change_x = self.force * direction
-            chat.change_y = 8
-            self._recharge = 0.7
+            chat.change_y = 13
+            self._recharge = 0.55
             return True
         return False
 

@@ -371,9 +371,9 @@ class VueJeu(arcade.View):
             self.minuteur_deguisement = 4.0
         for pousseur in self.pousseurs:
             if pousseur.mettre_a_jour(delta_time, self.chat):
-                self.effets.pouf(self.chat.center_x, self.chat.center_y, (200, 210, 235), 8)
-                self.effets.trembler(4)
-                self.audio.jouer("piege", 0.4)
+                self.effets.pouf(self.chat.center_x, self.chat.center_y, (200, 210, 235), 14)
+                self.effets.trembler(9)
+                self.audio.jouer("piege", 0.6)
 
         if contacts.atterrissage:
             self.chat.signaler_atterrissage()
