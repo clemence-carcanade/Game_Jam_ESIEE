@@ -154,7 +154,7 @@ NIVEAUX = [
             dict(min="salon", max="tv", vitesse=2.2),
         ],
         objet="planche_milieu_g", pousse="g", objet_image="somniferes",
-        piege="planche_centre", piege_image="aucune", piege_largeur=150,
+        piege="planche_centre", piege_image="aucune", piege_largeur=200, piege_hauteur=4,
         faux_pieges={
             "s": dict(pos="planche_centre", declenchement="action", effet="soin",
                       image="scalpel", cause="le scalpel",

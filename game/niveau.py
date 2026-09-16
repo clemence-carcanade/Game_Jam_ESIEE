@@ -393,7 +393,8 @@ def construire_maison(definition, numero=1) -> Niveau:
     if "piege" in definition:
         x, y = point(definition["piege"])
         largeur = definition.get("piege_largeur", 110)
-        zone = _carre(largeur, 64, invisible, x, y + 32, "piege")
+        h = int(definition.get("piege_hauteur", 1) * C.TAILLE_TUILE)
+        zone = _carre(largeur, h, invisible, x, y + h / 2, "piege")
         zone.role = "gamelle"
         zone.remplie = False
         image = _image(definition.get("piege_image", ""), x, y_bas=y)
