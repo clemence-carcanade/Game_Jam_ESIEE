@@ -20,16 +20,7 @@ NIVEAUX = [
         ],
         objet="tv", pousse="d",
         piege="gamelle_bas", piege_largeur=200,
-        faux_pieges={
-            "j": dict(pos="chatterie", declenchement="contact", recharge=8.0, image="griffures",
-                      texte="Il saute du haut de la bibliotheque. Retombe sur ses pattes. Toujours."),
-            "w": dict(pos="chambre", declenchement="action", image="fenetre_ouverte",
-                      texte="Il grimpe a la fenetre pour sauter. Le daron le rattrape par la queue."),
-            "p": dict(pos="tv", declenchement="action", image="prise",
-                      texte="Il mordille la prise de la tele. Ca picote a peine. Rien."),
-            "g": dict(pos="cuisine", declenchement="action", image="gaz",
-                      texte="Il ouvre le gaz de la cuisiniere. Le daron sent, coupe tout, ronchonne."),
-        },
+        faux_pieges={},
     ),
     dict(
         titre="La vieille demeure : cent chats, un chat noir", maitre="la vieille",

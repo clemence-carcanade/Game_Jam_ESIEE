@@ -177,8 +177,8 @@ class VueJeu(arcade.View):
         self.effets.mettre_a_jour(delta_time)
         self.ambiance.mettre_a_jour(delta_time)      # la maison respire, en continu
         if self.camera_active:
-            self.champ_x += (self.chat.center_x - self.champ_x) * 0.045
-            self.champ_y += (self.chat.center_y - self.champ_y) * 0.045
+            self.champ_x += (self.chat.center_x - self.champ_x) * 0.022
+            self.champ_y += (self.chat.center_y - self.champ_y) * 0.022
         self._vivre_la_horde(delta_time)
         if self.chat_noir is not None:
             self.chat_noir.mettre_a_jour(delta_time)

@@ -129,7 +129,7 @@ class Fille(arcade.Sprite):
         base = self._anim["droite"] or [arcade.Texture.create_empty("f", (32, 48), (150, 80, 160))]
         self._anim.setdefault("droite", base)
         self._anim.setdefault("gauche", base)
-        super().__init__(self._anim["droite"][0], scale=1.6, center_x=x)
+        super().__init__(self._anim["droite"][0], scale=0.35, center_x=x)
         self.bottom = y
         self.sol = y
         self.vitesse = vitesse
