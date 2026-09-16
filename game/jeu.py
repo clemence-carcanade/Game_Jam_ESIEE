@@ -181,6 +181,12 @@ class VueJeu(arcade.View):
         # niveau 4 : le champ de camera de l'influenceur, qui suit le chat en retard
         self.camera_active = getattr(self.niveau, "camera", False)
         self.champ_x, self.champ_y = self.chat.center_x, self.chat.center_y
+        self.moniteur_cam = None
+        if self.camera_active:
+            # une camera dediee : elle projette le carre du champ dans le moniteur
+            self.moniteur_cam = arcade.Camera2D()
+            if self.gui_camera is None:
+                self.gui_camera = arcade.Camera2D()
 
         self.fille = None
         if getattr(self.niveau, "fille", None) is not None:
@@ -468,11 +474,48 @@ class VueJeu(arcade.View):
         self.camera_y = 0.0
         self.afficher("Rate ! On repart du bas.")
 
+    def _dessiner_moniteur(self, dedans: bool) -> None:
+        """Le retour camera de l'influenceur : le contenu du cadre, dans un ecran.
+
+        Une camera dediee projette le carre du champ (autour de champ_x/y) dans
+        un petit moniteur en haut a droite. Le chat n'y apparait que lorsqu'il
+        est dans le cadre : hors cadre, l'ecran ne montre que la piece vide.
+        """
+        L, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
+        cote = 210
+        mx, my = L - cote - 24, H - cote - 58
+        r = self.champ_rayon
+
+        # le boitier du moniteur
+        arcade.draw_lrbt_rectangle_filled(mx - 8, mx + cote + 8, my - 8, my + cote + 34, (22, 20, 27))
+        arcade.draw_lrbt_rectangle_filled(mx, mx + cote, my, my + cote, (8, 8, 12))
+
+        # le flux : on redessine la scene, vue par la camera du moniteur
+        self.moniteur_cam.viewport = arcade.LBWH(mx, my, cote, cote)
+        self.moniteur_cam.position = (self.champ_x, self.champ_y)
+        self.moniteur_cam.projection = arcade.LRBT(-r, r, -r, r)
+        self.moniteur_cam.use()
+        if self.fond is not None:
+            arcade.draw_sprite(self.fond, pixelated=True)
+        self.niveau.dessiner()
+        self.pousseurs.draw(pixelated=True)
+        arcade.draw_sprite(self.chat, pixelated=True)
+        self.gui_camera.use()                    # on rend la vue plein cadre
+
+        # l'habillage de l'ecran : liseré, pastille REC, etat du direct
+        arcade.draw_lrbt_rectangle_outline(mx, mx + cote, my, my + cote, (90, 90, 110), 2)
+        clign = 0.5 + 0.5 * math.sin(self.ambiance.t * 6)
+        arcade.draw_circle_filled(mx + 16, my + cote + 14, 6, (230, 60, 60, int(120 + 135 * clign)))
+        arcade.draw_text("REC", mx + 28, my + cote + 7, (240, 240, 245), 13, bold=True)
+        arcade.draw_text("EN DIRECT" if dedans else "HORS CADRE", mx + cote - 6, my + cote + 7,
+                         (240, 120, 120) if dedans else (150, 255, 190), 12,
+                         anchor_x="right", bold=True)
+
     def _dans_le_champ(self) -> bool:
-        """Le chat est-il dans le champ de la camera de l'influenceur ?"""
-        dx = self.chat.center_x - self.champ_x
-        dy = self.chat.center_y - self.champ_y
-        return (dx * dx + dy * dy) ** 0.5 <= self.champ_rayon
+        """Le chat est-il dans le cadre (carre) de la camera de l'influenceur ?"""
+        dx = abs(self.chat.center_x - self.champ_x)
+        dy = abs(self.chat.center_y - self.champ_y)
+        return max(dx, dy) <= self.champ_rayon
 
     def _action_possible(self) -> bool:
         """Y a-t-il quelque chose a faire avec E, la, maintenant ?"""
@@ -1009,12 +1052,16 @@ class VueJeu(arcade.View):
         arcade.draw_sprite(self.chat, pixelated=True)
         if self.camera_active:
             dedans = self._dans_le_champ()
-            # couleurs inversees : rouge quand le chat est DANS le champ, vert
-            # quand il est en DEHORS
-            couleur = (240, 120, 120, 40) if dedans else (120, 240, 160, 30)
-            arcade.draw_circle_filled(self.champ_x, self.champ_y, self.champ_rayon, couleur)
-            arcade.draw_circle_outline(self.champ_x, self.champ_y, self.champ_rayon,
-                                       (255, 150, 150) if dedans else (150, 255, 190), 3)
+            # le cadre carre de la camera. Couleurs inversees : rouge quand le
+            # chat est DANS le cadre, vert quand il est en DEHORS.
+            r = self.champ_rayon
+            g, d = self.champ_x - r, self.champ_x + r
+            b, h = self.champ_y - r, self.champ_y + r
+            arcade.draw_lrbt_rectangle_filled(g, d, b, h,
+                (240, 120, 120, 40) if dedans else (120, 240, 160, 30))
+            arcade.draw_lrbt_rectangle_outline(g, d, b, h,
+                (255, 150, 150) if dedans else (150, 255, 190), 3)
+            self._dessiner_moniteur(dedans)
         self.effets.dessiner()
         if self.flash > 0:
             arcade.draw_lrbt_rectangle_filled(
