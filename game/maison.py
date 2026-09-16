@@ -79,98 +79,107 @@ _M2 = _trois_etages(
     },
 )
 
-# --- niveau 3 : la chambre de l'enfant (1365 x 768) ------------------------
+# Nouveaux fonds (1670 x 940) : geometrie relevee sur les rebords eclaires des
+# images. Trois etages a y~300 / y~560-615 / y~860, plus des plateformes
+# flottantes. Le sol du bas est solide, les etages sont traversables par le bas.
+
+# --- niveau 3 : la chambre de l'enfant (pastel) ----------------------------
 _M3 = dict(
-    fond="fonds/niveau3.png", largeur=1365, hauteur=768,
+    fond="fonds/niveau3.png", largeur=1670, hauteur=940,
     solides=[
-        (24, 700, 1340, 730), (0, 20, 24, 740), (1340, 20, 1365, 740), (0, 10, 1365, 24),
+        (30, 858, 1640, 890), (0, 30, 30, 905), (1640, 30, 1670, 905), (0, 14, 1670, 34),
     ],
     plateformes=[
-        (24, 235, 760), (810, 235, 1340),        # plancher etage 2 (coupe au milieu)
-        (24, 465, 1340),                          # plancher etage 1
-        (310, 215, 470), (620, 235, 770),         # plateformes etage 2
-        (100, 430, 260), (400, 380, 580), (660, 415, 820),   # plateformes etage 1
-        (980, 320, 1150), (1230, 320, 1340),
-        (880, 660, 1130),                         # plateforme RDC droite
-        (180, 560, 400), (940, 560, 1160),        # marches intermediaires RDC -> etage 1
+        (40, 300, 1640),                                  # etage haut (chambre)
+        (30, 558, 545), (545, 576, 1010), (1010, 556, 1420),   # etage milieu
+        (150, 492, 370), (500, 444, 700), (800, 492, 995), (1250, 410, 1470),  # flottantes
     ],
     ancres={
-        "salon": (300, 700), "cuisine": (500, 700), "salle_droite": (1000, 660),
-        "gamelle_bas": (1000, 660), "canape": (1000, 660), "tv": (700, 700),
-        "frigo": (180, 430), "sdb": (490, 380), "chatterie": (1060, 320),
-        "planche_sdb": (490, 380), "planche_centre": (740, 415),
-        "planche_milieu_g": (180, 430), "planche_milieu_d": (1290, 320),
-        "planche_salon": (740, 415), "arbre_bas": (1060, 320), "arbre_haut": (390, 215),
-        "chambre": (200, 235), "lit": (200, 235), "couloir": (690, 235),
-        "armoire": (390, 215), "salle_haut": (1000, 235), "paniere": (1010, 235),
-        "aquarium": (1010, 200),
+        "salon": (300, 858), "cuisine": (560, 858), "salle_droite": (1080, 556),
+        "gamelle_bas": (900, 858), "canape": (300, 858), "tv": (770, 858),
+        "frigo": (250, 492), "sdb": (300, 558), "chatterie": (1330, 556),
+        "planche_sdb": (600, 444), "planche_centre": (890, 492),
+        "planche_milieu_g": (250, 492), "planche_milieu_d": (1350, 410),
+        "planche_salon": (770, 576), "arbre_bas": (1300, 556), "arbre_haut": (1350, 410),
+        "chambre": (250, 300), "lit": (200, 300), "couloir": (770, 300),
+        "armoire": (1250, 300), "salle_haut": (1350, 300), "paniere": (1300, 300),
+        "aquarium": (1130, 556),
     },
 )
 
-# --- niveau 4 : l'appart de l'influenceur (1672 x 941) ----------------------
-_M4 = _trois_etages(
-    "fonds/niveau4.png", 1672, 941, sols=(870, 575, 300),
-    plats=[
-        (400, 195, 580), (700, 195, 900), (930, 195, 1100), (1180, 195, 1360),
-        (330, 435, 500), (600, 435, 760), (1040, 435, 1200), (1300, 490, 1480),
-        (280, 512, 450), (500, 555, 720), (860, 555, 1050),
-        # tremplins pour monter du rez-de-chaussee a l'etage 1
-        (150, 730, 350), (550, 730, 760), (960, 730, 1170), (1250, 720, 1400),
-        (350, 650, 560), (760, 650, 970), (1100, 650, 1310),
+# --- niveau 4 : l'appart de l'influenceur -----------------------------------
+_M4 = dict(
+    fond="fonds/niveau4.png", largeur=1672, hauteur=940,
+    solides=[
+        (30, 858, 1642, 890), (0, 30, 30, 905), (1642, 30, 1672, 905), (0, 14, 1672, 34),
+    ],
+    plateformes=[
+        (30, 297, 1642),                                  # etage haut
+        (55, 544, 486), (491, 578, 855), (856, 556, 1180),
+        (1186, 578, 1421), (1425, 556, 1615),             # etage milieu
+        (366, 425, 519), (730, 425, 853), (543, 524, 726),
+        (1201, 486, 1340), (579, 765, 742),               # flottantes
     ],
     ancres={
-        "salon": (1100, 870), "cuisine": (500, 870), "salle_droite": (1400, 870),
-        "gamelle_bas": (300, 870), "canape": (1100, 870), "tv": (1350, 870),
-        "frigo": (400, 870), "sdb": (200, 575), "chatterie": (1400, 575),
-        "planche_sdb": (410, 435), "planche_centre": (680, 435),
-        "planche_milieu_g": (1120, 435), "planche_milieu_d": (1390, 490),
-        "planche_salon": (610, 555), "arbre_bas": (1400, 490), "arbre_haut": (1270, 195),
-        "chambre": (200, 300), "lit": (200, 300), "couloir": (800, 300),
-        "armoire": (490, 195), "salle_haut": (1270, 300), "paniere": (1270, 195),
+        "salon": (1150, 858), "cuisine": (500, 858), "salle_droite": (1520, 858),
+        "gamelle_bas": (300, 858), "canape": (1150, 858), "tv": (1350, 858),
+        "frigo": (400, 858), "sdb": (180, 544), "chatterie": (1520, 556),
+        "planche_sdb": (440, 425), "planche_centre": (640, 524),
+        "planche_milieu_g": (1000, 556), "planche_milieu_d": (1300, 578),
+        "planche_salon": (670, 578), "arbre_bas": (1520, 556), "arbre_haut": (790, 425),
+        "chambre": (200, 297), "lit": (200, 297), "couloir": (640, 297),
+        "armoire": (490, 297), "salle_haut": (1300, 297), "paniere": (1300, 297),
     },
 )
 
-# --- niveau 5 : la cuisine du restaurant (1672 x 941) -----------------------
-_M5 = _trois_etages(
-    "fonds/niveau5.png", 1672, 941, sols=(830, 600, 320),
-    plats=[
-        (1000, 320, 1200),                                        # haut
-        (120, 560, 320), (470, 470, 670), (1140, 430, 1340), (1360, 470, 1560),
-        (300, 700, 500), (760, 720, 960), (1150, 680, 1350),
+# --- niveau 5 : la cuisine du restaurant ------------------------------------
+_M5 = dict(
+    fond="fonds/niveau5.png", largeur=1672, hauteur=940,
+    solides=[
+        (30, 864, 1642, 894), (0, 30, 30, 905), (1642, 30, 1672, 905), (0, 14, 1672, 34),
+    ],
+    plateformes=[
+        (40, 306, 1630),                                  # etage haut (salle)
+        (40, 618, 596), (599, 630, 1035), (1042, 611, 1620),   # etage milieu (cuisine)
+        (494, 448, 663), (1071, 418, 1208), (1317, 473, 1436),
+        (156, 544, 299), (303, 572, 544), (668, 572, 971),
+        (1123, 568, 1346), (608, 739, 782), (1143, 708, 1332),  # flottantes
     ],
     ancres={
-        "salon": (600, 830), "cuisine": (400, 600), "salle_droite": (1400, 830),
-        "gamelle_bas": (700, 600), "canape": (400, 700), "tv": (1250, 680),
-        "frigo": (200, 600), "sdb": (220, 560), "chatterie": (1450, 600),
-        "planche_sdb": (570, 470), "planche_centre": (860, 720),
-        "planche_milieu_g": (1240, 430), "planche_milieu_d": (1460, 470),
-        "planche_salon": (400, 700), "arbre_bas": (1250, 680), "arbre_haut": (1100, 320),
-        "chambre": (400, 320), "lit": (400, 320), "couloir": (900, 320),
-        "armoire": (1100, 320), "salle_haut": (1300, 320), "paniere": (1300, 320),
+        "salon": (300, 864), "cuisine": (500, 864), "salle_droite": (1400, 864),
+        "gamelle_bas": (800, 864), "canape": (300, 618), "tv": (1250, 611),
+        "frigo": (150, 864), "sdb": (220, 544), "chatterie": (1450, 611),
+        "planche_sdb": (570, 448), "planche_centre": (820, 630),
+        "planche_milieu_g": (1140, 418), "planche_milieu_d": (1370, 473),
+        "planche_salon": (450, 572), "arbre_bas": (1230, 568), "arbre_haut": (1140, 306),
+        "chambre": (400, 306), "lit": (400, 306), "couloir": (900, 306),
+        "armoire": (1100, 306), "salle_haut": (1300, 306), "paniere": (1300, 306),
     },
 )
 
-# --- niveau 6 : le cabinet medical (1672 x 941) -----------------------------
-_M6 = _trois_etages(
-    "fonds/niveau6.png", 1672, 941, sols=(870, 620, 300),
-    plats=[
-        (1050, 195, 1250),
-        (60, 445, 230), (770, 415, 970), (1050, 415, 1220), (1360, 460, 1540),
-        (60, 515, 230), (500, 575, 680), (270, 705, 490), (770, 745, 1000), (1150, 705, 1330),
-        # tremplins pour monter, et la petite plateforme des somniferes,
-        # etroite et pile au-dessus du medecin (image x~880) pour qu'ils tombent dessus
-        (900, 550, 1080), (1080, 480, 1250),
-        (825, 430, 935),
+# --- niveau 6 : le cabinet medical ------------------------------------------
+_M6 = dict(
+    fond="fonds/niveau6.png", largeur=1670, hauteur=940,
+    solides=[
+        (30, 866, 1640, 896), (0, 30, 30, 905), (1640, 30, 1670, 905), (0, 14, 1670, 34),
+    ],
+    plateformes=[
+        (40, 302, 1620), (778, 197, 1043),                # etage haut + comptoir
+        (40, 600, 300), (292, 614, 870), (1107, 606, 1620),    # etage milieu
+        (278, 406, 368), (717, 405, 870), (1122, 405, 1279),
+        (158, 496, 295), (929, 509, 1021), (636, 538, 796),
+        (1344, 538, 1487), (932, 542, 1218), (56, 596, 289), (873, 596, 1103),
+        (467, 687, 627), (1194, 705, 1347), (825, 747, 962), (418, 806, 560),  # flottantes
     ],
     ancres={
-        "salon": (700, 870), "cuisine": (400, 870), "salle_droite": (1400, 870),
-        "gamelle_bas": (900, 870), "canape": (400, 705), "tv": (1240, 705),
-        "frigo": (200, 620), "sdb": (150, 445), "chatterie": (1450, 620),
-        "planche_centre": (880, 745), "planche_milieu_g": (1140, 415),
-        "planche_milieu_d": (870, 415), "planche_salon": (590, 575),
-        "arbre_bas": (1450, 460), "arbre_haut": (1150, 195),
-        "chambre": (200, 300), "lit": (200, 300), "couloir": (700, 300),
-        "armoire": (1150, 195), "salle_haut": (1400, 300), "paniere": (1400, 300),
+        "salon": (400, 866), "cuisine": (700, 866), "salle_droite": (1250, 866),
+        "gamelle_bas": (700, 866), "canape": (400, 614), "tv": (1250, 606),
+        "frigo": (200, 600), "sdb": (220, 496), "chatterie": (1450, 606),
+        "planche_centre": (700, 614), "planche_milieu_g": (1000, 542),
+        "planche_milieu_d": (1200, 405), "planche_salon": (600, 596),
+        "arbre_bas": (1450, 606), "arbre_haut": (1150, 302),
+        "chambre": (200, 302), "lit": (200, 302), "couloir": (700, 302),
+        "armoire": (1150, 302), "salle_haut": (1400, 302), "paniere": (1400, 302),
     },
 )
 

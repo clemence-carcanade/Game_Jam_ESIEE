@@ -113,8 +113,8 @@ NIVEAUX = [
         message_mort="Electrocute en direct. Trois cent mille vues.",
         message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         depart="salon",
-        perso=dict(image="influenceur", pos="salon"),
-        piege=(1540, 270), piege_image="aucune", piege_anime="cable_anime", piege_largeur=130, piege_direct=True, camera=True, libelle_piege="Se prendre dans le cable",
+        # l'influenceur est deja peint sur le fond (a son bureau) : pas de sprite
+        piege=(1560, 295), piege_image="aucune", piege_anime="cable_anime", piege_largeur=130, piege_direct=True, camera=True, libelle_piege="Se prendre dans le cable",
         pousseurs=[
             dict(min="cuisine", max="salle_droite", vitesse=3.0, force=18),
             dict(min="planche_milieu_g", max="planche_milieu_d", vitesse=2.8),
@@ -160,7 +160,7 @@ NIVEAUX = [
         ],
                 piege="planche_centre", piege_image="aucune", piege_largeur=200, piege_hauteur=4,
         faux_pieges={
-            "so": dict(pos=(880, 434), declenchement="action", effet="endort",
+            "so": dict(pos=(760, 400), declenchement="action", effet="endort",
                        image="somniferes", texte="Tu renverses les somniferes sur le medecin. Il s endort."),
             "s": dict(pos="frigo", declenchement="action", effet="soin",
                       image="scalpel", cause="le scalpel",
