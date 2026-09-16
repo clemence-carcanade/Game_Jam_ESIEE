@@ -14,6 +14,7 @@ Ordre d'une image :
 """
 
 import math
+import random
 
 import arcade
 
@@ -72,6 +73,11 @@ class VueJeu(arcade.View):
         self.satiete = 0.0                 # niveau 1 : barre a remplir en se gavant
         self.croquettes = arcade.SpriteList()
         self.distributeur = None
+        self.doodle = False                # niveau 1 : mode Doodle Jump vertical
+        self.camera_y = 0.0
+        self.camera_doodle = None
+        self.gui_camera = None
+        self.doodle_base_y = 0.0
         self.transition = 0.0              # ecran de lore entre les niveaux
         self.audio = Audio()
         self.audio.demarrer_ambiance()
@@ -94,6 +100,10 @@ class VueJeu(arcade.View):
         # Les métadonnées du niveau peuvent couper un réflexe dès le départ.
         for reflexe in self.niveau.reflexes_coupes:
             setattr(self.chat, f"reflexe_{reflexe}", False)
+
+        self.doodle = getattr(self.niveau, "doodle", False)
+        if self.doodle:
+            self._generer_doodle()
 
         self.collisions = MoteurCollisions(
             self.chat,
@@ -121,21 +131,23 @@ class VueJeu(arcade.View):
             piment.repop = 0.0
             self.piments.append(piment)
 
-        # niveau 1 : l escalade et le distributeur (barre de satiete a remplir)
-        self.satiete = 0.0
-        self.croquettes = arcade.SpriteList()
-        for pos in getattr(self.niveau, "croquettes", []):
-            x, y = self.niveau.point(pos)
-            croq = module_niveau._image("catfood", x, y_bas=y)
-            if croq is None:
-                croq = arcade.Sprite(arcade.Texture.create_empty("c", (18, 24), (150, 96, 50)),
-                                     center_x=x, center_y=y + 12)
-            self.croquettes.append(croq)
-        self.distributeur = None
-        nom_distri = getattr(self.niveau, "distributeur", "")
-        if nom_distri:
-            x, y = self.niveau.point(nom_distri)
-            self.distributeur = module_niveau._image("distributeur", x, y_bas=y)
+        # niveau 1 : les croquettes et le distributeur poses par ancres.
+        # En mode Doodle Jump, tout est deja genere par _generer_doodle.
+        if not self.doodle:
+            self.satiete = 0.0
+            self.croquettes = arcade.SpriteList()
+            for pos in getattr(self.niveau, "croquettes", []):
+                x, y = self.niveau.point(pos)
+                croq = module_niveau._image("catfood", x, y_bas=y)
+                if croq is None:
+                    croq = arcade.Sprite(arcade.Texture.create_empty("c", (18, 24), (150, 96, 50)),
+                                         center_x=x, center_y=y + 12)
+                self.croquettes.append(croq)
+            self.distributeur = None
+            nom_distri = getattr(self.niveau, "distributeur", "")
+            if nom_distri:
+                x, y = self.niveau.point(nom_distri)
+                self.distributeur = module_niveau._image("distributeur", x, y_bas=y)
 
         # l'animation du piege mortel (aquarium, cable) posee sur sa zone
         self.piege_frames = []
@@ -203,6 +215,54 @@ class VueJeu(arcade.View):
         if self.niveau.aide:
             self.afficher(self.niveau.aide)
 
+    def _generer_doodle(self) -> None:
+        """Construit la tour du Doodle Jump : une colonne d etageres a grimper.
+
+        Les plateformes generees deviennent la geometrie du niveau (le moteur de
+        collisions n est pas utilise en mode doodle : la physique est maison).
+        Une graine fixe garantit une tour toujours franchissable.
+        """
+        W = C.LARGEUR_FENETRE
+        rng = random.Random(7)
+        plats = arcade.SpriteList(use_spatial_hash=True)
+        self.croquettes = arcade.SpriteList()
+
+        def barre(cx, cy, larg, haut=18, couleur=(150, 104, 66)):
+            tex = arcade.Texture.create_empty(f"_plat_{int(cx)}_{int(cy)}",
+                                              (int(larg), int(haut)), couleur)
+            return arcade.Sprite(tex, center_x=cx, center_y=cy)
+
+        base_y = 90
+        plats.append(barre(W / 2, base_y, W, 26, (120, 86, 56)))   # sol de depart
+        self.doodle_base_y = base_y
+
+        y = base_y
+        for _ in range(C.DOODLE_NB_PLATEFORMES):
+            y += rng.randint(C.DOODLE_ESPACE_MIN, C.DOODLE_ESPACE_MAX)
+            larg = rng.choice((150, 180, 210))
+            x = rng.randint(int(larg / 2) + 10, int(W - larg / 2 - 10))
+            plats.append(barre(x, y, larg))
+            if rng.random() < 0.55:                                # un sac pose dessus
+                croq = module_niveau._image("catfood", x, y_bas=y + 9)
+                if croq is not None:
+                    self.croquettes.append(croq)
+
+        y += 150                                                    # le sommet
+        plats.append(barre(W / 2, y, 260, 22, (120, 86, 56)))
+        self.distributeur = module_niveau._image("distributeur", W / 2, y_bas=y + 11)
+        self.monde_haut = y + 220
+
+        # la tour devient la geometrie ; pas de murs (defilement + rebouclage)
+        self.niveau.plateformes = plats
+        self.niveau.murs = arcade.SpriteList()
+
+        self.chat.center_x = W / 2
+        self.chat.center_y = base_y + 30
+        self.chat.change_x = self.chat.change_y = 0.0
+        self.camera_y = 0.0
+        self.camera_doodle = arcade.Camera2D()
+        self.gui_camera = arcade.Camera2D()
+
     def on_show_view(self) -> None:
         self.window.background_color = C.COULEUR_FOND
 
@@ -237,6 +297,10 @@ class VueJeu(arcade.View):
                 self.chat.vivant = True
                 self.chat.ange = False
                 self.chat.alpha = 255
+            return
+
+        if self.doodle:
+            self._update_doodle(delta_time)
             return
 
         au_sol = self.collisions.est_au_sol()
@@ -291,6 +355,61 @@ class VueJeu(arcade.View):
             self.chat.angle = (self.toupie * 900) % 360 if self.toupie > 0.15 else 0
         self.chat.mettre_a_jour_animation(delta_time)
 
+    def _update_doodle(self, delta_time: float) -> None:
+        """Physique maison du Doodle Jump : rebond auto, rebouclage, camera qui monte."""
+        pas = min(2.0, delta_time * 60.0)     # cale sur le pas de 60 ips du reste du jeu
+
+        # 1. pilotage gauche/droite (le joueur ne fait que diriger)
+        cible = 0.0
+        if self.chat.veut_gauche:
+            cible -= C.VITESSE_CHAT
+        if self.chat.veut_droite:
+            cible += C.VITESSE_CHAT
+        self.chat.change_x += (cible - self.chat.change_x) * 0.30
+        self.chat.center_x += self.chat.change_x * pas
+        # rebouclage horizontal facon Doodle Jump
+        if self.chat.center_x < 0:
+            self.chat.center_x += C.LARGEUR_FENETRE
+        elif self.chat.center_x > C.LARGEUR_FENETRE:
+            self.chat.center_x -= C.LARGEUR_FENETRE
+
+        # 2. gravite + rebond automatique quand on retombe sur une etagere
+        self.chat.change_y = max(-C.VITESSE_CHUTE_MAX, self.chat.change_y - C.GRAVITE * pas)
+        bas_avant = self.chat.bottom
+        self.chat.center_y += self.chat.change_y * pas
+        self.chat.au_sol = False
+        if self.chat.change_y <= 0:
+            for plat in self.niveau.plateformes:
+                if (plat.left - 8 <= self.chat.center_x <= plat.right + 8
+                        and self.chat.bottom <= plat.top <= bas_avant + 2):
+                    self.chat.bottom = plat.top
+                    self.chat.change_y = C.REBOND_DOODLE
+                    self.chat.au_sol = True
+                    self.effets.pouf(self.chat.center_x, plat.top, (210, 180, 120), 5)
+                    self.audio.jouer("saut", 0.2)
+                    break
+
+        # 3. la camera suit le chat vers le haut, sans jamais redescendre
+        self.camera_y = max(self.camera_y, self.chat.center_y - C.HAUTEUR_FENETRE * 0.42)
+        # chute ratee : on repart du bas (sans perdre de vie)
+        if self.chat.center_y < self.camera_y - 60:
+            self._respawn_doodle()
+
+        # 4. croquettes gobees + gavage au distributeur (remplit la satiete)
+        self._vivre_les_croquettes(delta_time)
+
+        self.chat.mettre_a_jour_animation(delta_time)
+        self.effets.mettre_a_jour(delta_time)
+        self.ambiance.mettre_a_jour(delta_time)
+
+    def _respawn_doodle(self) -> None:
+        """Le chat a rate un rebond : on le remet en bas de la tour."""
+        self.chat.center_x = C.LARGEUR_FENETRE / 2
+        self.chat.center_y = self.doodle_base_y + 30
+        self.chat.change_x = self.chat.change_y = 0.0
+        self.camera_y = 0.0
+        self.afficher("Rate ! On repart du bas.")
+
     def _dans_le_champ(self) -> bool:
         """Le chat est-il dans le champ de la camera de l'influenceur ?"""
         dx = self.chat.center_x - self.champ_x
@@ -328,6 +447,32 @@ class VueJeu(arcade.View):
             return (getattr(self.niveau, "libelle_piege", "")
                     or LIBELLES.get(self.niveau.piege_image, "Le piege"))
         return "Le sac de croquettes"
+
+    def _draw_doodle(self) -> None:
+        """Rendu du Doodle Jump : le salon fixe en fond, la tour sous la camera."""
+        W, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
+        # le salon peint sert de toile de fond fixe, ajuste a la fenetre
+        if self.fond is not None:
+            arcade.draw_texture_rect(self.fond.texture, arcade.LBWH(0, 0, W, H), pixelated=True)
+        # le monde qui defile, vu par la camera verticale
+        self.camera_doodle.position = (W / 2, self.camera_y + H / 2)
+        self.camera_doodle.use()
+        self.niveau.plateformes.draw(pixelated=True)
+        self.croquettes.draw(pixelated=True)
+        if self.distributeur is not None:
+            arcade.draw_sprite(self.distributeur, pixelated=True)
+        arcade.draw_sprite(self.chat, pixelated=True)
+        self.effets.dessiner()
+        # le HUD, repere fixe a l ecran
+        self.gui_camera.use()
+        self._dessiner_barre_satiete()
+        arcade.draw_text("Dirige gauche / droite (Q D ou fleches) - le chat rebondit tout seul",
+                         W / 2, 18, C.COULEUR_TEXTE, 14, anchor_x="center")
+        if self.minuteur_message > 0 and self.message:
+            arcade.draw_text(self.message, W / 2, H * 0.5, (255, 240, 220), 22,
+                             anchor_x="center", bold=True)
+        if self.transition > 0:
+            self._dessiner_transition()
 
     def _dessiner_barre_satiete(self) -> None:
         """La barre de satiete a REMPLIR (niveau 1) : pleine = le ventre lache."""
@@ -734,6 +879,9 @@ class VueJeu(arcade.View):
     # ------------------------------------------------------------------
     def on_draw(self) -> None:
         self.clear()
+        if self.doodle:
+            self._draw_doodle()
+            return
         dx, dy = self.effets.decalage()
         if self.fond is not None:
             self.fond.center_x += dx
@@ -827,6 +975,9 @@ class VueJeu(arcade.View):
             self.chat.veut_droite = True
         elif touche in C.TOUCHES_BAS:
             self.chat.veut_descendre = True
+
+        if self.doodle:                       # en doodle : pas de saut ni de descente manuels
+            return
 
         if touche in C.TOUCHES_SAUT:
             if self.chat.au_sol:

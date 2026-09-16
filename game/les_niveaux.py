@@ -10,7 +10,8 @@ NIVEAUX = [
     dict(
         titre="Salon, 20h : escalade jusqu au distributeur", maitre="le daron",
         famille='Le daron et sa femme', probleme='Croquettes tous les soirs, matchs de foot hurles',
-        aide="Grimpe d etagere en etagere en gobant les croquettes, jusqu au gros distributeur tout en haut. Gave-toi.",
+        aide="Rebondis d etagere en etagere en gobant les sacs, jusqu au gros distributeur tout en haut. Gave-toi.",
+        doodle=True,
         message_piege="Le distributeur deverse sans fin. Le ventre se tend, le ventre se tend...",
         message_mort="Trop de croquettes d un coup. Une vie de moins, une maison de plus.",
         message_attente="Encore un peu de place dans ce petit ventre. Continue.",

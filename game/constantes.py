@@ -80,6 +80,12 @@ CROQUETTE_GAVE = 6.0         # ce qu une croquette ramassee ajoute a la satiete
 DISTRIBUTEUR_GAVE = 48.0     # ce que le distributeur deverse par seconde au contact
 SATIETE_DIGESTION = 0.0      # ce que la satiete redescend par seconde (0 = niveau facile)
 
+# Niveau 1 en mode Doodle Jump (scroller vertical, rebond automatique)
+REBOND_DOODLE = 19.0          # vitesse verticale rendue a chaque atterrissage
+DOODLE_NB_PLATEFORMES = 32    # hauteur de la tour a grimper
+DOODLE_ESPACE_MIN = 95        # ecart vertical mini entre deux etageres
+DOODLE_ESPACE_MAX = 150       # ... et maxi (doit rester sous la hauteur de rebond)
+
 # ---------------------------------------------------------------------------
 # Chutes
 # ---------------------------------------------------------------------------
