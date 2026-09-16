@@ -336,6 +336,7 @@ def construire_maison(definition, numero=1) -> Niveau:
     niveau.pousseurs = definition.get("pousseurs", [])
     niveau.horde = definition.get("horde", False)
     niveau.piege_direct = definition.get("piege_direct", False)
+    niveau.camera = definition.get("camera", False)
     cn = definition.get("chat_noir")
     niveau.chat_noir = point(cn) if cn else None
     fl = definition.get("fille")

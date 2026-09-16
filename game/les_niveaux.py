@@ -94,16 +94,16 @@ NIVEAUX = [
     ),
     dict(
         titre="L appart de l influenceur", maitre="l influenceur",
-        aide="La ring light est sur la plateforme du couloir. Son cable pend dans la chatterie.",
+        aide="L influenceur te filme (le cercle). Sors de son champ, rejoins le cable, et fais E. Dans le champ, il te sauve.",
         message_piege="Le cable est denude. Il gresille.",
         message_mort="Electrocute en direct. Trois cent mille vues.",
         message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         depart="salon",
+        piege="chatterie", piege_image="cable", piege_largeur=120, piege_direct=True, camera=True,
         pousseurs=[
-            dict(min="salon", max="salle_droite", vitesse=3.0, force=18),
+            dict(min="cuisine", max="salle_droite", vitesse=3.0, force=18),
+            dict(min="planche_milieu_g", max="planche_milieu_d", vitesse=2.8),
         ],
-        objet="planche_milieu_d", pousse="d", objet_image="ring_light",
-        piege="chatterie", piege_image="cable", piege_largeur=120,
         faux_pieges={
             "g": dict(pos="cuisine", declenchement="action", effet="projection",
                       vitesse=(3, 15), image="griffures",

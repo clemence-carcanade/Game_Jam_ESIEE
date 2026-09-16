@@ -45,6 +45,9 @@ class VueJeu(arcade.View):
         self.pause_mort = 0.0        # temps d'affichage du chat allonge
         self.effets = Effets()
         self.toupie = 0.0            # le chat tourne sur lui-meme (faux piege)
+        self.camera_active = False
+        self.champ_x = self.champ_y = 0.0
+        self.champ_rayon = 160
         self.horde = arcade.SpriteList()   # cent chats qui deferlent (niveau 2)
         self.horde_lancee = False
         self.audio = Audio()
@@ -85,6 +88,10 @@ class VueJeu(arcade.View):
         self._construire_faux_pieges()
 
         # la fille (niveau 3) : elle poursuit et rejette le chat
+        # niveau 4 : le champ de camera de l'influenceur, qui suit le chat en retard
+        self.camera_active = getattr(self.niveau, "camera", False)
+        self.champ_x, self.champ_y = self.chat.center_x, self.chat.center_y
+
         self.fille = None
         if getattr(self.niveau, "fille", None) is not None:
             from game.entites import Fille
@@ -169,6 +176,9 @@ class VueJeu(arcade.View):
             self.medecin.mettre_a_jour(delta_time)
         self.effets.mettre_a_jour(delta_time)
         self.ambiance.mettre_a_jour(delta_time)      # la maison respire, en continu
+        if self.camera_active:
+            self.champ_x += (self.chat.center_x - self.champ_x) * 0.045
+            self.champ_y += (self.chat.center_y - self.champ_y) * 0.045
         self._vivre_la_horde(delta_time)
         if self.chat_noir is not None:
             self.chat_noir.mettre_a_jour(delta_time)
@@ -199,6 +209,12 @@ class VueJeu(arcade.View):
             # il tourne vite puis ralentit, et se stabilise droit
             self.chat.angle = (self.toupie * 900) % 360 if self.toupie > 0.15 else 0
         self.chat.mettre_a_jour_animation(delta_time)
+
+    def _dans_le_champ(self) -> bool:
+        """Le chat est-il dans le champ de la camera de l'influenceur ?"""
+        dx = self.chat.center_x - self.champ_x
+        dy = self.chat.center_y - self.champ_y
+        return (dx * dx + dy * dy) ** 0.5 <= self.champ_rayon
 
     def _action_possible(self) -> bool:
         """Y a-t-il quelque chose a faire avec E, la, maintenant ?"""
@@ -488,6 +504,12 @@ class VueJeu(arcade.View):
                 arcade.draw_text("Zzz", self.medecin.center_x + 30,
                                  self.medecin.top + 6, (240, 220, 120), 16, bold=True)
         arcade.draw_sprite(self.chat, pixelated=True)
+        if self.camera_active:
+            dedans = self._dans_le_champ()
+            couleur = (120, 240, 160, 40) if dedans else (240, 120, 120, 30)
+            arcade.draw_circle_filled(self.champ_x, self.champ_y, self.champ_rayon, couleur)
+            arcade.draw_circle_outline(self.champ_x, self.champ_y, self.champ_rayon,
+                                       (150, 255, 190) if dedans else (255, 150, 150), 3)
         self.effets.dessiner()
         if self.flash > 0:
             arcade.draw_lrbt_rectangle_filled(
@@ -548,6 +570,9 @@ class VueJeu(arcade.View):
             return
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
             if getattr(self.niveau, "piege_direct", False):
+                if self.camera_active and self._dans_le_champ():
+                    self.afficher("L influenceur te filme ! Il te tire du cable pour la video.")
+                    return
                 self.griller_une_vie(self.niveau.message_mort or "le piege")
                 return
             if self.gamelle.remplie:

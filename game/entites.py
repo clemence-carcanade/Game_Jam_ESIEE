@@ -129,7 +129,7 @@ class Fille(arcade.Sprite):
         base = self._anim["droite"] or [arcade.Texture.create_empty("f", (32, 48), (150, 80, 160))]
         self._anim.setdefault("droite", base)
         self._anim.setdefault("gauche", base)
-        super().__init__(self._anim["droite"][0], scale=2.4, center_x=x)
+        super().__init__(self._anim["droite"][0], scale=1.6, center_x=x)
         self.bottom = y
         self.sol = y
         self.vitesse = vitesse
@@ -140,10 +140,11 @@ class Fille(arcade.Sprite):
         self._t += delta_time
         self._recharge = max(0.0, self._recharge - delta_time)
 
-        # elle marche vers le chat, sans relache
+        # elle marche vers le chat, sans relache, et le suit meme en hauteur
         direction = 1 if chat.center_x > self.center_x else -1
         self.center_x += self.vitesse * direction
-        self.bottom = self.sol
+        # elle "grimpe" doucement vers l'etage du chat (elle ne reste plus en bas)
+        self.center_y += (chat.center_y - self.center_y) * 0.04
 
         jeu = self._anim["droite"] if direction > 0 else self._anim["gauche"]
         self.texture = jeu[int(self._t * 8) % len(jeu)]
