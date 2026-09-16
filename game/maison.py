@@ -156,8 +156,10 @@ _M6 = _trois_etages(
         (1050, 195, 1250),
         (60, 445, 230), (770, 415, 970), (1050, 415, 1220), (1360, 460, 1540),
         (60, 515, 230), (500, 575, 680), (270, 705, 490), (770, 745, 1000), (1150, 705, 1330),
-        # tremplins pour atteindre la plateforme des somniferes (planche_milieu_g)
+        # tremplins pour monter, et la petite plateforme des somniferes,
+        # etroite et pile au-dessus du medecin (image x~880) pour qu'ils tombent dessus
         (900, 550, 1080), (1080, 480, 1250),
+        (825, 430, 935),
     ],
     ancres={
         "salon": (700, 870), "cuisine": (400, 870), "salle_droite": (1400, 870),

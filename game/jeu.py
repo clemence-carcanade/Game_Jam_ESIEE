@@ -212,6 +212,8 @@ class VueJeu(arcade.View):
 
         self._surfaces_glissantes(contacts)
         self._remplir_la_gamelle()
+        if self.medecin is not None:
+            self._somniferes_sur_le_medecin()
         self._sortir_du_sac()
         self._vivre_les_faux_pieges(delta_time)
         self._oter_le_deguisement(delta_time)
@@ -402,6 +404,11 @@ class VueJeu(arcade.View):
             self.minuteur_deguisement = effet.get("duree", 4.0)
         elif genre == "sac":
             chat.coincer_dans_le_sac()
+        elif genre == "endort":
+            # les somniferes : le chat les renverse sur le medecin, il s'endort
+            if self.medecin is not None and not self.medecin.endormi and self.gamelle is not None:
+                self.medecin.endormir()
+                self.gamelle.remplie = True
         elif genre == "toupie":
             # manque de tomber en tournant sur lui-meme, puis se rattrape
             self.toupie = effet.get("duree", 1.1)
@@ -420,6 +427,20 @@ class VueJeu(arcade.View):
         self.chat.sur_surface_glissante = any(
             getattr(zone, "role", "") == "verre" for zone in contacts.zones
         )
+
+    def _somniferes_sur_le_medecin(self) -> None:
+        """Niveau 6 : des somniferes qui tombent sur le medecin l'endorment."""
+        if (self.medecin is None or self.medecin.endormi or self.gamelle is None
+                or self.gamelle.remplie):
+            return
+        touches = arcade.check_for_collision_with_list(self.medecin, self.niveau.poussables)
+        if touches:
+            self.gamelle.remplie = True
+            self.medecin.endormir()
+            for objet in touches:
+                objet.remove_from_sprite_lists()
+            self.afficher(self.niveau.message_piege
+                          or "Les somniferes tombent sur le medecin. Il glisse. Il ronfle.")
 
     def _remplir_la_gamelle(self) -> None:
         """Un objet renverse dans la gamelle y deverse son contenu."""

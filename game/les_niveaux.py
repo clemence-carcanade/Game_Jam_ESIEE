@@ -145,7 +145,7 @@ NIVEAUX = [
     dict(
         titre="Le cabinet medical", maitre="le docteur",
         famille='Le veterinaire', probleme='Bete de foire du cabinet, soigne de force',
-        aide="Il soigne TOUT. Les somniferes sont sur la plateforme du couloir : fais-les-lui tomber dessus.",
+        aide="Il soigne TOUT. Les somniferes sont sur la plateforme juste au-dessus de lui : fais-les tomber dessus.",
         message_piege="Les somniferes tombent sur le medecin. Il glisse. Il ronfle.",
         message_mort="Cette fois, personne n est venu recoudre.",
         message_attente="Le medecin veille. Il recoud tout. Les somniferes d abord.",
@@ -153,10 +153,11 @@ NIVEAUX = [
         pousseurs=[
             dict(min="salon", max="tv", vitesse=2.2),
         ],
-        objet="planche_milieu_g", pousse="g", objet_image="somniferes",
-        piege="planche_centre", piege_image="aucune", piege_largeur=200, piege_hauteur=4,
+                piege="planche_centre", piege_image="aucune", piege_largeur=200, piege_hauteur=4,
         faux_pieges={
-            "s": dict(pos="planche_centre", declenchement="action", effet="soin",
+            "so": dict(pos=(880, 434), declenchement="action", effet="endort",
+                       image="somniferes", texte="Tu renverses les somniferes sur le medecin. Il s endort."),
+            "s": dict(pos="frigo", declenchement="action", effet="soin",
                       image="scalpel", cause="le scalpel",
                       texte="Le scalpel. Precis. Le medecin le recoud en huit minutes, montre en main."),
             "q": dict(pos="planche_milieu_d", declenchement="action", effet="soin",
