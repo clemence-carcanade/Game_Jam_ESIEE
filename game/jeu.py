@@ -103,6 +103,16 @@ class VueJeu(arcade.View):
 
         self.gamelle = self.niveau.trouver_zone("gamelle")
         self.sortie = self.niveau.trouver_zone("sortie")
+
+        # l'animation du piege mortel (aquarium, cable) posee sur sa zone
+        self.piege_frames = []
+        nom_anime = getattr(self.niveau, "piege_anime", "")
+        if nom_anime and self.gamelle is not None:
+            i = 0
+            while (C.DOSSIER_IMAGES / "decor" / f"{nom_anime}_{i}.png").is_file():
+                self.piege_frames.append(arcade.load_texture(C.DOSSIER_IMAGES / "decor" / f"{nom_anime}_{i}.png"))
+                i += 1
+
         if self.niveau.famille:
             self.transition = 5.0
         if getattr(self, "audio", None) is not None:
@@ -608,6 +618,13 @@ class VueJeu(arcade.View):
         self.pousseurs.draw(pixelated=True)
         self.horde.draw(pixelated=True)
         self._dessiner_les_flammes()
+        if self.piege_frames and self.gamelle is not None:
+            fr = self.piege_frames[int(self.ambiance.t * 12) % len(self.piege_frames)]
+            ech = min(120 / fr.width, 90 / fr.height)
+            arcade.draw_texture_rect(
+                fr, arcade.LBWH(self.gamelle.center_x - fr.width*ech/2,
+                                self.gamelle.center_y - fr.height*ech/2,
+                                fr.width*ech, fr.height*ech), pixelated=True)
         if self.chat_noir is not None:
             arcade.draw_sprite(self.chat_noir, pixelated=True)
         if self.fille is not None:

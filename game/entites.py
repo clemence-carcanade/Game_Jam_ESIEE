@@ -115,21 +115,24 @@ class Fille(arcade.Sprite):
     """
 
     def __init__(self, x, y, vitesse=3.4):
-        self._anim = {}
-        for nom in ("droite", "gauche"):
-            frames = []
-            i = 0
-            while True:
-                chemin = C.DOSSIER_IMAGES / "fille" / f"{nom}_{i}.png"
-                if not chemin.is_file():
-                    break
-                frames.append(arcade.load_texture(chemin))
-                i += 1
-            self._anim[nom] = frames
-        base = self._anim["droite"] or [arcade.Texture.create_empty("f", (32, 48), (150, 80, 160))]
-        self._anim.setdefault("droite", base)
-        self._anim.setdefault("gauche", base)
-        super().__init__(self._anim["droite"][0], scale=0.35, center_x=x)
+        # le vrai sprite de la fillette (une image, retournee selon le sens) ;
+        # a defaut, les frames de marche extraites des planches.
+        fillette = C.DOSSIER_IMAGES / "decor" / "fillette.png"
+        if fillette.is_file():
+            t = arcade.load_texture(fillette)
+            self._anim = {"droite": [t], "gauche": [t.flip_left_right()]}
+            echelle = 0.42
+        else:
+            self._anim = {}
+            for nom in ("droite", "gauche"):
+                frames = []
+                i = 0
+                while (C.DOSSIER_IMAGES / "fille" / f"{nom}_{i}.png").is_file():
+                    frames.append(arcade.load_texture(C.DOSSIER_IMAGES / "fille" / f"{nom}_{i}.png"))
+                    i += 1
+                self._anim[nom] = frames or [arcade.Texture.create_empty("f", (32, 48), (150, 80, 160))]
+            echelle = 0.35
+        super().__init__(self._anim["droite"][0], scale=echelle, center_x=x)
         self.bottom = y
         self.sol = y
         self.vitesse = vitesse

@@ -15,6 +15,7 @@ NIVEAUX = [
         message_mort="Etouffe avec les croquettes. Une vie de moins, une maison de plus.",
         message_attente="Les memes croquettes que tous les soirs. Meme pas de quoi s etouffer.",
         depart="salon",
+        perso=dict(image="daron", pos="canape"),
         pousseurs=[
             dict(min="canape", max="tv", vitesse=2.4),
             dict(min="chambre", max="couloir", vitesse=1.8),
@@ -31,6 +32,7 @@ NIVEAUX = [
         message_mort="Le chat noir cligne des yeux. Une vie s en va, doucement.",
         message_attente="",
         depart="salon",
+        perso=dict(image="mamie", pos="cuisine"),
         chat_noir="paniere",
         pousseurs=[
             dict(min="canape", max="tv", vitesse=2.6, force=17),
@@ -64,7 +66,7 @@ NIVEAUX = [
         message_mort="Noye dans l aquarium. Elle croira a un jeu.",
         message_attente="",
         depart="salon",
-        piege="aquarium", piege_image="aucune", piege_largeur=120, piege_direct=True, libelle_piege="L aquarium",
+        piege="aquarium", piege_image="aucune", piege_anime="aquarium_anime", piege_largeur=120, piege_direct=True, libelle_piege="L aquarium",
         fille="salle_droite",
         pousseurs=[
             dict(min="frigo", max="planche_centre", vitesse=2.6),
@@ -94,7 +96,8 @@ NIVEAUX = [
         message_mort="Electrocute en direct. Trois cent mille vues.",
         message_attente="Le cable est encore bien range. Fais tomber la ring light.",
         depart="salon",
-        piege=(1540, 270), piege_image="aucune", piege_largeur=130, piege_direct=True, camera=True, libelle_piege="Le cable",
+        perso=dict(image="influenceur", pos="salon"),
+        piege=(1540, 270), piege_image="aucune", piege_anime="cable_anime", piege_largeur=130, piege_direct=True, camera=True, libelle_piege="Le cable",
         pousseurs=[
             dict(min="cuisine", max="salle_droite", vitesse=3.0, force=18),
             dict(min="planche_milieu_g", max="planche_milieu_d", vitesse=2.8),
@@ -119,6 +122,7 @@ NIVEAUX = [
         message_mort="Tombe dans l eau bouillante. Le service continue.",
         message_attente="Le couvercle est encore sur la marmite. Fais-le tomber.",
         depart="salon",
+        perso=dict(image="chef_normal", pos="cuisine"),
         flammes=["cuisine", "planche_centre", "sdb", "salon"],
         pousseurs=[
             dict(min="cuisine", max="salon", vitesse=3.4, force=18),
@@ -179,6 +183,7 @@ NIVEAUX = [
         message_mort="Pas comme ca. Pas maintenant. On recommence.",
         survivre=True, reflexes_coupes=["moustaches"],
         depart="salon",
+        perso=dict(image="couple", pos="salon"),
         pousseurs=[
             dict(min="canape", max="tv", vitesse=2.6),
             dict(min="chambre", max="couloir", vitesse=2.2),

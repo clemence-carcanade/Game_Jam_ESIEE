@@ -341,6 +341,13 @@ def construire_maison(definition, numero=1) -> Niveau:
     niveau.horde = definition.get("horde", False)
     niveau.flammes = definition.get("flammes", [])
     niveau.piege_direct = definition.get("piege_direct", False)
+    niveau.piege_anime = definition.get("piege_anime", "")
+    per = definition.get("perso")
+    if per:
+        x, y = point(per["pos"])
+        img = _image(per["image"], x, y_bas=y)
+        if img is not None:
+            niveau.decor.append(img)
     niveau.camera = definition.get("camera", False)
     niveau.libelle_piege = definition.get("libelle_piege", "")
     cn = definition.get("chat_noir")
