@@ -114,7 +114,7 @@ class Fille(arcade.Sprite):
     d'atteindre l'aquarium. Il faut la semer, ou aller plus vite qu'elle.
     """
 
-    def __init__(self, x, y, vitesse=3.4):
+    def __init__(self, x, y, vitesse=4.4):
         # la petite fille animee : les frames de marche extraites des planches
         self._anim = {}
         for nom in ("droite", "gauche"):
@@ -135,21 +135,21 @@ class Fille(arcade.Sprite):
         self._t += delta_time
         self._recharge = max(0.0, self._recharge - delta_time)
 
-        # elle marche vers le chat, sans relache, et le suit meme en hauteur
+        # elle fonce vers le chat, sans relache, et le suit meme en hauteur
         direction = 1 if chat.center_x > self.center_x else -1
         self.center_x += self.vitesse * direction
-        # elle "grimpe" doucement vers l'etage du chat (elle ne reste plus en bas)
-        self.center_y += (chat.center_y - self.center_y) * 0.04
+        # elle grimpe vite vers l'etage du chat (impossible de la semer en montant)
+        self.center_y += (chat.center_y - self.center_y) * 0.10
 
         jeu = self._anim["droite"] if direction > 0 else self._anim["gauche"]
         self.texture = jeu[int(self._t * 8) % len(jeu)]
 
-        # elle rattrape le chat : maquillage + envoi a l'autre bout
+        # elle rattrape le chat : maquillage + projection violente a l'autre bout
         if self._recharge <= 0 and chat.vivant and arcade.check_for_collision(self, chat):
             chat.color = (255, 150, 200)                 # maquille en rose
             loin = 1 if chat.center_x < self.center_x else -1
-            chat.change_x = 15 * loin                    # balance a l'autre bout
-            chat.change_y = 13
-            self._recharge = 1.2
+            chat.change_x = 26 * loin                    # balance brutalement, tres loin
+            chat.change_y = 20
+            self._recharge = 0.7                         # elle recommence vite
             return True
         return False

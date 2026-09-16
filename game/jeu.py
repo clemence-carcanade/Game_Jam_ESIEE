@@ -196,7 +196,12 @@ class VueJeu(arcade.View):
         # le fond peint : c'est lui, le decor
         self.fond = None
         if self.niveau.fond:
-            texture = arcade.load_texture(C.DOSSIER_IMAGES / self.niveau.fond)
+            chemin_fond = C.DOSSIER_IMAGES / self.niveau.fond
+            # niveau 4 (l'influenceur) : couleurs inversees, ambiance "negatif"
+            invert = chemin_fond.with_name(chemin_fond.stem + "_invert.png")
+            if self.numero_niveau == 4 and invert.is_file():
+                chemin_fond = invert
+            texture = arcade.load_texture(chemin_fond)
             self.fond = arcade.Sprite(texture, scale=self.niveau.largeur / texture.width)
             self.fond.center_x = self.niveau.largeur / 2
             self.fond.center_y = self.niveau.hauteur / 2
@@ -355,8 +360,9 @@ class VueJeu(arcade.View):
         if self.chat_noir is not None:
             self.chat_noir.mettre_a_jour(delta_time)
         if self.fille is not None and self.fille.mettre_a_jour(delta_time, self.chat):
-            self.afficher("Elle t attrape, te maquille et te balance a l autre bout.")
-            self.effets.pouf(self.chat.center_x, self.chat.top, (255, 180, 210), 10)
+            self.effets.pouf(self.chat.center_x, self.chat.center_y, (255, 120, 190), 22)
+            self.effets.trembler(16)               # ca cogne : l ecran tremble
+            self.audio.jouer("piege", 0.6)
             self.minuteur_deguisement = 4.0
         for pousseur in self.pousseurs:
             if pousseur.mettre_a_jour(delta_time, self.chat):
@@ -979,18 +985,9 @@ class VueJeu(arcade.View):
                 self.niveau.aide, C.LARGEUR_FENETRE / 2, 16,
                 C.COULEUR_TEXTE_FADE, 13, anchor_x="center",
             )
-        if self.minuteur_message > 0 and self.chat is not None and self.transition <= 0:
-            # au-dessus du chat, en petit, avec un fond pour rester lisible
-            x = min(max(self.chat.center_x, 220), C.LARGEUR_FENETRE - 220)
-            y = self.chat.top + 48
-            larg = 12 + len(self.message) * 6.5
-            a = int(255 * min(1, self.minuteur_message))
-            # un discret contour sombre pour rester lisible sur le decor, sans fond
-            for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
-                arcade.draw_text(self.message, x + dx, y + dy, (20, 18, 26, a), 12,
-                                 anchor_x="center", width=int(larg), align="center")
-            arcade.draw_text(self.message, x, y, (255, 250, 235, a), 12,
-                             anchor_x="center", width=int(larg), align="center")
+        # Plus de message flottant au-dessus du chat : le seul texte affiche
+        # au-dessus de lui est l'indicateur d'action (le E), et seulement quand
+        # une action est possible (voir _dessiner_indicateur_action).
 
         if len(self.piments):
             self._dessiner_barre_vie()

@@ -92,6 +92,7 @@ _M3 = dict(
         (100, 430, 260), (400, 380, 580), (660, 415, 820),   # plateformes etage 1
         (980, 320, 1150), (1230, 320, 1340),
         (880, 660, 1130),                         # plateforme RDC droite
+        (180, 560, 400), (940, 560, 1160),        # marches intermediaires RDC -> etage 1
     ],
     ancres={
         "salon": (300, 700), "cuisine": (500, 700), "salle_droite": (1000, 660),
