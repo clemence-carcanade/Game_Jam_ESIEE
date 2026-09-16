@@ -335,6 +335,7 @@ def construire_maison(definition, numero=1) -> Niveau:
     niveau.faux_pieges = definition.get("faux_pieges", {})
     niveau.pousseurs = definition.get("pousseurs", [])
     niveau.horde = definition.get("horde", False)
+    niveau.flammes = definition.get("flammes", [])
     niveau.piege_direct = definition.get("piege_direct", False)
     niveau.camera = definition.get("camera", False)
     niveau.libelle_piege = definition.get("libelle_piege", "")

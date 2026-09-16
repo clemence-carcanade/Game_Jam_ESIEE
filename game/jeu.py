@@ -66,6 +66,7 @@ class VueJeu(arcade.View):
         self.champ_rayon = 160
         self.horde = arcade.SpriteList()   # cent chats qui deferlent (niveau 2)
         self.horde_lancee = False
+        self.flammes = []                  # jets de feu de la cuisine (niveau 5)
         self.audio = Audio()
         self.audio.demarrer_ambiance()
         self.ralenti = 0.0           # court ralenti a la mort
@@ -104,6 +105,12 @@ class VueJeu(arcade.View):
         self._construire_faux_pieges()
 
         # la fille (niveau 3) : elle poursuit et rejette le chat
+        # niveau 5 : les jets de flammes des cuisinieres (position, phase)
+        self.flammes = []
+        for i, pos in enumerate(getattr(self.niveau, "flammes", [])):
+            x, y = self.niveau.point(pos)
+            self.flammes.append({"x": x, "y": y, "phase": i * 0.7})
+
         # niveau 4 : le champ de camera de l'influenceur, qui suit le chat en retard
         self.camera_active = getattr(self.niveau, "camera", False)
         self.champ_x, self.champ_y = self.chat.center_x, self.chat.center_y
@@ -196,6 +203,7 @@ class VueJeu(arcade.View):
             self.champ_x += (self.chat.center_x - self.champ_x) * 0.022
             self.champ_y += (self.chat.center_y - self.champ_y) * 0.022
         self._vivre_la_horde(delta_time)
+        self._vivre_les_flammes(delta_time)
         if self.chat_noir is not None:
             self.chat_noir.mettre_a_jour(delta_time)
         if self.fille is not None and self.fille.mettre_a_jour(delta_time, self.chat):
@@ -433,6 +441,44 @@ class VueJeu(arcade.View):
         self.afficher("Le chat a la tete dans le sac. Il ne voit plus rien.")
         return True
 
+    def _flamme_active(self, f) -> bool:
+        """Le jet de feu est allume ~1,2 s toutes les 2,4 s, decale par jet."""
+        cycle = (self.ambiance.t + f["phase"]) % 2.4
+        return cycle < 1.2
+
+    def _hauteur_flamme(self, f) -> float:
+        """La hauteur du jet quand il est allume (0 -> 70 px), pour l'animation."""
+        cycle = (self.ambiance.t + f["phase"]) % 2.4
+        if cycle >= 1.2:
+            return 0.0
+        montee = min(cycle, 0.25) / 0.25
+        descente = min(max(1.2 - cycle, 0), 0.25) / 0.25
+        return 70 * min(montee, descente) * (0.85 + 0.15 * math.sin(self.ambiance.t * 30))
+
+    def _vivre_les_flammes(self, delta_time: float) -> None:
+        """Un jet allume qui touche le chat le fait reculer (il ne le tue pas)."""
+        for f in self.flammes:
+            if not self._flamme_active(f):
+                continue
+            h = self._hauteur_flamme(f)
+            if (abs(self.chat.center_x - f["x"]) < 34
+                    and 0 < self.chat.bottom - f["y"] < h + 10):
+                self.chat.change_x = 12 if self.chat.center_x > f["x"] else -12
+                self.chat.change_y = 6
+
+    def _dessiner_les_flammes(self) -> None:
+        for f in self.flammes:
+            h = self._hauteur_flamme(f)
+            if h <= 0:
+                continue
+            import random
+            for _ in range(int(h / 5)):
+                py = f["y"] + random.random() * h
+                t = (py - f["y"]) / h                 # 0 en bas, 1 en haut
+                r = (18 - t * 12) * (0.6 + 0.4 * random.random())
+                couleur = (255, int(220 - t * 140), int(60 - t * 50), int(220 * (1 - t)))
+                arcade.draw_circle_filled(f["x"] + (random.random() - 0.5) * 16, py, r, couleur)
+
     def _lancer_la_horde(self) -> None:
         """La cloche a sonne : cent chats affames deferlent des deux cotes."""
         if self.horde_lancee:
@@ -531,6 +577,7 @@ class VueJeu(arcade.View):
         self.images_pieges.draw(pixelated=True)
         self.pousseurs.draw(pixelated=True)
         self.horde.draw(pixelated=True)
+        self._dessiner_les_flammes()
         if self.chat_noir is not None:
             arcade.draw_sprite(self.chat_noir, pixelated=True)
         if self.fille is not None:

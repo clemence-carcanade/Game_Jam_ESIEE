@@ -114,11 +114,13 @@ NIVEAUX = [
         message_mort="Tombe dans l eau bouillante. Le service continue.",
         message_attente="Le couvercle est encore sur la marmite. Fais-le tomber.",
         depart="salon",
+        flammes=["cuisine", "planche_centre", "sdb", "salon"],
         pousseurs=[
-            dict(min="cuisine", max="salon", vitesse=2.8, force=17),
-            dict(min="chatterie", max="salle_haut", vitesse=2.0),
+            dict(min="cuisine", max="salon", vitesse=3.4, force=18),
+            dict(min="salle_droite", max="chatterie", vitesse=3.0),
+            dict(min="planche_milieu_g", max="planche_milieu_d", vitesse=3.2, force=17),
         ],
-        objet="frigo", pousse="d", objet_image="couvercle",
+                objet="frigo", pousse="d", objet_image="couvercle",
         piege="cuisine", piege_image="marmite", piege_largeur=110,
         faux_pieges={
             "u": dict(pos="sdb", declenchement="action", image="couteau",
