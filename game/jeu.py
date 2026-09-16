@@ -510,6 +510,18 @@ class VueJeu(arcade.View):
                          (240, 120, 120) if dedans else (150, 255, 190), 12,
                          anchor_x="right", bold=True)
 
+    def _pres_du_chat_noir(self) -> bool:
+        """Niveau 2 : le chat est-il assez pres du chat noir pour l'action ?
+
+        On tolere une bonne marge (pas un contact pile) : sinon la nuee de
+        pousseurs degage le chat en un instant et on ne voit jamais le prompt.
+        """
+        if self.chat_noir is None:
+            return False
+        dx = abs(self.chat.center_x - self.chat_noir.center_x)
+        dy = abs(self.chat.center_y - self.chat_noir.center_y)
+        return dx < 100 and dy < 90
+
     def _dans_le_champ(self) -> bool:
         """Le chat est-il dans le cadre (carre) de la camera de l'influenceur ?"""
         dx = abs(self.chat.center_x - self.champ_x)
@@ -527,7 +539,7 @@ class VueJeu(arcade.View):
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
             if getattr(self.niveau, "piege_direct", False) or self.gamelle.remplie:
                 return True
-        if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
+        if self._pres_du_chat_noir():
             return True
         depart = self.chat.center_x
         self.chat.center_x += self.chat.regarde * PORTEE_ACTION
@@ -542,7 +554,7 @@ class VueJeu(arcade.View):
         le chat noir, un soin devenu mortel pendant que le medecin dort).
         Les leurres, eux, n'affichent que le E, sans texte -- a toi de tenter.
         """
-        if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
+        if self._pres_du_chat_noir():
             return "Rejoindre le chat noir"
         for zone in self.faux_pieges:
             if (zone.effet["declenchement"] == "action" and zone.recharge <= 0
@@ -1125,7 +1137,7 @@ class VueJeu(arcade.View):
         """
         if self.chat.dans_le_sac:
             return
-        if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
+        if self._pres_du_chat_noir():
             self.griller_une_vie(self.niveau.message_mort or "emporte par le chat noir")
             return
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):

@@ -150,7 +150,7 @@ NIVEAUX = [
     dict(
         titre="Le cabinet medical", maitre="le docteur",
         famille='Le veterinaire', probleme='Bete de foire du cabinet, soigne de force',
-        aide="Des que tu tentes de mourir, il surgit sur toi et te recoud. Endors-le avec les somniferes (au-dessus de lui), puis file te tuer avant qu il ne se releve.",
+        aide="Des que tu tentes de mourir, il accourt te recoudre. Endors-le avec les somniferes (au-dessus de lui), puis file te tuer avant qu il ne se releve.",
         message_piege="Les somniferes tombent sur le medecin. Il glisse. Il ronfle... pour un moment.",
         message_mort="Cette fois, personne n est venu recoudre.",
         message_attente="Le medecin veille (aura rouge). Endors-le d abord avec les somniferes.",
