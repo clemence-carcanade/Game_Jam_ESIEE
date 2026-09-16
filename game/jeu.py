@@ -230,7 +230,9 @@ class VueJeu(arcade.View):
         def barre(cx, cy, larg, haut=18, couleur=(150, 104, 66)):
             tex = arcade.Texture.create_empty(f"_plat_{int(cx)}_{int(cy)}",
                                               (int(larg), int(haut)), couleur)
-            return arcade.Sprite(tex, center_x=cx, center_y=cy)
+            p = arcade.Sprite(tex, center_x=cx, center_y=cy)
+            p.vx = 0.0                  # etagere fixe par defaut
+            return p
 
         base_y = 90
         base = barre(W / 2, base_y, W, 26, (120, 86, 56))          # sol de depart
@@ -239,16 +241,27 @@ class VueJeu(arcade.View):
 
         y = base_y
         sens = -1                       # on demarre en partant vers la gauche
+        mobile_precedente = False
         for _ in range(C.DOODLE_NB_PLATEFORMES):
             y += rng.randint(C.DOODLE_ESPACE_MIN, C.DOODLE_ESPACE_MAX)
-            larg = rng.choice((150, 175, 200))
+            larg = rng.choice((140, 165, 190))
             # zigzag centre sur l ecran : une etagere a gauche du milieu, la
             # suivante a droite, pour forcer des sauts alternes gauche/droite
             sens = -sens
-            x = W / 2 + sens * rng.randint(90, 110)
-            x_prec = x
-            plats.append(barre(x, y, larg))
-            if rng.random() < 0.55:                                # un sac pose dessus
+            x = W / 2 + sens * rng.randint(85, 100)
+            plat = barre(x, y, larg)
+            # une etagere sur deux coulisse horizontalement (jamais deux de
+            # suite) : il faut viser un rebond sur une cible en mouvement
+            if not mobile_precedente and rng.random() < 0.5:
+                course = rng.randint(35, 55)
+                plat.vx = rng.choice((-1, 1)) * (1.8 + rng.random() * 1.0)
+                plat.xmin = max(larg / 2 + 10, x - course)
+                plat.xmax = min(W - larg / 2 - 10, x + course)
+                mobile_precedente = True
+            else:
+                mobile_precedente = False
+            plats.append(plat)
+            if rng.random() < 0.5:                                 # un sac pose dessus
                 croq = module_niveau._image("catfood", x, y_bas=y + 9)
                 if croq is not None:
                     self.croquettes.append(croq)
@@ -270,6 +283,12 @@ class VueJeu(arcade.View):
         self.camera_y = 0.0
         self.camera_doodle = arcade.Camera2D()
         self.gui_camera = arcade.Camera2D()
+
+        # le fond cuisine, toile de fond fixe du Doodle Jump
+        self.fond_doodle = None
+        chemin_fond = C.DOSSIER_IMAGES / "fonds" / "cuisine_doodle.png"
+        if chemin_fond.is_file():
+            self.fond_doodle = arcade.load_texture(chemin_fond)
 
     def on_show_view(self) -> None:
         self.window.background_color = C.COULEUR_FOND
@@ -381,6 +400,14 @@ class VueJeu(arcade.View):
         elif self.chat.center_x > C.LARGEUR_FENETRE:
             self.chat.center_x -= C.LARGEUR_FENETRE
 
+        # 1bis. les etageres coulissantes vont et viennent horizontalement
+        for plat in self.niveau.plateformes:
+            if plat.vx:
+                plat.center_x += plat.vx * pas
+                if plat.center_x < plat.xmin or plat.center_x > plat.xmax:
+                    plat.vx = -plat.vx
+                    plat.center_x = max(plat.xmin, min(plat.xmax, plat.center_x))
+
         # 2. gravite + rebond automatique quand on retombe sur une etagere
         self.chat.change_y = max(-C.VITESSE_CHUTE_MAX, self.chat.change_y - C.GRAVITE * pas)
         bas_avant = self.chat.bottom
@@ -458,11 +485,13 @@ class VueJeu(arcade.View):
         return "Le sac de croquettes"
 
     def _draw_doodle(self) -> None:
-        """Rendu du Doodle Jump : le salon fixe en fond, la tour sous la camera."""
+        """Rendu du Doodle Jump : la cuisine fixe en fond, la tour sous la camera."""
         W, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
-        # le salon peint sert de toile de fond fixe, ajuste a la fenetre
-        if self.fond is not None:
-            arcade.draw_texture_rect(self.fond.texture, arcade.LBWH(0, 0, W, H), pixelated=True)
+        # la cuisine sert de toile de fond fixe, ajustee a la fenetre
+        fond = self.fond_doodle if getattr(self, "fond_doodle", None) is not None \
+            else (self.fond.texture if self.fond is not None else None)
+        if fond is not None:
+            arcade.draw_texture_rect(fond, arcade.LBWH(0, 0, W, H), pixelated=True)
         # le monde qui defile, vu par la camera verticale
         self.camera_doodle.position = (W / 2, self.camera_y + H / 2)
         self.camera_doodle.use()
