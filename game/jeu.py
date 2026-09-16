@@ -13,6 +13,8 @@ Ordre d'une image :
     4. jeu         -> vies, progression, dessin
 """
 
+import math
+
 import arcade
 
 from game import constantes as C
@@ -43,6 +45,8 @@ class VueJeu(arcade.View):
         self.pause_mort = 0.0        # temps d'affichage du chat allonge
         self.effets = Effets()
         self.toupie = 0.0            # le chat tourne sur lui-meme (faux piege)
+        self.horde = arcade.SpriteList()   # cent chats qui deferlent (niveau 2)
+        self.horde_lancee = False
         self.audio = Audio()
         self.audio.demarrer_ambiance()
         self.ralenti = 0.0           # court ralenti a la mort
@@ -151,6 +155,7 @@ class VueJeu(arcade.View):
             self.medecin.mettre_a_jour(delta_time)
         self.effets.mettre_a_jour(delta_time)
         self.ambiance.mettre_a_jour(delta_time)      # la maison respire, en continu
+        self._vivre_la_horde(delta_time)
         for pousseur in self.pousseurs:
             if pousseur.mettre_a_jour(delta_time, self.chat):
                 self.effets.pouf(self.chat.center_x, self.chat.center_y, (200, 210, 235), 8)
@@ -309,6 +314,8 @@ class VueJeu(arcade.View):
                 objet.remove_from_sprite_lists()
             if self.medecin is not None:
                 self.medecin.endormir()
+            if getattr(self.niveau, "horde", False):
+                self._lancer_la_horde()
             self.afficher(self.niveau.message_piege
                           or "Le sac se renverse dans la gamelle. Les croquettes du fond, celles qui sentent.")
 
@@ -349,6 +356,36 @@ class VueJeu(arcade.View):
         self.chat.coincer_dans_le_sac()
         self.afficher("Le chat a la tete dans le sac. Il ne voit plus rien.")
         return True
+
+    def _lancer_la_horde(self) -> None:
+        """La cloche a sonne : cent chats affames deferlent des deux cotes."""
+        if self.horde_lancee:
+            return
+        self.horde_lancee = True
+        sol = self.niveau.point("salon")[1]
+        import random
+        for i in range(40):
+            cote = -1 if i % 2 == 0 else 1
+            depart = -60 - random.random() * 500 if cote > 0 else self.niveau.largeur + 60 + random.random() * 500
+            chemin = C.DOSSIER_IMAGES / "decor" / "chat_gris.png"
+            t = arcade.load_texture(chemin) if chemin.is_file() else \
+                arcade.Texture.create_empty("c", (24, 16), (150, 150, 160))
+            chat = arcade.Sprite(t if cote > 0 else t.flip_left_right(), scale=2.6)
+            chat.center_x = depart
+            chat.bottom = sol + random.random() * 90
+            chat.vx = (5 + random.random() * 4) * cote
+            self.horde.append(chat)
+
+    def _vivre_la_horde(self, delta_time: float) -> None:
+        if not len(self.horde):
+            return
+        for chat in self.horde:
+            chat.center_x += chat.vx
+            chat.center_y += math.sin(self.ambiance.t * 20 + chat.center_x) * 1.5
+            if chat.center_x < -120 or chat.center_x > self.niveau.largeur + 120:
+                chat.remove_from_sprite_lists()
+        if self.chat.vivant and arcade.check_for_collision_with_list(self.chat, self.horde):
+            self.griller_une_vie("cent chats affames")
 
     def griller_une_vie(self, cause: str) -> None:
         """Le chat change de vie.
@@ -414,6 +451,7 @@ class VueJeu(arcade.View):
         self.niveau.dessiner()
         self.images_pieges.draw(pixelated=True)
         self.pousseurs.draw(pixelated=True)
+        self.horde.draw(pixelated=True)
         if self.medecin is not None:
             arcade.draw_sprite(self.medecin, pixelated=True)
             if self.medecin.endormi:

@@ -935,6 +935,19 @@ def lit_baldaquin():
     return t.enregistrer("lit_baldaquin")
 
 
+def cloche():
+    t = Toile(24, 26)
+    t.rect(9, 1, 14, 4, "metal_sombre")            # l'anneau
+    t.rect(6, 5, 17, 20, (210, 180, 90))           # la cloche (laiton)
+    t.ligne_v(8, 6, 19, (240, 215, 130))
+    t.cadre(6, 5, 17, 20, "contour")
+    t.rect(4, 20, 19, 23, (190, 160, 80))          # le bord evase
+    t.cadre(4, 20, 19, 23, "contour")
+    t.rect(10, 23, 13, 25, "metal_sombre")         # le battant
+    for x,y in ((2,8),(21,10),(1,14)): t.point(x,y,(255,240,180))  # ca sonne
+    return t.enregistrer("cloche")
+
+
 # ---------------------------------------------------------------------------
 def tout_dessiner():
     mur(); mur_bas(); sol(); plafond(); fenetre(); cadre()
@@ -948,7 +961,7 @@ def tout_dessiner():
     somniferes(); defibrillateur(); medicaments()
     arbre_chat_objet(); jouet_bain(); ring_light(); couvercle()
     prise(); fenetre_ouverte(); four(); poison(); gaz(); cordelette(); bougie(); verre_casse()
-    lit_baldaquin()
+    lit_baldaquin(); cloche()
     gamelle(False); gamelle(True)
     fichiers = sorted(p.name for p in DOSSIER.glob("*.png"))
     print(f"{len(fichiers)} images ecrites dans {DOSSIER} :")
