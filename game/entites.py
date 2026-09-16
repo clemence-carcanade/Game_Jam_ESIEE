@@ -104,3 +104,56 @@ class ChatNoir(arcade.Sprite):
     def mettre_a_jour(self, delta_time):
         self._t += delta_time
         self.texture = self._frames[int(self._t * 8) % len(self._frames)]
+
+
+class Fille(arcade.Sprite):
+    """La petite fille du niveau 3 : elle poursuit le chat sans relache.
+
+    Des qu'elle le rattrape, elle le maquille (le chat vire au rose), puis le
+    balance a l'autre bout de la piece. Elle ne tue pas -- elle empeche juste
+    d'atteindre l'aquarium. Il faut la semer, ou aller plus vite qu'elle.
+    """
+
+    def __init__(self, x, y, vitesse=3.4):
+        self._anim = {}
+        for nom in ("droite", "gauche"):
+            frames = []
+            i = 0
+            while True:
+                chemin = C.DOSSIER_IMAGES / "fille" / f"{nom}_{i}.png"
+                if not chemin.is_file():
+                    break
+                frames.append(arcade.load_texture(chemin))
+                i += 1
+            self._anim[nom] = frames
+        base = self._anim["droite"] or [arcade.Texture.create_empty("f", (32, 48), (150, 80, 160))]
+        self._anim.setdefault("droite", base)
+        self._anim.setdefault("gauche", base)
+        super().__init__(self._anim["droite"][0], scale=2.4, center_x=x)
+        self.bottom = y
+        self.sol = y
+        self.vitesse = vitesse
+        self._t = 0.0
+        self._recharge = 0.0
+
+    def mettre_a_jour(self, delta_time, chat):
+        self._t += delta_time
+        self._recharge = max(0.0, self._recharge - delta_time)
+
+        # elle marche vers le chat, sans relache
+        direction = 1 if chat.center_x > self.center_x else -1
+        self.center_x += self.vitesse * direction
+        self.bottom = self.sol
+
+        jeu = self._anim["droite"] if direction > 0 else self._anim["gauche"]
+        self.texture = jeu[int(self._t * 8) % len(jeu)]
+
+        # elle rattrape le chat : maquillage + envoi a l'autre bout
+        if self._recharge <= 0 and chat.vivant and arcade.check_for_collision(self, chat):
+            chat.color = (255, 150, 200)                 # maquille en rose
+            loin = 1 if chat.center_x < self.center_x else -1
+            chat.change_x = 15 * loin                    # balance a l'autre bout
+            chat.change_y = 13
+            self._recharge = 1.2
+            return True
+        return False

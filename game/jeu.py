@@ -84,6 +84,13 @@ class VueJeu(arcade.View):
         self.sortie = self.niveau.trouver_zone("sortie")
         self._construire_faux_pieges()
 
+        # la fille (niveau 3) : elle poursuit et rejette le chat
+        self.fille = None
+        if getattr(self.niveau, "fille", None) is not None:
+            from game.entites import Fille
+            x, y = self.niveau.fille
+            self.fille = Fille(x, y)
+
         # le chat noir (niveau 2) : la sortie, E dessus fait griller une vie
         self.chat_noir = None
         if getattr(self.niveau, "chat_noir", None) is not None:
@@ -165,6 +172,10 @@ class VueJeu(arcade.View):
         self._vivre_la_horde(delta_time)
         if self.chat_noir is not None:
             self.chat_noir.mettre_a_jour(delta_time)
+        if self.fille is not None and self.fille.mettre_a_jour(delta_time, self.chat):
+            self.afficher("Elle t attrape, te maquille et te balance a l autre bout.")
+            self.effets.pouf(self.chat.center_x, self.chat.top, (255, 180, 210), 10)
+            self.minuteur_deguisement = 4.0
         for pousseur in self.pousseurs:
             if pousseur.mettre_a_jour(delta_time, self.chat):
                 self.effets.pouf(self.chat.center_x, self.chat.center_y, (200, 210, 235), 8)
@@ -198,7 +209,8 @@ class VueJeu(arcade.View):
                     and arcade.check_for_collision(self.chat, zone)):
                 return True
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
-            return True
+            if getattr(self.niveau, "piege_direct", False) or self.gamelle.remplie:
+                return True
         if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
             return True
         depart = self.chat.center_x
@@ -468,6 +480,8 @@ class VueJeu(arcade.View):
         self.horde.draw(pixelated=True)
         if self.chat_noir is not None:
             arcade.draw_sprite(self.chat_noir, pixelated=True)
+        if self.fille is not None:
+            arcade.draw_sprite(self.fille, pixelated=True)
         if self.medecin is not None:
             arcade.draw_sprite(self.medecin, pixelated=True)
             if self.medecin.endormi:
@@ -532,8 +546,11 @@ class VueJeu(arcade.View):
         if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
             self.griller_une_vie(self.niveau.message_mort or "emporte par le chat noir")
             return
-        if self.gamelle is not None and self.gamelle.remplie:
-            if arcade.check_for_collision(self.chat, self.gamelle):
+        if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
+            if getattr(self.niveau, "piege_direct", False):
+                self.griller_une_vie(self.niveau.message_mort or "le piege")
+                return
+            if self.gamelle.remplie:
                 self.manger()
                 return
         for zone in self.faux_pieges:

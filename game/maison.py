@@ -79,23 +79,30 @@ _M2 = _trois_etages(
     },
 )
 
-# --- niveau 3 : la chambre de l'enfant (1672 x 941) -------------------------
-_M3 = _trois_etages(
-    "fonds/niveau3.png", 1672, 941, sols=(830, 590, 300),
-    plats=[
-        (360, 300, 560), (820, 100, 1020), (1380, 270, 1580),
-        (140, 460, 340), (460, 460, 660), (820, 490, 1020), (1180, 400, 1380),
-        (300, 700, 500), (1150, 700, 1400),
+# --- niveau 3 : la chambre de l'enfant (1365 x 768) ------------------------
+_M3 = dict(
+    fond="fonds/niveau3.png", largeur=1365, hauteur=768,
+    solides=[
+        (24, 700, 1340, 730), (0, 20, 24, 740), (1340, 20, 1365, 740), (0, 10, 1365, 24),
+    ],
+    plateformes=[
+        (24, 235, 760), (810, 235, 1340),        # plancher etage 2 (coupe au milieu)
+        (24, 465, 1340),                          # plancher etage 1
+        (310, 215, 470), (620, 235, 770),         # plateformes etage 2
+        (100, 430, 260), (400, 380, 580), (660, 415, 820),   # plateformes etage 1
+        (980, 320, 1150), (1230, 320, 1340),
+        (880, 660, 1130),                         # plateforme RDC droite
     ],
     ancres={
-        "salon": (700, 830), "cuisine": (300, 830), "salle_droite": (1450, 830),
-        "gamelle_bas": (1500, 830), "canape": (400, 700), "tv": (900, 830),
-        "frigo": (200, 590), "sdb": (1050, 500), "chatterie": (1450, 590),
-        "planche_sdb": (250, 460), "planche_centre": (560, 460),
-        "planche_milieu_g": (920, 490), "planche_milieu_d": (1280, 400),
-        "planche_salon": (400, 300), "arbre_bas": (1480, 270), "arbre_haut": (920, 100),
-        "chambre": (300, 300), "lit": (250, 280), "couloir": (700, 300),
-        "armoire": (460, 300), "salle_haut": (1480, 300), "paniere": (1480, 270),
+        "salon": (300, 700), "cuisine": (500, 700), "salle_droite": (1000, 660),
+        "gamelle_bas": (1000, 660), "canape": (1000, 660), "tv": (700, 700),
+        "frigo": (180, 430), "sdb": (490, 380), "chatterie": (1060, 320),
+        "planche_sdb": (490, 380), "planche_centre": (740, 415),
+        "planche_milieu_g": (180, 430), "planche_milieu_d": (1290, 320),
+        "planche_salon": (740, 415), "arbre_bas": (1060, 320), "arbre_haut": (390, 215),
+        "chambre": (200, 235), "lit": (200, 235), "couloir": (690, 235),
+        "armoire": (390, 215), "salle_haut": (1000, 235), "paniere": (1010, 235),
+        "aquarium": (1010, 200),
     },
 )
 
