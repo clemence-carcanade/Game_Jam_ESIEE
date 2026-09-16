@@ -84,6 +84,13 @@ class VueJeu(arcade.View):
         self.sortie = self.niveau.trouver_zone("sortie")
         self._construire_faux_pieges()
 
+        # le chat noir (niveau 2) : la sortie, E dessus fait griller une vie
+        self.chat_noir = None
+        if getattr(self.niveau, "chat_noir", None) is not None:
+            from game.entites import ChatNoir
+            x, y = self.niveau.chat_noir
+            self.chat_noir = ChatNoir(x, y)
+
         self.medecin = None
         if self.niveau.docteur and self.gamelle is not None:
             from game.medecin import Medecin
@@ -156,6 +163,8 @@ class VueJeu(arcade.View):
         self.effets.mettre_a_jour(delta_time)
         self.ambiance.mettre_a_jour(delta_time)      # la maison respire, en continu
         self._vivre_la_horde(delta_time)
+        if self.chat_noir is not None:
+            self.chat_noir.mettre_a_jour(delta_time)
         for pousseur in self.pousseurs:
             if pousseur.mettre_a_jour(delta_time, self.chat):
                 self.effets.pouf(self.chat.center_x, self.chat.center_y, (200, 210, 235), 8)
@@ -189,6 +198,8 @@ class VueJeu(arcade.View):
                     and arcade.check_for_collision(self.chat, zone)):
                 return True
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
+            return True
+        if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
             return True
         depart = self.chat.center_x
         self.chat.center_x += self.chat.regarde * PORTEE_ACTION
@@ -455,6 +466,8 @@ class VueJeu(arcade.View):
         self.images_pieges.draw(pixelated=True)
         self.pousseurs.draw(pixelated=True)
         self.horde.draw(pixelated=True)
+        if self.chat_noir is not None:
+            arcade.draw_sprite(self.chat_noir, pixelated=True)
         if self.medecin is not None:
             arcade.draw_sprite(self.medecin, pixelated=True)
             if self.medecin.endormi:
@@ -515,6 +528,9 @@ class VueJeu(arcade.View):
         sac vide traine juste a cote, et ce serait rageant de rater le repas.
         """
         if self.chat.dans_le_sac:
+            return
+        if self.chat_noir is not None and arcade.check_for_collision(self.chat, self.chat_noir):
+            self.griller_une_vie(self.niveau.message_mort or "emporte par le chat noir")
             return
         if self.gamelle is not None and self.gamelle.remplie:
             if arcade.check_for_collision(self.chat, self.gamelle):

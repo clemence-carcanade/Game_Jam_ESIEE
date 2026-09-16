@@ -76,3 +76,31 @@ class Pousseur(arcade.Sprite):
             self._recharge = 0.7
             return True
         return False
+
+
+class ChatNoir(arcade.Sprite):
+    """Le chat noir du niveau 2 : immobile, il danse pour attirer le chat.
+
+    Ce n'est pas un ennemi qui tue : c'est la sortie. Atteindre le chat noir et
+    faire E, c'est se laisser emporter -- griller une vie, gagner le niveau.
+    Toute la difficulte est d'arriver jusqu'a lui malgre la nuee de pousseurs.
+    """
+
+    def __init__(self, x, y):
+        self._frames = []
+        i = 0
+        while True:
+            chemin = C.DOSSIER_IMAGES / "chat_noir" / f"dance_{i}.png"
+            if not chemin.is_file():
+                break
+            self._frames.append(arcade.load_texture(chemin))
+            i += 1
+        if not self._frames:
+            self._frames = [arcade.Texture.create_empty("noir", (32, 40), (20, 20, 26))]
+        super().__init__(self._frames[0], scale=3.0, center_x=x)
+        self.bottom = y
+        self._t = 0.0
+
+    def mettre_a_jour(self, delta_time):
+        self._t += delta_time
+        self.texture = self._frames[int(self._t * 8) % len(self._frames)]
