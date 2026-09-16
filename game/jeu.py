@@ -352,7 +352,11 @@ class VueJeu(arcade.View):
         self._vivre_les_faux_pieges(delta_time)
         self._oter_le_deguisement(delta_time)
         if self.medecin is not None:
-            self.medecin.mettre_a_jour(delta_time)
+            self.medecin.mettre_a_jour(delta_time, self.chat)
+            # il te traque : au contact, il te recoud de force -> retour depart
+            if (not self.medecin.endormi and self.chat.vivant and self.pause_mort <= 0
+                    and arcade.check_for_collision(self.medecin, self.chat)):
+                self._soigne_de_force()
         self.effets.mettre_a_jour(delta_time)
         self.ambiance.mettre_a_jour(delta_time)      # la maison respire, en continu
         if self.camera_active:
@@ -633,7 +637,7 @@ class VueJeu(arcade.View):
 
         # le medecin dort ? alors ses methodes de soin sont devenues des fins.
         if (genre == "soin" and self.niveau.docteur
-                and self.gamelle is not None and self.gamelle.remplie):
+                and self.medecin is not None and self.medecin.endormi):
             self.griller_une_vie(effet.get("cause", "le cabinet"))
             return
 
@@ -660,13 +664,21 @@ class VueJeu(arcade.View):
         elif genre == "sac":
             chat.coincer_dans_le_sac()
         elif genre == "endort":
-            # les somniferes : le chat les renverse sur le medecin, il s'endort
-            if self.medecin is not None and not self.medecin.endormi and self.gamelle is not None:
+            # les somniferes : le chat les renverse sur le medecin. Il ne dort
+            # qu'un temps -- il faut filer se tuer avant qu'il ne se releve.
+            if self.medecin is not None and not self.medecin.endormi:
                 self.medecin.endormir()
-                self.gamelle.remplie = True
         elif genre == "toupie":
             # manque de tomber en tournant sur lui-meme, puis se rattrape
             self.toupie = effet.get("duree", 1.1)
+
+    def _soigne_de_force(self) -> None:
+        """Niveau 6 : le medecin rattrape le chat et le recoud -> retour depart."""
+        self.effets.pouf(self.chat.center_x, self.chat.center_y, (140, 240, 170), 16)
+        self.effets.trembler(6)
+        self.audio.jouer("piege", 0.5)
+        self.chat.replacer_au_depart()
+        self.chat.color = (255, 255, 255)
 
     def _oter_le_deguisement(self, delta_time: float) -> None:
         if getattr(self, "minuteur_deguisement", 0) > 0:
@@ -960,10 +972,22 @@ class VueJeu(arcade.View):
         if self.fille is not None:
             arcade.draw_sprite(self.fille, pixelated=True)
         if self.medecin is not None:
+            mx, my = self.medecin.center_x, self.medecin.center_y
+            if not self.medecin.endormi:
+                # il veille : aura rouge menacante qui pulse
+                pulse = 0.7 + 0.3 * math.sin(self.ambiance.t * 4)
+                arcade.draw_circle_filled(mx, my, 74, (240, 90, 90, int(34 * pulse)))
+                arcade.draw_circle_outline(mx, my, 74, (255, 120, 120, 180), 2)
             arcade.draw_sprite(self.medecin, pixelated=True)
             if self.medecin.endormi:
-                arcade.draw_text("Zzz", self.medecin.center_x + 30,
-                                 self.medecin.top + 6, (240, 220, 120), 16, bold=True)
+                zx, zy = self.medecin.center_x, self.medecin.top + 20
+                arcade.draw_text("Zzz", zx + 30, zy - 6, (240, 220, 120), 16, bold=True)
+                # barre de compte a rebours du reveil
+                r = self.medecin.ratio_sommeil
+                arcade.draw_lrbt_rectangle_filled(zx - 45, zx + 45, zy, zy + 7, (30, 26, 20))
+                arcade.draw_lrbt_rectangle_filled(zx - 45, zx - 45 + 90 * r, zy, zy + 7,
+                                                  (240, 210, 90))
+                arcade.draw_lrbt_rectangle_outline(zx - 45, zx + 45, zy, zy + 7, (240, 230, 210), 1)
         arcade.draw_sprite(self.chat, pixelated=True)
         if self.camera_active:
             dedans = self._dans_le_champ()
