@@ -188,9 +188,9 @@ class VueJeu(arcade.View):
         self.moniteur_cam = None
         if self.camera_active:
             # une camera dediee : elle projette le carre du champ dans le moniteur
-            self.moniteur_cam = arcade.Camera2D()
+            self.moniteur_cam = arcade.Camera2D(viewport=arcade.LBWH(0, 0, C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE))
             if self.gui_camera is None:
-                self.gui_camera = arcade.Camera2D()
+                self.gui_camera = arcade.Camera2D(viewport=arcade.LBWH(0, 0, C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE))
 
         self.fille = None
         if getattr(self.niveau, "fille", None) is not None:
@@ -313,8 +313,8 @@ class VueJeu(arcade.View):
         self.chat.change_x = 0.0
         self.chat.change_y = C.REBOND_DOODLE       # premier rebond immediat
         self.camera_y = 0.0
-        self.camera_doodle = arcade.Camera2D()
-        self.gui_camera = arcade.Camera2D()
+        self.camera_doodle = arcade.Camera2D(viewport=arcade.LBWH(0, 0, C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE))
+        self.gui_camera = arcade.Camera2D(viewport=arcade.LBWH(0, 0, C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE))
 
         # le fond cuisine, toile de fond fixe du Doodle Jump
         self.fond_doodle = None
