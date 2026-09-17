@@ -42,32 +42,30 @@ class FenetreJeu(arcade.Window):
             self._camera_jeu = arcade.Camera2D(
                 viewport=arcade.LBWH(0, 0, C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE))
             self._programme = self.ctx.utility_textured_quad_program
-            self._quad = geometry.quad_2d_fs()
+            self._quad = geometry.quad_2d_fs()   # recalcule au 1er rendu
+            self._taille_quad = None
             self._mise_a_echelle = True
-            self._recalculer_letterbox()
         except Exception as e:                       # secours : rendu direct
             print(f"[plein ecran] mise a l'echelle indisponible : {e}")
 
-    # -- letterbox : quad de sortie qui garde le ratio 1408:792 -------------
-    def _recalculer_letterbox(self) -> None:
-        if not self._mise_a_echelle:
-            return
-        sw, sh = self.get_framebuffer_size()
-        if sw <= 0 or sh <= 0:
-            return
-        echelle = min(sw / C.LARGEUR_FENETRE, sh / C.HAUTEUR_FENETRE)
-        ndc_w = (C.LARGEUR_FENETRE * echelle / sw) * 2.0
-        ndc_h = (C.HAUTEUR_FENETRE * echelle / sh) * 2.0
-        self._quad = geometry.quad_2d(size=(ndc_w, ndc_h))
+    def _maj_quad(self):
+        """Le quad de sortie garde le ratio 1408:792 (bandes noires sinon).
 
-    def on_resize(self, width: int, height: int):
-        super().on_resize(width, height)
-        self._recalculer_letterbox()
+        Recalcule seulement quand la taille du framebuffer change (rare) :
+        robuste au passage plein ecran / fenetre et au retina.
+        """
+        sw, sh = self.get_framebuffer_size()
+        if self._taille_quad == (sw, sh) or sw <= 0 or sh <= 0:
+            return
+        self._taille_quad = (sw, sh)
+        ech = min(sw / C.LARGEUR_FENETRE, sh / C.HAUTEUR_FENETRE)
+        ndc_w = (C.LARGEUR_FENETRE * ech / sw) * 2.0
+        ndc_h = (C.HAUTEUR_FENETRE * ech / sh) * 2.0
+        self._quad = geometry.quad_2d(size=(ndc_w, ndc_h))
 
     def on_key_press(self, symbole: int, modificateurs: int):
         if symbole == arcade.key.F11:
             self.set_fullscreen(not self.fullscreen)
-            self._recalculer_letterbox()
 
     # -- souris : ramener les coordonnees ecran dans l'espace 1408 x 792 ----
     _EVENEMENTS_SOURIS = frozenset((
@@ -104,9 +102,10 @@ class FenetreJeu(arcade.Window):
         self._camera_jeu.use()
         self.dispatch_event("on_draw")
         self.dispatch_event("on_refresh", delta_time)
-        # 2. on etire la cible sur l'ecran, fond noir pour les bandes
+        # 2. on etire la cible sur l'ecran (centree, bandes noires), fond noir
         self.ctx.screen.use()
         self.ctx.screen.clear(color=(0, 0, 0))
+        self._maj_quad()
         self._cible.color_attachments[0].use(0)
         self._quad.render(self._programme)
         self.flip()
