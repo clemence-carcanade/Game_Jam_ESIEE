@@ -2,6 +2,7 @@ import os
 import arcade
 import arcade.gui
 from game import constantes as _S
+from views.ui_logique import UIManagerLogique
 import pyglet
 from PIL import Image
 
@@ -10,7 +11,7 @@ class MenuView(arcade.View):
 
     def __init__(self):
         super().__init__()
-        self.manager = arcade.gui.UIManager()
+        self.manager = UIManagerLogique()
 
         # Chargement sécurisé de la police
         font_path = "assets/fonts/8-bit Arcade In.ttf"
