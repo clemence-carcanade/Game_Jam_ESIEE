@@ -26,7 +26,7 @@ DOSSIER_NIVEAUX = DOSSIER_RACINE / "niveaux"
 # ---------------------------------------------------------------------------
 LARGEUR_FENETRE = 1408   # 22 cases de 64 px
 HAUTEUR_FENETRE = 792   # la maison peinte, a l'echelle 1408/1672
-TITRE_FENETRE = "Sept Vies"
+TITRE_FENETRE = "Chat Va Mal"
 IMAGES_PAR_SECONDE = 60
 
 # ---------------------------------------------------------------------------
