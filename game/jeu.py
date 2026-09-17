@@ -413,6 +413,7 @@ class VueJeu(arcade.View):
                 self.effets.pouf(self.chat.center_x, self.chat.center_y, (200, 210, 235), 14)
                 self.effets.trembler(9)
                 self.audio.jouer("piege", 0.6)
+                self.audio.jouer_miaou(0.7)          # en plus : un miaulement
 
         if contacts.atterrissage:
             self.chat.signaler_atterrissage()

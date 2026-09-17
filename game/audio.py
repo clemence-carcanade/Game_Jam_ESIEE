@@ -12,11 +12,15 @@ propre au niveau, on retombe sur ``ambiance``, et sans ``ambiance`` le jeu est
 silencieux.
 """
 
+import random
+
 import arcade
 
 from game import constantes as C
 
 NOMS = ("saut", "atterrissage", "mort", "piege", "reincarnation", "win", "boing")
+#: les miaulements joues quand un chat bouscule le heros (choisis au hasard)
+MIAOUS = ("miaou1", "miaou2", "miaou3")
 EXTENSIONS = (".wav", ".ogg", ".mp3")
 
 #: volume general du jeu, de 0.0 a 1.0, regle depuis les parametres du menu.
@@ -37,6 +41,7 @@ class Audio:
             son = self._charger(nom)
             if son is not None:
                 self._sons[nom] = son
+        self._miaous = [s for s in (self._charger(n) for n in MIAOUS) if s is not None]
         self._ambiance = self._charger("ambiance")
         self._musiques = {n: self._charger(f"niveau{n}") for n in range(1, 8)}
         self._lecteur_musique = None
@@ -82,6 +87,12 @@ class Audio:
         son = self._sons.get(nom)
         if son is not None:
             arcade.play_sound(son, volume=volume * VOLUME)
+
+    def jouer_miaou(self, volume=0.7):
+        """Un miaulement au hasard : le chat bouscule le heros, il rale."""
+        if self.muet or not self._miaous:
+            return
+        arcade.play_sound(random.choice(self._miaous), volume=volume * VOLUME)
 
     def demarrer_ambiance(self):
         """Compat : lance l'ambiance par defaut (le menu s'en sert)."""
