@@ -8,8 +8,8 @@ import { SceneGameplay } from "./scenes/SceneGameplay";
 import { SceneHistoire } from "./scenes/SceneHistoire";
 import { SceneIntro } from "./scenes/SceneIntro";
 
-// La bande-annonce complete : 30 s pile a 30 i/s, soit 900 frames.
-// 300 + 170 + 270 + 190 - 3 fondus de 10 = 900.
+// La bande-annonce complete : 34,6 s a 30 i/s, soit 1039 frames.
+// 300 + 170 + 270 + 329 (la video de fin entiere) - 3 fondus de 10 = 1039.
 export const BandeAnnonce: React.FC = () => {
   return (
     <>
@@ -35,17 +35,18 @@ export const BandeAnnonce: React.FC = () => {
           presentation={fade()}
           timing={linearTiming({ durationInFrames: 10 })}
         />
-        <TransitionSeries.Sequence durationInFrames={190} name="Fin">
+        <TransitionSeries.Sequence durationInFrames={329} name="Fin">
           <SceneFin />
         </TransitionSeries.Sequence>
       </TransitionSeries>
-      {/* La musique du jeu accompagne tout ce qui suit l'intro. */}
-      <Sequence from={292} durationInFrames={608} name="Musique">
+      {/* La musique du jeu couvre l'histoire et le gameplay ; elle s'efface
+          quand la video de fin (qui a sa propre bande son) prend le relais. */}
+      <Sequence from={292} durationInFrames={420} name="Musique">
         <Audio
           src={staticFile("sons/niveau3.mp3")}
           loop
           volume={(f) =>
-            interpolate(f, [0, 20, 540, 605], [0, 0.35, 0.35, 0], {
+            interpolate(f, [0, 20, 375, 418], [0, 0.35, 0.35, 0], {
               extrapolateLeft: "clamp",
               extrapolateRight: "clamp",
             })
