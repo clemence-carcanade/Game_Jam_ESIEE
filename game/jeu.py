@@ -320,9 +320,11 @@ class VueJeu(arcade.View):
         self.camera_doodle = arcade.Camera2D(viewport=arcade.LBWH(0, 0, C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE))
         self.gui_camera = arcade.Camera2D(viewport=arcade.LBWH(0, 0, C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE))
 
-        # le fond cuisine, toile de fond fixe du Doodle Jump
+        # le fond de la tour : une grande image verticale qui defile avec la montee
         self.fond_doodle = None
-        chemin_fond = C.DOSSIER_IMAGES / "fonds" / "cuisine_doodle.png"
+        chemin_fond = C.DOSSIER_IMAGES / "fonds" / "niveau1_tour.png"
+        if not chemin_fond.is_file():
+            chemin_fond = C.DOSSIER_IMAGES / "fonds" / "cuisine_doodle.png"
         if chemin_fond.is_file():
             self.fond_doodle = arcade.load_texture(chemin_fond)
 
@@ -592,13 +594,20 @@ class VueJeu(arcade.View):
         return ""
 
     def _draw_doodle(self) -> None:
-        """Rendu du Doodle Jump : la cuisine fixe en fond, la tour sous la camera."""
+        """Rendu du Doodle Jump : la tour (fond mobile) et les etageres qui defilent."""
         W, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
-        # la cuisine sert de toile de fond fixe, ajustee a la fenetre
-        fond = self.fond_doodle if getattr(self, "fond_doodle", None) is not None \
-            else (self.fond.texture if self.fond is not None else None)
-        if fond is not None:
-            arcade.draw_texture_rect(fond, arcade.LBWH(0, 0, W, H), pixelated=True)
+        # le fond de la tour defile avec la montee : plus le chat grimpe, plus on
+        # remonte dans l'image (elle couvre toute l'escalade).
+        if self.fond_doodle is not None:
+            bg_h = W * self.fond_doodle.height / self.fond_doodle.width
+            monte = 0.0
+            if self.monde_haut > H:
+                monte = min(1.0, max(0.0, self.camera_y / (self.monde_haut - H)))
+            bas = monte * (bg_h - H)                      # decalage vers le haut de l'image
+            arcade.draw_texture_rect(self.fond_doodle, arcade.LBWH(0, -bas, W, bg_h),
+                                     pixelated=True)
+        elif self.fond is not None:
+            arcade.draw_texture_rect(self.fond.texture, arcade.LBWH(0, 0, W, H), pixelated=True)
         # le monde qui defile, vu par la camera verticale
         self.camera_doodle.position = (W / 2, self.camera_y + H / 2)
         self.camera_doodle.use()
