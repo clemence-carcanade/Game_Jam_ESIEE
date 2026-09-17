@@ -299,8 +299,8 @@ class VueJeu(arcade.View):
             else:
                 mobile_precedente = False
             plats.append(plat)
-            if rng.random() < 0.5:                                 # un sac pose dessus
-                croq = module_niveau._image("catfood", x, y_bas=y + 9)
+            if rng.random() < 0.5:                    # une tablette posee dessus
+                croq = module_niveau._image("chocolat", x, y_bas=y + 9)
                 if croq is not None:
                     self.croquettes.append(croq)
 
@@ -641,7 +641,7 @@ class VueJeu(arcade.View):
         couleur = (150, 96, 50) if ratio < 0.7 else (210, 90, 60)
         arcade.draw_lrbt_rectangle_filled(x, x + larg*ratio, y, y+haut, couleur)
         arcade.draw_lrbt_rectangle_outline(x, x+larg, y, y+haut, (240, 230, 220), 2)
-        arcade.draw_text("Escalade jusqu au distributeur et gave-toi de croquettes !",
+        arcade.draw_text("Escalade jusqu au distributeur et gave-toi de chocolat !",
                          L/2, y + haut + 8, (255, 240, 220), 15, anchor_x="center", bold=True)
         arcade.draw_text(f"{int(self.satiete)} %", L/2, y+4, (255,255,255), 13, anchor_x="center", bold=True)
 
