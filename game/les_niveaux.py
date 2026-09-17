@@ -111,7 +111,7 @@ NIVEAUX = [
         aide="L influenceur te filme (le cadre carre, visible sur son ecran). Sors de son champ, rejoins le cable, et fais E. Dans le champ, il te sauve.",
         message_piege="Le cable est denude. Il gresille.",
         message_mort="Electrocute en direct. Trois cent mille vues.",
-        message_attente="Le cable est encore bien range. Fais tomber la ring light.",
+        message_attente="",
         depart="salon",
         # l'influenceur est deja peint sur le fond (a son bureau) : pas de sprite
         piege=(1560, 295), piege_image="aucune", piege_anime="cable_anime", piege_largeur=130, piege_direct=True, camera=True, libelle_piege="Se prendre dans le cable",
@@ -119,17 +119,10 @@ NIVEAUX = [
             dict(min="cuisine", max="salle_droite", vitesse=3.0, force=18),
             dict(min="planche_milieu_g", max="planche_milieu_d", vitesse=2.8),
         ],
-        faux_pieges={
-            "g": dict(pos="cuisine", declenchement="action", effet="projection",
-                      vitesse=(3, 15), image="griffures",
-                      texte="Il grimpe au mur pour s echapper. Glisse. Retombe. Story instantanee."),
-            "n": dict(pos="salle_droite", declenchement="action", image="poison",
-                      texte="Il mange la plante pour s empoisonner. La vomit. Vivant, et pas fier."),
-            "p": dict(pos="tv", declenchement="action", image="prise",
-                      texte="Il mord une multiprise de tournage. Disjoncte. L influenceur peste."),
-            "w": dict(pos="chambre", declenchement="action", image="fenetre_ouverte",
-                      texte="Il saute par la fenetre de l appart. Un auvent le rattrape. Content en bas."),
-        },
+        # tout le niveau tient dans le champ de la camera : pas de faux pieges,
+        # on garde seulement le cable, le cadre qui suit le chat, le retour
+        # video et les pousseurs.
+        faux_pieges={},
     ),
     dict(
         titre="La cuisine du restaurant, en plein rush", maitre="le chef",
