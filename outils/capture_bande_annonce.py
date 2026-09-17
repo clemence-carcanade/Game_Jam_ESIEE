@@ -35,7 +35,7 @@ SCENARIOS = {
         "duree": 240,
         "entrees": [
             (0, "appui", arcade.key.SPACE), (1, "relache", arcade.key.SPACE),
-            (10, "appui", arcade.key.D),
+            (30, "appui", arcade.key.D),
             (60, "appui", arcade.key.SPACE), (76, "relache", arcade.key.SPACE),
             (124, "appui", arcade.key.SPACE), (140, "relache", arcade.key.SPACE),
             (190, "appui", arcade.key.SPACE), (206, "relache", arcade.key.SPACE),
@@ -45,7 +45,7 @@ SCENARIOS = {
         "duree": 240,
         "entrees": [
             (0, "appui", arcade.key.SPACE), (1, "relache", arcade.key.SPACE),
-            (10, "appui", arcade.key.D),
+            (30, "appui", arcade.key.D),
             (50, "appui", arcade.key.SPACE), (66, "relache", arcade.key.SPACE),
             (110, "appui", arcade.key.SPACE), (126, "relache", arcade.key.SPACE),
             (170, "appui", arcade.key.SPACE), (186, "relache", arcade.key.SPACE),
@@ -55,7 +55,7 @@ SCENARIOS = {
         "duree": 240,
         "entrees": [
             (0, "appui", arcade.key.SPACE), (1, "relache", arcade.key.SPACE),
-            (10, "appui", arcade.key.D),
+            (30, "appui", arcade.key.D),
             (70, "appui", arcade.key.SPACE), (86, "relache", arcade.key.SPACE),
             (140, "appui", arcade.key.SPACE), (156, "relache", arcade.key.SPACE),
         ],
