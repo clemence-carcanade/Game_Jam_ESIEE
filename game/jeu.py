@@ -563,28 +563,33 @@ class VueJeu(arcade.View):
         return pres_du_sac
 
     def _libelle_action(self) -> str:
-        """L'action a faire ici, SEULEMENT si elle est reellement fatale.
+        """L'action a faire ici, affichee au-dessus du chat.
 
-        On n'annonce que ce qui fait vraiment griller une vie (le vrai piege,
-        le chat noir, un soin devenu mortel pendant que le medecin dort).
-        Les leurres, eux, n'affichent que le E, sans texte -- a toi de tenter.
+        On annonce d'abord les vraies fins (le vrai piege, le chat noir), qui
+        priment sur les leurres poses au meme endroit. Au cabinet du medecin,
+        on nomme aussi chaque objet (c'est la que se joue le niveau).
         """
+        # 1. les vraies fins d'abord (prioritaires sur un leurre superpose)
         if self._pres_du_chat_noir():
             return "Rejoindre le chat noir"
+        if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
+            if getattr(self.niveau, "piege_direct", False) or self.gamelle.remplie:
+                return getattr(self.niveau, "libelle_piege", "") or "En finir ici"
+
+        # 2. les objets a portee de E
         for zone in self.faux_pieges:
             if (zone.effet["declenchement"] == "action" and zone.recharge <= 0
                     and arcade.check_for_collision(self.chat, zone)):
                 eff = zone.effet
-                # un soin ne tue que si le medecin dort : alors on l'annonce
-                if (eff.get("effet") == "soin" and self.niveau.docteur
-                        and self.medecin is not None and self.medecin.endormi):
-                    return eff.get("libelle_action") or f"En finir avec {eff.get('cause', 'ca')}"
-                return ""                         # leurre : juste le E
-        if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
-            if getattr(self.niveau, "piege_direct", False) or self.gamelle.remplie:
-                return getattr(self.niveau, "libelle_piege", "") or "En finir ici"
-            return ""
-        return ""                                 # le sac : pas de texte
+                if eff.get("effet") == "endort":          # les somniferes
+                    return "Endormir le medecin"
+                if eff.get("effet") == "soin" and self.niveau.docteur:
+                    # nomme l'objet du cabinet ; s'il dort, l'objet devient mortel
+                    if self.medecin is not None and self.medecin.endormi:
+                        return eff.get("libelle_action") or f"En finir avec {eff.get('cause', 'ca')}"
+                    return LIBELLES.get(eff.get("image", ""), "Un objet du cabinet")
+                return ""                                 # autres leurres : juste le E
+        return ""
 
     def _draw_doodle(self) -> None:
         """Rendu du Doodle Jump : la cuisine fixe en fond, la tour sous la camera."""
