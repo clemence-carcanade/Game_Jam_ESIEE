@@ -83,6 +83,7 @@ class VueJeu(arcade.View):
         self.doodle_base_y = 0.0
         self.transition = 0.0              # ecran de lore entre les niveaux
         self.transition_image = None       # planche BD de transition (si fournie)
+        self.transition_attente = False    # la planche attend Espace / un clic
         self.audio = Audio()
         self.audio.demarrer_ambiance()
         self.ralenti = 0.0           # court ralenti a la mort
@@ -174,6 +175,7 @@ class VueJeu(arcade.View):
         # plus jamais de fond fonce avec du texte au milieu.
         if self.transition_image is not None:
             self.transition = 5.0
+            self.transition_attente = True   # le niveau ne demarre pas tout seul
         if getattr(self, "audio", None) is not None:
             self.audio.jouer_musique(self.numero_niveau)
         self._construire_faux_pieges()
@@ -335,7 +337,11 @@ class VueJeu(arcade.View):
     # ------------------------------------------------------------------
     def on_update(self, delta_time: float) -> None:
         if self.transition > 0:
-            self.transition -= delta_time
+            if self.transition_attente:
+                # la planche reste affichee tant que le joueur n'a pas valide
+                self.transition = max(1.0, self.transition - delta_time)
+            else:
+                self.transition -= delta_time
             self.ambiance.mettre_a_jour(delta_time)
             return
 
@@ -573,7 +579,7 @@ class VueJeu(arcade.View):
         """
         # 1. les vraies fins d'abord (prioritaires sur un leurre superpose)
         if self._pres_du_chat_noir():
-            return "Rejoindre le chat noir"
+            return "Boire la mort au rat"
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
             if getattr(self.niveau, "piege_direct", False) or self.gamelle.remplie:
                 return getattr(self.niveau, "libelle_piege", "") or "En finir ici"
@@ -660,12 +666,15 @@ class VueJeu(arcade.View):
         if self.transition_image is None:
             return
         L, H = C.LARGEUR_FENETRE, C.HAUTEUR_FENETRE
-        a = int(255 * min(1.0, self.transition, 5.0 - self.transition + 1))
+        if self.transition_attente:
+            a = 255
+        else:                              # court fondu une fois la planche validee
+            a = int(255 * min(1.0, self.transition / 0.4))
         arcade.draw_lrbt_rectangle_filled(0, L, 0, H, (10, 8, 12, 255))
         arcade.draw_texture_rect(self.transition_image, arcade.LBWH(0, 0, L, H),
                                  pixelated=False, alpha=a)
         if self.transition < 4.2:
-            arcade.draw_text("Espace / Entree pour continuer", L / 2, H * 0.04,
+            arcade.draw_text("Espace, Entree ou clic pour commencer", L / 2, H * 0.04,
                              (240, 240, 245), 15, anchor_x="center", bold=True)
 
     def _dessiner_indicateur_action(self) -> None:
@@ -1165,10 +1174,20 @@ class VueJeu(arcade.View):
             self._dessiner_transition()
 
     # ------------------------------------------------------------------
+    def _fermer_transition(self) -> None:
+        """Le joueur valide la planche : court fondu, puis le niveau demarre."""
+        if self.transition_attente:
+            self.transition_attente = False
+            self.transition = 0.4
+
+    def on_mouse_press(self, x, y, bouton, modificateurs) -> None:
+        if self.transition > 0:
+            self._fermer_transition()
+
     def on_key_press(self, touche: int, modificateurs: int) -> None:
         if self.transition > 0:
             if touche in (arcade.key.SPACE, arcade.key.ENTER, arcade.key.RETURN):
-                self.transition = 0.0
+                self._fermer_transition()
             return
 
         if touche in C.TOUCHES_GAUCHE:
@@ -1205,7 +1224,7 @@ class VueJeu(arcade.View):
         if self.chat.dans_le_sac:
             return
         if self._pres_du_chat_noir():
-            self.griller_une_vie(self.niveau.message_mort or "emporte par le chat noir")
+            self.griller_une_vie(self.niveau.message_mort or "la mort au rat")
             return
         if self.gamelle is not None and arcade.check_for_collision(self.chat, self.gamelle):
             if getattr(self.niveau, "piege_direct", False):

@@ -83,31 +83,37 @@ class Pousseur(arcade.Sprite):
 
 
 class ChatNoir(arcade.Sprite):
-    """Le chat noir du niveau 2 : immobile, il danse pour attirer le chat.
+    """La mort-au-rat du niveau 2 : la sortie.
 
-    Ce n'est pas un ennemi qui tue : c'est la sortie. Atteindre le chat noir et
-    faire E, c'est se laisser emporter -- griller une vie, gagner le niveau.
-    Toute la difficulte est d'arriver jusqu'a lui malgre la nuee de pousseurs.
+    Ce n'est pas un ennemi qui tue par surprise : c'est le moyen de partir.
+    Atteindre la fiole et faire E, c'est boire le poison -- griller une vie,
+    gagner. Toute la difficulte est d'y arriver malgre la nuee de pousseurs.
+    (Le nom de la classe reste ``ChatNoir`` par compat avec le reste du code.)
     """
 
     def __init__(self, x, y):
-        self._frames = []
-        i = 0
-        while True:
-            chemin = C.DOSSIER_IMAGES / "chat_noir" / f"dance_{i}.png"
-            if not chemin.is_file():
-                break
-            self._frames.append(arcade.load_texture(chemin))
-            i += 1
-        if not self._frames:
-            self._frames = [arcade.Texture.create_empty("noir", (32, 40), (20, 20, 26))]
-        super().__init__(self._frames[0], scale=3.0, center_x=x)
+        chemin = C.DOSSIER_IMAGES / "decor" / "mort_au_rat.png"
+        if chemin.is_file():
+            self._frames = [arcade.load_texture(chemin)]
+        else:                                 # secours : anciennes frames de danse
+            self._frames = []
+            i = 0
+            while (C.DOSSIER_IMAGES / "chat_noir" / f"dance_{i}.png").is_file():
+                self._frames.append(arcade.load_texture(C.DOSSIER_IMAGES / "chat_noir" / f"dance_{i}.png"))
+                i += 1
+            if not self._frames:
+                self._frames = [arcade.Texture.create_empty("poison", (32, 44), (190, 60, 60))]
+        super().__init__(self._frames[0], scale=90 / self._frames[0].height, center_x=x)
         self.bottom = y
+        self._sol = self.center_y
         self._t = 0.0
 
     def mettre_a_jour(self, delta_time):
         self._t += delta_time
-        self.texture = self._frames[int(self._t * 8) % len(self._frames)]
+        if len(self._frames) > 1:                         # secours anime
+            self.texture = self._frames[int(self._t * 8) % len(self._frames)]
+        else:                                             # la fiole flotte doucement
+            self.center_y = self._sol + math.sin(self._t * 3) * 4
 
 
 class Fille(arcade.Sprite):
