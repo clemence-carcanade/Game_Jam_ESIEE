@@ -1,8 +1,9 @@
 import React from "react";
 import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 
-// Les 8 images du cycle de course, jouees a 12 images/seconde comme dans le jeu.
-const CADENCE = 30 / 12;
+// Le chat joueur (planche assets/images/chat.png, ligne de la marche),
+// extrait en 8 images jouees a la meme cadence que dans le jeu (0,07 s).
+const CADENCE = 30 * 0.07;
 
 export const ChatQuiCourt: React.FC<{
   departX: number;
@@ -16,7 +17,7 @@ export const ChatQuiCourt: React.FC<{
 
   return (
     <Img
-      src={staticFile(`chats/course_${image}.png`)}
+      src={staticFile(`chat/marche_${image}.png`)}
       style={{
         position: "absolute",
         width: taille,

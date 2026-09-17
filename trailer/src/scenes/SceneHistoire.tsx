@@ -31,8 +31,8 @@ export const SceneHistoire: React.FC = () => {
       <ChatQuiCourt
         departX={-160}
         arriveeX={1360}
-        y={585}
-        taille={125}
+        y={545}
+        taille={170}
         dureeEnFrames={170}
       />
       <CartoucheTexte
