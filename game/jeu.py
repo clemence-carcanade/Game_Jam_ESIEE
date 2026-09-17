@@ -1031,9 +1031,10 @@ class VueJeu(arcade.View):
     def griller_une_vie(self, cause: str) -> None:
         """Le chat change de vie.
 
-        Dans les six premiers niveaux, c'est l'objectif : la vie brulee fait
-        passer au foyer suivant. Au septieme, le jeu s'inverse — le chat est
-        enfin heureux, mourir devient l'echec et on recommence le niveau.
+        C'est l'objectif : la vie brulee fait passer au foyer suivant. Apres le
+        dernier foyer, la video de fin se lance puis on revient au menu.
+        (La mecanique ``survivre`` reste generique, mais plus aucun niveau ne
+        l'active.)
         """
         if self.termine:
             return
@@ -1069,8 +1070,11 @@ class VueJeu(arcade.View):
 
     def niveau_suivant(self) -> None:
         if self.numero_niveau >= C.NOMBRE_NIVEAUX:
+            # dernier foyer franchi : la video de fin, puis retour au menu
             self.termine = True
-            self.afficher("Sept vies, sept maisons. Il ne lui en restait qu'une.")
+            self.audio.arreter_musique()
+            from views.fin import FinView
+            self.window.show_view(FinView())
             return
         self.audio.jouer("reincarnation", 0.7)   # il se reincarne dans la maison suivante
         self.charger_niveau(self.numero_niveau + 1)

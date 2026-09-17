@@ -178,7 +178,14 @@ class MenuView(arcade.View):
 
         @exit_button.event("on_click")
         def on_click_exit(event):
-            arcade.exit()
+            # on quitte vraiment le jeu : fermeture de la fenetre puis arret net
+            self.manager.disable()
+            try:
+                self.window.close()
+            except Exception:
+                pass
+            import os
+            os._exit(0)
 
         anchor = arcade.gui.UIAnchorLayout()
         anchor.add(child=self.v_box, anchor_x="center_x", anchor_y="center_y", align_y=-60)

@@ -175,31 +175,4 @@ NIVEAUX = [
                       texte="Il lape la morphine du medecin. Naloxone, oxygene. Sauve, encore."),
         },
     ),
-    dict(
-        titre="Chez lui : il ne veut plus mourir", maitre="la famille",
-        famille='La bonne famille, enfin', probleme='Aucun. Et c est ca, le probleme',
-        aide="Cette fois il faut rentrer vivant. Evite les guirlandes de la fete. Ils t attendent pres de la paniere, a l etage.",
-        message_mort="Pas comme ca. Pas maintenant. On recommence.",
-        survivre=True, reflexes_coupes=["moustaches"],
-        depart="salon",
-        perso=dict(image="couple", pos="salon"),
-        pousseurs=[
-            dict(min="canape", max="tv", vitesse=2.6),
-            dict(min="chambre", max="couloir", vitesse=2.2),
-        ],
-        sortie="paniere",
-        mortels=[
-            dict(pos="planche_centre", image="cable", cause="la guirlande electrique"),
-            dict(pos="couloir", image="cable", cause="la guirlande electrique"),
-        ],
-        faux_pieges={
-            "y": dict(pos="planche_milieu_g", declenchement="contact", recharge=10.0,
-                      image="papillon",
-                      texte="Un papillon. Il le suit des yeux. La guirlande est juste la. Pas cette fois."),
-            "z": dict(pos="canape", declenchement="action", image="pelote",
-                      texte="Une balle de laine. Non. Il sait exactement comment ca finit."),
-            "b": dict(pos="salle_droite", declenchement="action", image="bougie",
-                      texte="Une bougie de la fete. Il s ecarte. Il tient trop a ce soir."),
-        },
-    ),
 ]

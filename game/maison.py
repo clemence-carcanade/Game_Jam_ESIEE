@@ -183,31 +183,7 @@ _M6 = dict(
     },
 )
 
-# --- niveau 7 : le jardin (1671 x 941) --------------------------------------
-# deux niveaux : le jardin (herbe) en haut, la maison ouverte en bas.
-_M7 = dict(
-    fond="fonds/niveau7.png", largeur=1671, hauteur=941,
-    solides=[
-        (30, 796, 1641, 828), (0, 24, 30, 900), (1641, 24, 1671, 900), (0, 12, 1671, 30),
-    ],
-    plateformes=[
-        (200, 448, 1400),                                         # le sol du jardin
-        (480, 90, 720), (770, 180, 970), (1000, 330, 1200),       # flottantes du ciel
-        (1100, 575, 1280), (450, 640, 620), (700, 790, 1060),     # flottantes de la maison
-    ],
-    ancres={
-        "salon": (300, 796), "cuisine": (1300, 796), "salle_droite": (1300, 796),
-        "gamelle_bas": (1350, 448), "canape": (550, 640), "tv": (880, 790),
-        "frigo": (1400, 796), "sdb": (600, 448), "chatterie": (1000, 448),
-        "planche_sdb": (600, 90), "planche_centre": (870, 180),
-        "planche_milieu_g": (1100, 330), "planche_milieu_d": (1190, 575),
-        "planche_salon": (535, 640), "arbre_bas": (1100, 330), "arbre_haut": (600, 90),
-        "chambre": (400, 448), "lit": (300, 448), "couloir": (800, 448),
-        "armoire": (600, 448), "salle_haut": (1200, 448), "paniere": (1150, 448),
-    },
-)
-
-MAISONS = {1: _M1, 2: _M2, 3: _M3, 4: _M4, 5: _M5, 6: _M6, 7: _M7}
+MAISONS = {1: _M1, 2: _M2, 3: _M3, 4: _M4, 5: _M5, 6: _M6}
 
 
 def pour(numero):
