@@ -11,6 +11,7 @@ F11 bascule plein ecran / fenetre a tout moment.
 import sys
 
 import arcade
+import pyglet
 from arcade.gl import geometry
 
 from game import constantes as C
@@ -108,6 +109,14 @@ class FenetreJeu(arcade.Window):
         self._maj_quad()
         self._cible.color_attachments[0].use(0)
         self._quad.render(self._programme)
+        # 3. le curseur pyglet (la patte) est dessine au flip(), en coordonnees
+        #    fenetre : il lui faut une projection fenetre, pas celle -- logique
+        #    1408 x 792 -- laissee par la derniere camera du jeu, sinon la patte
+        #    ne suit pas la souris.
+        larg, haut = self.get_size()
+        self.projection = pyglet.math.Mat4.orthogonal_projection(
+            0, larg, 0, haut, -255, 255)
+        self.view = pyglet.math.Mat4()
         self.flip()
 
 
