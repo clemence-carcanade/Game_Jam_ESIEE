@@ -15,3 +15,10 @@ __pycache__/
 # Système
 .DS_Store
 Thumbs.db
+
+# Vidéos (bande-annonce rendue et clip source)
+*.mp4
+
+# Captures de gameplay de la bande-annonce (regenerees par
+# outils/capture_bande_annonce.py, ~100 Mo)
+trailer/public/gameplay/
