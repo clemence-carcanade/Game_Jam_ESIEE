@@ -30,6 +30,9 @@ from game.audio import Audio
 #: distance a laquelle le chat peut attraper un objet devant lui
 PORTEE_ACTION = 14.0
 
+#: les differents types de chats (couleurs) pour varier la nuee de pousseurs
+TYPES_CHATS = ("gris", "orange", "blanc", "noir", "creme")
+
 #: libelles affiches au-dessus du chat quand une action est possible
 LIBELLES = {
     "scalpel": "Le scalpel", "couteau": "Le couteau", "seringue": "La seringue",
@@ -226,12 +229,13 @@ class VueJeu(arcade.View):
 
         # les pousseurs : des entites qui bousculent le chat loin du danger
         self.pousseurs = arcade.SpriteList()
-        for spec in self.niveau.pousseurs:
+        for i, spec in enumerate(self.niveau.pousseurs):
             (xg, yg) = self.niveau.point(spec["min"])
             (xd, yd) = self.niveau.point(spec["max"])
+            # sans type precise, on alterne les couleurs pour une nuee variee
             self.pousseurs.append(Pousseur(
                 (xg + xd) / 2, min(xg, xd), max(xg, xd), yg,
-                image=spec.get("image", "chat_gris"),
+                image=spec.get("image", TYPES_CHATS[i % len(TYPES_CHATS)]),
                 vitesse=spec.get("vitesse", 2.2),
                 force=spec.get("force", 16)))
         if self.niveau.aide:

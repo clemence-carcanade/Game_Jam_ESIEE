@@ -42,9 +42,12 @@ def frames(nom):
 class Pousseur(arcade.Sprite):
     """Un chat qui fait l'aller-retour anime et bouscule le joueur."""
 
-    def __init__(self, x, xmin, xmax, y, image="chat_gris", vitesse=2.2, force=16):
-        self._droite, self._gauche = frames("marche")
-        super().__init__(self._droite[0], scale=2.4, center_x=x)
+    def __init__(self, x, xmin, xmax, y, image="marche", vitesse=2.2, force=16):
+        self._droite, self._gauche = frames(image)
+        # on cale la taille sur la hauteur de la frame (les planches 16 px sont
+        # agrandies plus fort que celles de 32 px, pour des chats homogenes)
+        echelle = 2.4 * 32 / self._droite[0].height
+        super().__init__(self._droite[0], scale=echelle, center_x=x)
         self.bottom = y
         self.sol = y
         self.xmin, self.xmax = xmin, xmax
