@@ -44,9 +44,10 @@ class Pousseur(arcade.Sprite):
 
     def __init__(self, x, xmin, xmax, y, image="marche", vitesse=2.2, force=16):
         self._droite, self._gauche = frames(image)
-        # les chats de profil (planches 16 px) sont petits : on les agrandit un
-        # peu plus, mais sans exces (sinon ils debordent des plateformes).
-        echelle = 2.5 if self._droite[0].height <= 20 else 2.4
+        # les chats de profil sont recadres au plus pres (17 x 11, pattes
+        # comprises) : on les agrandit un peu plus, mais sans exces (sinon ils
+        # debordent des plateformes). ~51 x 33 px a l'ecran.
+        echelle = 3.0 if self._droite[0].height <= 20 else 2.4
         super().__init__(self._droite[0], scale=echelle, center_x=x)
         self.bottom = y
         self.sol = y
